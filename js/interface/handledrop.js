@@ -161,14 +161,14 @@ function dropHandler(ev) {
             if (item.kind === 'file') {
                 const file = item.getAsFile();
                 files.push(file);
-                console.log(`… file[${i}].name = ${file.name}`);
+                console.log(`ï¿½ file[${i}].name = ${file.name}`);
             }
         });
     } else {
         // Use DataTransfer interface to access the file(s)
         [...ev.dataTransfer.files].forEach((file, i) => {
             files.push(file)
-            console.log(`… file[${i}].name = ${file.name}`);
+            console.log(`ï¿½ file[${i}].name = ${file.name}`);
         });
     }
     console.log(files);
@@ -191,31 +191,11 @@ function dropHandler(ev) {
             }
 
             let url = URL.createObjectURL(files[i]);
-            let img;
-            let content = [];
-
-            let add = function (scale) {
-                let node = windowify(files[i].name, content, toZ(mousePos), (zoom.mag2() ** settings.zoomContentExp), scale);
-                /*node.push_extra_cb((node) => { //superceeded by new rewindowify (todo)
-                  return {
-                    f: "textarea",
-                    a: {
-                      p: [0, 1],
-                      v: files[i].name.value
-                    }
-                  };
-                })*/
-                htmlnodes_parent.appendChild(node.content);
-                registernode(node);
-                node.followingMouse = 1;
-                node.draw();
-                node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
-            }
             console.log("loading " + baseType);
             switch (baseType) {
                 case "image":
                     // We use a FileReader to read the dropped file and convert it to a Data URL (base64)
-                    let reader = new FileReader();
+                    reader = new FileReader();
                     reader.onload = function (e) {
                         let base64DataUrl = e.target.result;
                         let imageElement = document.createElement('img');
@@ -234,33 +214,13 @@ function dropHandler(ev) {
                     reader.readAsDataURL(files[i]); // Read the file as a Data URL
                     break;
                 case "audio":
-                    img = new Audio();
-                    img.setAttribute("controls", "");
-                    //let c = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                    //c.setAttribute("viewBox","0 0 128 64");
-                    //let name = document.createElementNS("http://www.w3.org/2000/svg","text");
-                    //name.setAttribute("x","0");name.setAttribute("y","0");
-                    //name.appendChild(document.createTextNode(files[i].name));
-                    //c.appendChild(name);
-                    img.style = "display: block";
-                    content = [
-                        img
-                    ];
-                    add(1);
-                    //div.appendChild(c);
-                    img.src = url;
+                    createAudioNode(files[i].name, undefined, url)
                     break;
                 case "video":
-                    img = document.createElement('video');
-                    img.style = "display: block";
-                    img.setAttribute("controls", "");
-                    content = [
-                        img
-                    ];
-                    add(1);
-                    img.src = url;
+                    createVideoNode(files[i].name, undefined, url)
                     break;
                 case "text":
+                    reader = new FileReader();
                     reader.onload = function (e) {
                         let text = e.target.result;
                         let node = createNodeFromWindow(files[i].name, text);
@@ -293,7 +253,7 @@ function dropHandler(ev) {
                     break;
                 case "application": // Handle PDF files
                     if (files[i].type.endsWith("pdf")) {
-                        let reader = new FileReader();
+                        reader = new FileReader();
                         reader.readAsArrayBuffer(files[i]);
 
                         reader.onload = function () {
@@ -347,16 +307,18 @@ addEventListener("paste", (event) => {
         node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
     } else {
         // Existing code for handling other pasted content
-        let content = document.createElement("div");
-        content.innerHTML = pastedData;
-        let t = document.createElement("input");
-        t.setAttribute("type", "text");
-        t.setAttribute("value", "untitled");
-        t.setAttribute("style", "background:none;");
-        t.classList.add("title-input");
-        let node = windowify("untitled", [content], toZ(mousePos), (zoom.mag2() ** settings.zoomContentExp), 1);
-        htmlnodes_parent.appendChild(node.content);
-        registernode(node);
+        // let content = document.createElement("div");
+        // content.innerHTML = pastedData;
+        // let t = document.createElement("input");
+        // t.setAttribute("type", "text");
+        // t.setAttribute("value", "untitled");
+        // t.setAttribute("style", "background:none;");
+        // t.classList.add("title-input");
+        // let node =  new WindowedNode({title: "untitled", content: [content], pos: toZ(mousePos),scale: (zoom.mag2() ** settings.zoomContentExp), intrinsicScale: 1});
+        // // let node = windowify("untitled", [content], toZ(mousePos), (zoom.mag2() ** settings.zoomContentExp), 1);
+        // htmlnodes_parent.appendChild(node.content);
+        // registernode(node);
+        let node = createNodeFromWindow('', pastedData, true);
         node.followingMouse = 1;
         node.draw();
         node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));

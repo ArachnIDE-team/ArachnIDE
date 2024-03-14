@@ -3,7 +3,7 @@ var CodemMirrorTokenizer = (function () {
     // Private CodeMirror instance
     var codeMirrorInstance = null;
 
-    // Private method to initialize CodeMirror instance
+    // Private method to _initialize CodeMirror instance
     function initializeCodeMirror() {
         if (!codeMirrorInstance) {
             codeMirrorInstance = CodeMirror(document.createElement('div'), {

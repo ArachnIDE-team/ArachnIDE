@@ -5,6 +5,7 @@ const servers = [
     { dir: './webscrape', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
     { dir: './wikisearch', cmd: 'python', args: ['novelty.py'] },
     { dir: './wolfram-alpha', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
+    { dir: './filemanager', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
 ];
 
 // Start each server

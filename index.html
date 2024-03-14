@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Neurite</title>
+    <title>Neuride</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="./styles_v1.css">
     <meta charset="UTF-8">
@@ -169,7 +169,7 @@
 
                     <!-- CodeMirror container -->
                     <div class="function-codemirror-container">
-                        <textarea id="neurite-function-cm"></textarea>
+                        <textarea id="neuride-function-cm"></textarea>
                     </div>
                 </div>
                 <!-- Toggle button for function call panel -->
@@ -394,7 +394,7 @@
                                 <input type="range" id="max-context-size-slider" name="max-context-size-slider" min="0" max="2000" value="555" step="1">
                             </div>
 
-                            <div class="settingsSlider" title="Number of Notes Retrieved from Neurite and Sent to AI">
+                            <div class="settingsSlider" title="Number of Notes Retrieved from Neuride and Sent to AI">
                                 <label id="node-slider-label">Top 3 <br />nodes</label>
                                 <input type="range" id="node-count-slider" name="node-count-slider" min="1" max="25" value="3">
                             </div>
@@ -606,10 +606,10 @@
                         <table>
                             <tr>
                                 <td><strong>AI HOW-TO</strong></td>
-                                <td><input type="checkbox" id="instructions-checkbox"><label for="instructions-checkbox">←This checkbox enables the Ai to explain Neurite</label></td>
+                                <td><input type="checkbox" id="instructions-checkbox"><label for="instructions-checkbox">←This checkbox enables the Ai to explain Neuride</label></td>
                             </tr>
                             <tr>
-                                <td><a href="https://github.com/satellitecomponent/Neurite" id="clickable-link">Github Link</a></td>
+                                <td><a href="https://github.com/satellitecomponent/Neuride" id="clickable-link">Github Link</a></td>
                                 <td>Visit our Github for extended documentation.</td>
                             </tr>
                             <tr>
@@ -661,7 +661,7 @@
                                 <td>
                                     <strong>Local LLM</strong>
                                 </td>
-                                <td>In the Ai tab, check Local LLM and select a model. The Ai will download into your browser cache. More info on our <a href="https://github.com/satellitecomponent/Neurite" target="_blank" id="clickable-link">Github</a> or <a href="https://mlc.ai/web-llm/" target="_blank" id="clickable-link">web-llm</a></td>
+                                <td>In the Ai tab, check Local LLM and select a model. The Ai will download into your browser cache. More info on our <a href="https://github.com/satellitecomponent/Neuride" target="_blank" id="clickable-link">Github</a> or <a href="https://mlc.ai/web-llm/" target="_blank" id="clickable-link">web-llm</a></td>
                             </tr>
                             <tr>
                                 <td>
@@ -671,7 +671,7 @@
                             </tr>
                             <tr>
                                 <td><strong>LocalHost Servers</strong></td>
-                                <td>Wiki, Wolfram, and Webpage Extraction currently require setting up of personal localhosts.<br /> More info on our <a href="https://github.com/satellitecomponent/Neurite" target="_blank" id="clickable-link">Github</a><br /> The Ai How-To Checkbox at the top of the instructions will allow the ai to explain basic set-up.</td>
+                                <td>Wiki, Wolfram, and Webpage Extraction currently require setting up of personal localhosts.<br /> More info on our <a href="https://github.com/satellitecomponent/Neuride" target="_blank" id="clickable-link">Github</a><br /> The Ai How-To Checkbox at the top of the instructions will allow the ai to explain basic set-up.</td>
                             </tr>
                             <tr>
                                 <td>
@@ -743,7 +743,7 @@
 
     </a-->
     <div id="elements" class="windowbuttons" style="display:none; visibility:hidden;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 2.125" height="16pt">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 2.125" height="16pt">
             <g id="button-delete" transform="scale(0.125 0.125) translate(1 1)">
                 <rect x="0" y="0" width="16" height="16" fill="RGB(100,100,100)" stroke="none" />
                 <path d="M 1,1 l 3,0 4,4 4,-4 3,0
@@ -770,6 +770,12 @@
             <g id="button-collapse" transform="scale(0.125 0.125) translate(41 1)">
                 <rect x="0" y="0" width="16" height="16" fill="RGB(100,100,100)" stroke="none" />
                 <circle cx="8" cy="8" r="5.375" stroke="RGB(170,170,170)" stroke-width="2.75" fill="none" />
+                <rect x="0" y="0" width="16" height="16" fill="transparent" stroke="none" />
+            </g>
+
+            <g id="button-settings"  transform="scale(0.125 0.125) translate(61 1)">
+                <rect x="0" y="0" width="16" height="16" fill="RGB(100,100,100)" stroke="none" />
+                <path id="gearPath" fill="RGB(170,170,170)"  d="M 14 8L 15 8L 13.908846518073247 9.041889066001582L 13.63815572471545 10.052120859954012L 14.062177826491071 11.5L 11.5 14.06217782649107L 10.052120859954012 13.63815572471545L 9.041889066001582 13.908846518073247L 8 15L 4.500000000000002 14.062177826491071L 4.143274341880765 12.59626665871387L 3.4037333412861326 11.856725658119236L 1.9378221735089305 11.500000000000002L 1 8L 2.091153481926751 6.9581109339984195L 2.3618442752845494 5.947879140045988L 1.9378221735089287 4.500000000000002L 4.4999999999999964 1.9378221735089314L 5.947879140045984 2.3618442752845503L 6.958110933998418 2.091153481926752L 7.999999999999999 1L 11.499999999999996 1.937822173508927L 11.856725658119231 3.403733341286128L 12.596266658713866 4.143274341880763L 14.06217782649107 4.4999999999999964L 15 7.999999999999998L 13.908846518073249 9.04188906600158ZM 8 8 m -1.5 0 a 1.5 1.5 0 1 0 3 0 a 1.5 1.5 0 1 0 -3 0"></path>
                 <rect x="0" y="0" width="16" height="16" fill="transparent" stroke="none" />
             </g>
         </svg>
@@ -844,6 +850,15 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
     </svg>
 
+    <svg id="folderIcon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" class="folder-icon"  viewBox="0 0 20 20" style="display: none;">
+        <path fill="#686868" d="M 18 2 L 9.992 2 L 7.992 0 L 2 0 C 0.896 0 0 0.896 0 2 L 0 18 C 0 19.104 0.896 20 2 20 L 18 20 C 19.104 20 20 19.104 20 18 L 20 4 C 20 2.896 19.104 2 18 2 Z M 2 18 L 1.992 6 L 17.992 6 L 18 18 L 2 18 Z" transform="matrix(0.9999999999999999, 0, 0, 0.9999999999999999, -5.684341886080802e-14, 0)"/>
+    </svg>
+
+    <svg id="fileIcon" width="16" height="16" viewBox="0 0 24 24" fill="#686868"  class="file-icon" style="display: none;">
+<!--        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM8 14v-4h8v4zM10 8h4v6h-4z"/>-->
+        <path d="M 16 18 L 15.955 5.67 L 10.833 5.636 L 10.833 0.036 L 2 0 C 0.895 0 0 0.895 0 2 L 0 18 C 0 19.105 0.895 20 2 20 L 14 20 C 15.104 20 16 19.105 16 18 Z M 15.933 4.636 L 11.833 0.036 L 11.833 4.636 L 15.933 4.636 Z" transform="matrix(1, 0, 0, 1, 0, 3.552713678800501e-15)"/>
+    </svg>
+
 
     <!--<script>
         window.onload = function () {
@@ -863,6 +878,9 @@
 
     <script src="js/globals.js"></script>
 
+    <script src="js/filesystem/filemanagerapi.js"></script>
+    <script src="js/filesystem/browserified_path.js"></script>
+
     <script src="js/dropdown/savenet.js"></script>
     <script src="js/dropdown/dropdown_v2_0_1.js"></script>
     <script src="js/dropdown/displaysavedcoords.js"></script>
@@ -881,9 +899,13 @@
 
     <script src="js/nodes/nodemode.js"></script>
     <script src="js/nodes/movenodes.js"></script>
-    <script src="js/interface/window.js"></script>
 
     <script src="js/interface/interface_v2.js"></script>
+    <script src="js/interface/tree.min.js"></script>
+    <script src="js/interface/fsTree.js"></script>
+
+    <script src="js/interface/window.js"></script>
+    <script src="js/interface/uinodes.js"></script>
 
     <script src="js/nodes/connect.js"></script>
     <script src="js/interface/search.js"></script>

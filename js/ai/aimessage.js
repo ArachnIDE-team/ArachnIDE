@@ -195,14 +195,14 @@ async function sendMessage(event, autoModeMessage = null) {
     const contextSize = Math.min(remainingTokens, maxContextSize);
 
 // Get the context
-    context = getLastPromptsAndResponses(100, contextSize);
+    let context = getLastPromptsAndResponses(100, contextSize);
     let topMatchedNodesContent = "";
 
     // Use the helper function to extract titles
     let existingTitles = extractTitlesFromContent(context, nodeTag);
 
-    // Replace the original search and highlight code with neuriteSearchNotes
-    const topMatchedNodes = await neuriteSearchNotes(keywords);
+    // Replace the original search and highlight code with neurideSearchNotes
+    const topMatchedNodes = await neurideSearchNotes(keywords);
 
     let titlesToForget = new Set();
 
@@ -296,7 +296,7 @@ Self-Prompting is ENABLED, on the LAST line, end your response with ${PROMPT_IDE
 
     if (wolframData) {
         const { wolframAlphaTextResult } = wolframData;
-        createWolframNode(wolframData);
+        createWolframNode("", wolframData);
 
         const wolframAlphaMessage = {
             role: "system",

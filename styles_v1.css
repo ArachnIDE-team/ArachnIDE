@@ -669,6 +669,11 @@ input[type="text"i]:hover {
                 background-color: #ddd;
             }
 
+            .linkbuttons:disabled {
+                background-color: #a4a4a4;
+                cursor: default;
+            }
+
             .linkbuttons[type="submit"] {
                 background-color: #222226;
                 color: #bbb;
@@ -2040,7 +2045,7 @@ textarea[id^='custom-instructions-textarea-'] {
 
 
 
-.node-panel .neurite-function-cm-style {
+.node-panel .neuride-function-cm-style {
     background-color: transparent;
     max-height: 300px; /* Maximum height */
     height: 300px;
@@ -2233,7 +2238,7 @@ textarea[id^='custom-instructions-textarea-'] {
 
 
 
-.cm-neurite-function-name {
+.cm-neuride-function-name {
     color: #8e8eff !important;
 }
 
@@ -2313,3 +2318,99 @@ textarea[id^='custom-instructions-textarea-'] {
     height: 100%;
     z-index: 9999;
 }
+
+
+/* WindowedNode */
+
+.content-sticky-header {
+    background-color: #222226;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    z-index: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.content-sticky-footer {
+    background-color: #222226;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    z-index: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+}
+.footer-left-container {
+    flex-grow: 1;
+    margin-left: 20px;
+}
+.footer-right-container {
+    right: 20px;
+    position: relative;
+    float: right;
+    display: inline-block;
+}
+.footer-button {
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #222226;
+    transition: background-color 0.3s;
+    border: inset;
+    border-color: #8882;
+}
+.header-content-footer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+/*.content-sticky-header + div {*/
+/*    margin-top: 30px;*/
+/*}*/
+/* treejs */
+
+.treejs .treejs-switcher:before {
+    border-top: 10px solid rgba(255, 255, 255, 0.4)!important;
+    border-bottom: 8px solid transparent!important;
+    border-left: 8px solid transparent!important;
+    border-right: 8px solid transparent!important;
+    top: 5px!important;
+    left: 1px!important;
+}
+
+.treejs .treejs-switcher:hover:before {
+    border-top: 10px solid rgba(255, 255, 255, 0.65)!important;
+}
+ .treejs .treejs-switcher:before {
+     position: absolute;
+     display: block;
+     content: ' ';
+     border: 8px solid transparent;
+     -webkit-transition: border-color 150ms;
+     -o-transition: border-color 150ms;
+     transition: border-color 150ms;
+ }
+svg.folder-icon {
+    margin: 0 auto;
+    display: block;
+    margin-top: 8px;
+}
+
+svg.file-icon {
+    margin: 0 auto;
+    display: block;
+    margin-top: 8px;
+    margin-left: 5px;
+}
+
+.treejs-icons {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+}
+.treejs .treejs-label {
+    margin-left: 3px;
+}
+

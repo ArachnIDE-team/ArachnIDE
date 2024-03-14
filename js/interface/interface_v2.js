@@ -47,65 +47,126 @@ function nextUUID() {
     }
     return NodeUUID;
 }
+
 class Node {
-    constructor(p, thing, scale = 1, intrinsicScale = 1, createEdges = true) {
+    static DEFAULT_CONFIGURATION = {
+        pos: undefined,
+        content: undefined,
+        scale: 1,
+        intrinsicScale: 1,
+        createEdges: true,
+        saveElements: [],
+        saved: false,
+        saveData: null
+    }
+    static VECTOR_PROPERTIES = ['anchor', 'mouseAnchor', 'vel', 'pos', 'force'];
+    static SAVE_PROPERTIES = ['scale', 'intrinsicScale', 'removed', 'createdAt', 'uuid', 'type'];
+
+    // constructor(pos, content, scale = 1, intrinsicScale = 1, createEdges = true) {
+    constructor(configuration=Node.DEFAULT_CONFIGURATION) {
+        configuration = {...Node.DEFAULT_CONFIGURATION, ...configuration}
+        this.startInitialization();
         this.anchor = new vec2(0, 0);
         this.anchorForce = 0;
         this.mouseAnchor = new vec2(0, 0);
         this.edges = [];
         this.createdAt = new Date().toISOString();
         this.init = (nodeMap) => { };
-        if (p === undefined) {
-            let n = thing;
-            let o = JSON.parse(n.dataset.node_json)
-            for (const k of ['anchor', 'mouseAnchor', 'vel', 'pos', 'force']) {
+        this.type = this.constructor.name;
+        this.saveElements = configuration.saveElements;
+        // console.log("Restoring Node: ", configuration.saved)
+        // if (configuration.pos === undefined) { // saved node
+        if (configuration.saved) { // saved node
+            // let n = configuration.content;
+            // let o = JSON.parse(n.dataset.node_json)
+            // for (const k of Node.VECTOR_PROPERTIES) {
+            //     o[k] = new vec2(o[k]);
+            // }
+            // for (const k in o) {
+            //     this[k] = o[k];
+            // }
+            // this.save_extras = [];
+            // this.content = configuration.content;
+            // if (n.dataset.node_extras) {
+            //     o = JSON.parse(n.dataset.node_extras);
+            //     for (const e of o) {
+            //         NodeExtensions[e.f](this, e.a);
+            //     }
+            // }
+            // this.attach();
+            // this.content.setAttribute("data-uuid", this.uuid);
+            // if (n.dataset.edges !== undefined && configuration.createEdges) {
+            //     let es = JSON.parse(n.dataset.edges);
+            //     this.init = ((nodeMap) => {
+            //         for (let e of es) {
+            //             edgeFromJSON(e, nodeMap);
+            //         }
+            //     }).bind(this);
+            // }
+            let o = configuration.saveData.json;
+            for (const k of Node.VECTOR_PROPERTIES) {
                 o[k] = new vec2(o[k]);
             }
             for (const k in o) {
                 this[k] = o[k];
             }
             this.save_extras = [];
-            this.content = thing;
-            if (n.dataset.node_extras) {
-                o = JSON.parse(n.dataset.node_extras);
+            this.content = configuration.content;
+            if (configuration.saveData.node_extras) {
+                o = configuration.saveData.node_extras;
                 for (const e of o) {
                     NodeExtensions[e.f](this, e.a);
                 }
             }
             this.attach();
             this.content.setAttribute("data-uuid", this.uuid);
-            if (n.dataset.edges !== undefined && createEdges) {
-                let es = JSON.parse(n.dataset.edges);
+            if (configuration.saveData.edges !== undefined && configuration.createEdges) {
+                let es = configuration.saveData.edges;
                 this.init = ((nodeMap) => {
                     for (let e of es) {
                         edgeFromJSON(e, nodeMap);
                     }
                 }).bind(this);
             }
-            return;
-        } else {
+        } else { // new node
             this.uuid = nextUUID();
+            this.uuid = "" + this.uuid;
+
+            this.pos = configuration.pos;
+            this.scale = configuration.scale;
+            this.intrinsicScale = configuration.intrinsicScale;
+
+            this.content = configuration.content;
+
+            this.vel = new vec2(0, 0);
+            this.force = new vec2(0, 0);
+            this.followingMouse = 0;
+            this.followingAiCursor = false;
+            this.aiCursorAnchor = new vec2(0, 0);
+
+            this.removed = false;
+
+            this.content.setAttribute("data-uuid", this.uuid);
+            this.attach();
+            this.save_extras = [];
         }
-        this.uuid = "" + this.uuid;
-
-        this.pos = p;
-        this.scale = scale;
-        this.intrinsicScale = intrinsicScale;
-
-        this.content = thing;
-
-        this.vel = new vec2(0, 0);
-        this.force = new vec2(0, 0);
-        this.followingMouse = 0;
-        this.followingAiCursor = false;
-        this.aiCursorAnchor = new vec2(0, 0);
-
-        this.removed = false;
-
-        this.content.setAttribute("data-uuid", this.uuid);
-        this.attach();
-        this.save_extras = [];
     }
+
+    startInitialization() {
+        this.initialized = false;
+        this.afterInitCallbackList = [];
+    }
+    addAfterInitCallback(callback) {
+        this.afterInitCallbackList.push(callback)
+    }
+    // call from extending classes after finished initialization
+    afterInit(){
+        this.initialized = true;
+        for (let callback of this.afterInitCallbackList) {
+            callback()
+        }
+    }
+
     attach() {
         let div = this.content;
         let node = this;
@@ -117,14 +178,17 @@ class Node {
         div.onwheel = node.onwheel.bind(node);
     }
     json() {
-        return JSON.stringify(this, (k, v) => {
-            if (k === "content" || k === "edges" || k === "save_extras" ||
-                k === "aiResponseEditor" || k === "aiCursor" || k === "responseHandler" ||
-                k === "windowDiv") { // Exclude windowDiv as well
+        let json = {}
+        for(let key of Node.VECTOR_PROPERTIES.concat(Node.SAVE_PROPERTIES)){
+            json[key] = this[key];
+        }
+        const replacer = (k, v) => {
+            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
                 return undefined;
             }
             return v;
-        });
+        };
+        return JSON.stringify(json, replacer);
     }
     push_extra_cb(f) {
         this.save_extras.push(f);
@@ -143,15 +207,15 @@ class Node {
         // Before saving, get the current title input value and store it in a data-attribute
         let titleInput = this.content.querySelector('.title-input');
         if (titleInput) {
-            this.content.setAttribute('data-title', titleInput.value);
+            // this.content.setAttribute('data-title', titleInput.value);
         }
 
-        this.content.setAttribute("data-node_json", this.json());
+        // this.content.setAttribute("data-node_json", this.json());
         let se = [];
         for (let e of this.save_extras) {
             se.push(typeof e === "function" ? e(this) : e);
         }
-        this.content.setAttribute("data-node_extras", JSON.stringify(se));
+        // this.content.setAttribute("data-node_extras", JSON.stringify(se));
     }
 
     step(dt) {
@@ -288,20 +352,9 @@ class Node {
     onclick(event) {
 
     }
-    toggleWindowAnchored(anchored) {
-        let windowDiv = this.content.querySelector('.window');
-        if (windowDiv && !windowDiv.collapsed) { // Check if not collapsed
-            if (anchored) {
-                windowDiv.classList.add("window-anchored");
-            } else {
-                windowDiv.classList.remove("window-anchored");
-            }
-        }
-    }
     ondblclick(event) {
         this.anchor = this.pos;
         this.anchorForce = 1 - this.anchorForce;
-        this.toggleWindowAnchored(this.anchorForce === 1);
         //let connectednodes = getAllConnectedNodesData(this)
         //console.log(connectednodes)
         cancel(event);
@@ -394,9 +447,10 @@ class Node {
             cancel(event);
         }
     }
-
+    // Refactor to WindowedNode
     getTitle() {
-        return this.content.getAttribute('data-title');
+        // return this.content.getAttribute('data-title');
+        return this.title;
     }
 
     getEdgeDirectionalities() {
@@ -460,8 +514,66 @@ class Node {
         this.content.remove();
     }
 
+    addSaveElements(propertyName){
+        this.saveElements.push(propertyName);
+    }
+    removeSaveElements(propertyName){
+        let propertyIndex = this.saveElements.indexOf(propertyName);
+        if(propertyIndex !== -1) {
+            this.saveElements.splice(propertyIndex, 1)
+            return true;
+        }
+        return false;
+    }
+
+    // save(){
+    //     let nodeElement = this.content.cloneNode(true);
+    //     let node = {
+    //         json: JSON.parse(nodeElement.dataset.node_json),
+    //         edges:  JSON.parse(nodeElement.dataset.edges),
+    //         node_extras: JSON.parse(nodeElement.dataset.node_extras),
+    //         title: nodeElement.dataset.title
+    //     }
+    //     nodeElement.removeAttribute('data-node_json')
+    //     nodeElement.removeAttribute('data-edges')
+    //     nodeElement.removeAttribute('data-node_extras')
+    //     nodeElement.removeAttribute('data-init')
+    //     nodeElement.removeAttribute('data-title')
+    //     nodeElement.removeAttribute('data-uuid')
+    //     nodeElement.removeAttribute('style')
+    //     node.html = nodeElement.outerHTML;
+    //     return node;
+    // }
+    save(){
+        return {
+            json: JSON.parse(this.json()),
+            edges:  this.edges.map((e) => e.dataObj()),
+            node_extras: this.save_extras.map((e) => typeof e === "function" ? e(this) : e),
+            // title: nodeElement.dataset.title
+        };
+    }
+
+
+    toSave() {
+        return {
+            pos: this.pos,
+            scale: this.scale,
+            intrinsicScale: this.intrinsicScale
+        }
+    }
+    static fromSave(nodeJSON, content){
+        content.setAttribute('data-node_json', JSON.stringify(nodeJSON.json))
+        content.setAttribute('data-edges', JSON.stringify(nodeJSON.edges))
+        content.setAttribute('data-node_extras', JSON.stringify(nodeJSON.node_extras))
+        content.setAttribute('data-init', 'window')
+        content.setAttribute('data-title', nodeJSON.title)
+        content.setAttribute('data-uuid', nodeJSON.json.uuid)
+
+    }
 }
 
+globalThis.Node = Node;// override Node
+globalThis.Neuride = {Node};// override Node
 // Global or scoped array for selected UUIDs
 let selectedNodeUUIDs = new Set();
 
@@ -1278,7 +1390,7 @@ document.addEventListener('wheel', (event) => {
     while (targetElement) {
         // Check if the target is a textarea or contenteditable
         if (targetElement.tagName.toLowerCase() === 'textarea' ||
-            targetElement.contentEditable === 'true') {
+            targetElement.contentEditable === 'true' || targetElement.classList.contains("scrollable-content")) {
             return;
         }
         targetElement = targetElement.parentElement;

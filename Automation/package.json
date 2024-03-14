@@ -1,10 +1,10 @@
 {
-  "name": "neurite-automation",
+  "name": "neuride-automation",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node NeuriteAutomation.js"
+    "start": "node NeurideAutomation.js"
   },
   "keywords": [],
   "author": "",

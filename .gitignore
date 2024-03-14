@@ -1,3 +1,12 @@
 node_modules/
 dist/
 package-lock.json
+/tmp/
+/saves/
+/.idea/
+TO-DO.md
+DEV-PROMPTS.md
+workspaces.json
+.neurIDE.40b0bfb2-740f-48bd-8ee4-ed4b94f0d0c9
+.neurIDE.d27f9b13-59c6-4e0f-95fd-e6e765225e9b
+.neurIDE.251d5669-f943-4f95-868a-0d6a2636eeeb

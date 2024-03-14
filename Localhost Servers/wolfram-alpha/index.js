@@ -60,7 +60,7 @@ const getWolframAlphaResult = async (query, apiKey, attempt = 1) => {
                 plaintexts: ["Request timed out"],
                 images: [] // Add any images here if available
             });
-        } else {
+        } else if(data.queryresult.pods && data.queryresult.pods[0]?.subpods[0]){
             // This is the 'Interpreting' pod.
             const interpreting = data.queryresult.pods[0].subpods[0].plaintext;
             pods.push({
@@ -68,6 +68,8 @@ const getWolframAlphaResult = async (query, apiKey, attempt = 1) => {
                 plaintexts: [interpreting],
                 images: [data.queryresult.pods[0].subpods[0].img.src]
             });
+        } else {
+            pods = [];
         }
     } else {
         // Convert all pods

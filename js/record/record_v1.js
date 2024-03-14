@@ -86,7 +86,8 @@ async function startRecording() {
         // When the recorder is stopped, create and handle the blob
         mediaRecorder.onstop = () => {
             const blob = new Blob(recordedChunks, { type: 'video/webm' });
-            handleBlob(blob);
+            createVideoNode("Recorded Video", blob);
+            // handleBlob(blob);
 
             // Reset recorded chunks for next recording
             recordedChunks = [];
@@ -101,65 +102,66 @@ async function startRecording() {
     }
 }
 
-function handleBlob(blob) {
-    // Create a URL that represents the blob
-    const url = URL.createObjectURL(blob);
-
-    // Create a video element to play the blob
-    const video = document.createElement('video');
-    video.src = url;
-    video.controls = true;
-    video.style.width = '800px';  // Adjust as needed
-    video.style.height = 'auto';  // This will maintain aspect ratio
-
-    // Create a download link for the video
-    const videoDownloadLink = document.createElement('a');
-    videoDownloadLink.href = url;
-    videoDownloadLink.download = "neuriterecord.webm";
-
-    // Set fixed width and height for the button to create a square around the SVG
-    videoDownloadLink.style.width = "40px";  // Width of the SVG + some padding
-    videoDownloadLink.style.height = "40px";
-    videoDownloadLink.style.display = "flex";  // Use flexbox to center the SVG
-    videoDownloadLink.style.alignItems = "center";
-    videoDownloadLink.style.justifyContent = "center";
-    videoDownloadLink.style.borderRadius = "5px";  // Optional rounded corners
-    videoDownloadLink.style.transition = "background-color 0.2s";  // Smooth transition for hover and active states
-    videoDownloadLink.style.cursor = "pointer";  // Indicate it's clickable
-
-    // Handle hover and active states using inline event listeners
-    videoDownloadLink.onmouseover = function () {
-        this.style.backgroundColor = "#e6e6e6";  // Lighter color on hover
-    }
-    videoDownloadLink.onmouseout = function () {
-        this.style.backgroundColor = "";  // Reset on mouse out
-    }
-    videoDownloadLink.onmousedown = function () {
-        this.style.backgroundColor = "#cccccc";  // Middle color on click (mousedown)
-    }
-    videoDownloadLink.onmouseup = function () {
-        this.style.backgroundColor = "#e6e6e6";  // Back to hover color on mouse release
-    }
-
-    // Clone the SVG from the HTML
-    const downloadSVG = document.querySelector('#download-icon').cloneNode(true);
-    downloadSVG.style.display = "inline";  // Make the cloned SVG visible
-
-    // Append the SVG to the download link and set link styles
-    videoDownloadLink.appendChild(downloadSVG);
-    videoDownloadLink.style.textDecoration = "none"; // to remove underline
-    videoDownloadLink.style.color = "#000";  // Set color for SVG
-
-    // Update the content array to include both the video and download link
-    const content = [video, videoDownloadLink];
-    const scale = 1; // You can adjust the scale as needed
-    const node = windowify("Recorded Video", content, toZ(mousePos), (zoom.mag2() ** settings.zoomContentExp), scale);
-    htmlnodes_parent.appendChild(node.content);
-    registernode(node);
-    node.followingMouse = 1;
-    node.draw();
-    node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
-}
+// function handleBlob(blob) {
+//     // Create a URL that represents the blob
+//     const url = URL.createObjectURL(blob);
+//
+//     // Create a video element to play the blob
+//     const video = document.createElement('video');
+//     video.src = url;
+//     video.controls = true;
+//     video.style.width = '800px';  // Adjust as needed
+//     video.style.height = 'auto';  // This will maintain aspect ratio
+//
+//     // Create a download link for the video
+//     const videoDownloadLink = document.createElement('a');
+//     videoDownloadLink.href = url;
+//     videoDownloadLink.download = "neuriderecord.webm";
+//
+//     // Set fixed width and height for the button to create a square around the SVG
+//     videoDownloadLink.style.width = "40px";  // Width of the SVG + some padding
+//     videoDownloadLink.style.height = "40px";
+//     videoDownloadLink.style.display = "flex";  // Use flexbox to center the SVG
+//     videoDownloadLink.style.alignItems = "center";
+//     videoDownloadLink.style.justifyContent = "center";
+//     videoDownloadLink.style.borderRadius = "5px";  // Optional rounded corners
+//     videoDownloadLink.style.transition = "background-color 0.2s";  // Smooth transition for hover and active states
+//     videoDownloadLink.style.cursor = "pointer";  // Indicate it's clickable
+//
+//     // Handle hover and active states using inline event listeners
+//     videoDownloadLink.onmouseover = function () {
+//         this.style.backgroundColor = "#e6e6e6";  // Lighter color on hover
+//     }
+//     videoDownloadLink.onmouseout = function () {
+//         this.style.backgroundColor = "";  // Reset on mouse out
+//     }
+//     videoDownloadLink.onmousedown = function () {
+//         this.style.backgroundColor = "#cccccc";  // Middle color on click (mousedown)
+//     }
+//     videoDownloadLink.onmouseup = function () {
+//         this.style.backgroundColor = "#e6e6e6";  // Back to hover color on mouse release
+//     }
+//
+//     // Clone the SVG from the HTML
+//     const downloadSVG = document.querySelector('#download-icon').cloneNode(true);
+//     downloadSVG.style.display = "inline";  // Make the cloned SVG visible
+//
+//     // Append the SVG to the download link and set link styles
+//     videoDownloadLink.appendChild(downloadSVG);
+//     videoDownloadLink.style.textDecoration = "none"; // to remove underline
+//     videoDownloadLink.style.color = "#000";  // Set color for SVG
+//
+//     // Update the content array to include both the video and download link
+//     const content = [video, videoDownloadLink];
+//     const scale = 1; // You can adjust the scale as needed
+//     const node = new WindowedNode({title: "Recorded Video", content, pos: toZ(mousePos), scale: (zoom.mag2() ** settings.zoomContentExp), intrinsicScale: scale});
+//     // const node = windowify("Recorded Video", content, toZ(mousePos), (zoom.mag2() ** settings.zoomContentExp), scale);
+//     htmlnodes_parent.appendChild(node.content);
+//     registernode(node);
+//     node.followingMouse = 1;
+//     node.draw();
+//     node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+// }
 
 async function stopRecording() {
     // Stop the media recorder and close the media stream

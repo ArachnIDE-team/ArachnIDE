@@ -2,13 +2,13 @@ const playwright = require('playwright');
 const http = require('http');
 const url = require('url');
 
-const defaultNeuriteUrl = 'http://localhost:8080/';
+const defaultNeurideUrl = 'http://localhost:8080/';
 
-async function startNeurite(url, browserType = 'chromium') {
+async function startNeuride(url, browserType = 'chromium') {
     const browser = await playwright[browserType].launch({ headless: false });
     const page = await browser.newPage();
 
-    // Navigate to the provided Neurite URL
+    // Navigate to the provided Neuride URL
     await page.goto(url);
 
     // Set a flag in the page's context to indicate it's controlled by Playwright
@@ -59,10 +59,10 @@ const args = process.argv.slice(2);
 let page; // Store the page object globally
 
 // Use provided URL or default if not provided
-const neuriteUrl = args.length >= 1 ? args[0] : defaultNeuriteUrl;
+const neurideUrl = args.length >= 1 ? args[0] : defaultNeurideUrl;
 const browserType = args[1] || 'chromium';
 
-startNeurite(neuriteUrl, browserType).then(async ({ page: p }) => {
+startNeuride(neurideUrl, browserType).then(async ({ page: p }) => {
     page = p;
     // Start the server
     server.listen(8081, () => {
@@ -70,4 +70,4 @@ startNeurite(neuriteUrl, browserType).then(async ({ page: p }) => {
     });
 });
 
-module.exports = { startNeurite, takeScreenshot };
+module.exports = { startNeuride, takeScreenshot };

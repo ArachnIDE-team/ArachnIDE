@@ -50,7 +50,7 @@ CodeMirror.defineMode("ignoreCodeBlocks", function (config) {
             if (stream.match(/^\w+/)) {
                 var currentToken = stream.current();
                 if (functionNameList.includes(currentToken)) {
-                    return "neurite-function-name"; // Custom style for function names
+                    return "neuride-function-name"; // Custom style for function names
                 }
                 stream.backUp(currentToken.length); // Back up to reprocess this token in jsMode
             }
@@ -72,7 +72,7 @@ CodeMirror.defineMode("ignoreCodeBlocks", function (config) {
     };
 });
 
-const neuriteFunctionCM = CodeMirror.fromTextArea(document.getElementById('neurite-function-cm'), {
+const neurideFunctionCM = CodeMirror.fromTextArea(document.getElementById('neuride-function-cm'), {
     mode: "ignoreCodeBlocks", // Use the custom mode
     lineNumbers: false,
     lineWrapping: true,
@@ -82,28 +82,28 @@ const neuriteFunctionCM = CodeMirror.fromTextArea(document.getElementById('neuri
 });
 
 // Add class to the CodeMirror wrapper
-neuriteFunctionCM.display.wrapper.classList.add('neurite-function-cm-style');
+neurideFunctionCM.display.wrapper.classList.add('neuride-function-cm-style');
 // Function to update the content of the CodeMirror instance
-function updateNeuriteFunctionCMContent(content) {
-    neuriteFunctionCM.setValue(content);
-    neuriteFunctionCM.refresh();
+function updateNeurideFunctionCMContent(content) {
+    neurideFunctionCM.setValue(content);
+    neurideFunctionCM.refresh();
 }
 
 let userScrolledUpFunctionPanel = false;
 
 // Scroll event listener
-neuriteFunctionCM.on("scroll", function () {
-    var scrollInfo = neuriteFunctionCM.getScrollInfo();
+neurideFunctionCM.on("scroll", function () {
+    var scrollInfo = neurideFunctionCM.getScrollInfo();
     var atBottom = scrollInfo.height - scrollInfo.top - scrollInfo.clientHeight < 1;
     userScrolledUpFunctionPanel = !atBottom;
 });
 
 // Change event listener
-neuriteFunctionCM.on("change", function () {
+neurideFunctionCM.on("change", function () {
     if (!userScrolledUpFunctionPanel) {
         // Scroll to the bottom
-        var scrollInfo = neuriteFunctionCM.getScrollInfo();
-        neuriteFunctionCM.scrollTo(null, scrollInfo.height);
+        var scrollInfo = neurideFunctionCM.getScrollInfo();
+        neurideFunctionCM.scrollTo(null, scrollInfo.height);
     }
 });
 
@@ -145,14 +145,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // Global log collector
 let logCollector = [];
 
-function runNeuriteCode() {
-    const code = neuriteFunctionCM.getValue();
+function runNeurideCode() {
+    const code = neurideFunctionCM.getValue();
     const codeBlocks = extractCodeBlocks(code);
     const codeToRun = codeBlocks.length > 0 ? codeBlocks.join('\n') : code;
 
     clearActiveStates();
 
-    // Generate the default title and initialize the log collector
+    // Generate the default title and _initialize the log collector
     const defaultTitle = generateTitleForCode(codeToRun);
     logCollector = [defaultTitle];
 
@@ -220,7 +220,7 @@ function runNeuriteCode() {
     // Cleanup
     window.onerror = originalOnError;
     updateTitleWithLogs();
-    neuriteFunctionCM.setValue('');
+    neurideFunctionCM.setValue('');
 }
 
 // Function to update the UI with the current title
@@ -290,7 +290,7 @@ function generateUUID() {
 }
 
 function addFunctionCallItem(functionName, code, isError = false) {
-    const currentCoords = neuriteGetMandelbrotCoords(); // Get current coordinates
+    const currentCoords = neurideGetMandelbrotCoords(); // Get current coordinates
 
     const item = document.createElement('div');
     item.classList.add('function-call-item');
@@ -393,7 +393,7 @@ function generateTitleForCode(code) {
 }
 
 const functionRunButton = document.getElementById('function-run-button');
-functionRunButton.addEventListener('click', runNeuriteCode);
+functionRunButton.addEventListener('click', runNeurideCode);
 
 const functionCallList = document.querySelector('.function-call-list');
 
@@ -401,15 +401,15 @@ functionCallList.addEventListener('click', function (event) {
     // Check if the clicked target is a div
     if (event.target.tagName === 'DIV') {
         if (event.target.classList.contains('active-state')) {
-            neuriteFunctionCM.setValue('');
+            neurideFunctionCM.setValue('');
             // If the div becomes active, repopulate the CodeMirror
             const originalText = event.target.originalText;
             if (originalText) {
-                updateNeuriteFunctionCMContent(originalText);
+                updateNeurideFunctionCMContent(originalText);
             }
         } else {
             // Clear the CodeMirror content if the div is not active
-            neuriteFunctionCM.setValue('');
+            neurideFunctionCM.setValue('');
         }
     }
 });

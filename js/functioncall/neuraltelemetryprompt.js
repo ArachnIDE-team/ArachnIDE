@@ -1,14 +1,14 @@
 
 class NeuralTelemetry {
     constructor() {
-        // The constructor can be used to initialize any necessary state,
+        // The constructor can be used to _initialize any necessary state,
         // but in this case, it might not be needed if we're only fetching current data.
     }
 
     // Method to directly fetch current Mandelbrot coordinates
     getCurrentMandelbrotCoords() {
-        // Assuming neuriteGetMandelbrotCoords is a globally available function
-        const coords = neuriteGetMandelbrotCoords();
+        // Assuming neurideGetMandelbrotCoords is a globally available function
+        const coords = neurideGetMandelbrotCoords();
         return {
             zoom: coords.zoom,
             pan: coords.pan
@@ -145,7 +145,7 @@ async function performSequence(animations) {
     });
 
     // Execute the queue of animations
-    await neuriteAnimationQueue(transformedAnimations);
+    await neurideAnimationQueue(transformedAnimations);
 }`,
         examples: [
             `// Expected Input Format for animations:
@@ -155,7 +155,7 @@ async function performSequence(animations) {
 //     ...
 // ]`,
             `// An Example of how to use performSequence(animations)
-async function neuriteExploreSequence() {
+async function neurideExploreSequence() {
     try {
         const animations = [
             // Edge of Scepter Valley (Disc 3)
@@ -177,11 +177,11 @@ async function neuriteExploreSequence() {
         await performSequence(animations);  // Utilize performSequence to await each call in const animations.
         console.log("Sequence completed!");
     } catch (error) {
-        console.error("An error occurred during the Neurite exploration sequence:", error);
+        console.error("An error occurred during the Neuride exploration sequence:", error);
     }
 }
 
-neuriteExploreSequence()`
+neurideExploreSequence()`
         ],
         options: { neuralApi: true, vision: true }
     },
@@ -323,14 +323,14 @@ async function furtherMovementSequence() {
 }
 
 // Combine the sequences with the Zettelkasten call in between
-async function completeNeuriteInteraction() {
+async function completeNeurideInteraction() {
     await initialSequence();
     callZettelkasten();
     await furtherMovementSequence();
 }
 
 // Execute the complete interaction
-completeNeuriteInteraction();`
+completeNeurideInteraction();`
         ],
         options: { neuralApi: true, vision: false }
     },
@@ -354,8 +354,8 @@ function constructPromptWithFunctions(functions, forVision = false) {
 }
 
 function functionBasePrompt() {
-    return `/* Neurite API Documentation
-You write code that is executed within the fractal mind mapping interface, Neurite.
+    return `/* Neuride API Documentation
+You write code that is executed within the fractal mind mapping interface, Neuride.
 
 REMEMBER, creativity, format, substance, etc... As you are a transformer architecture, each token generation is a chance to grow computational context. UTILIZE available JAVASCRIPT FUNCTIONALITY*/`;
 }
@@ -363,7 +363,7 @@ REMEMBER, creativity, format, substance, etc... As you are a transformer archite
 function neuralApiPrompt() {
     let prompt = functionBasePrompt();
     prompt += constructPromptWithFunctions(functionObjects, false);
-    prompt += `\n/* The creation of text notes and prompts to the zettelkasten can be called BOTH inside and/or outside of Neurite's async function performSequence(animations)
+    prompt += `\n/* The creation of text notes and prompts to the zettelkasten can be called BOTH inside and/or outside of Neuride's async function performSequence(animations)
 For example, you can either use promptZettelkasten within a performSequence such that there are no animations during the response, or call promptZettelkasten outside of a performSequence such that the Ai response and movements coordinate.
 The setting of coords, movement, zoomToTitle, etc. are ALWAYS CALLED within performSequence */`;
     return prompt;
@@ -373,14 +373,14 @@ function visionPrompt() {
     let prompt = functionBasePrompt();
     prompt += constructPromptWithFunctions(functionObjects, true);
     prompt += `\n/* Vision Specific Guidelines */\n
-You TAKE ACTION based off the provided SCREENSHOTS of Neurite's interface.`;
+You TAKE ACTION based off the provided SCREENSHOTS of Neuride's interface.`;
     return prompt;
 }
 
 // Usage
-const neuriteNeuralApiPrompt = neuralApiPrompt();
-const neuriteNeuralVisionPrompt = visionPrompt();
+const neurideNeuralApiPrompt = neuralApiPrompt();
+const neurideNeuralVisionPrompt = visionPrompt();
 
 // Example console log
-//console.log(neuriteNeuralApiPrompt);
-//console.log(neuriteNeuralVisionPrompt);
+//console.log(neurideNeuralApiPrompt);
+//console.log(neurideNeuralVisionPrompt);

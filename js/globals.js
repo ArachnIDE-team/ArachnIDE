@@ -91,7 +91,8 @@ window.addEventListener('message', function (event) {
     if (typeof event.data.nodeMode !== 'undefined') {
         nodeMode = event.data.nodeMode;
     } else {
-        nodeMode = 0;
+        // TO-DO: Understand why next instruction abruptly interrupt edge dragging
+        // nodeMode = 0;
     }
 });
 
@@ -152,7 +153,7 @@ const bracketsMap = {
     '[[': ']]',
     '{{': '}}',
     '<<': '>>',
-    '«': '»',      // Guillemet
+    'ï¿½': 'ï¿½',      // Guillemet
     '/*': '*/',
     '<!--': '-->',
     '#[': ']#',

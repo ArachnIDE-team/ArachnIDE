@@ -1,15 +1,44 @@
-function createWolframNode(wolframData) {
-    const { table, reformulatedQuery } = wolframData;
-    let content = [table];
-    let scale = 1;
-
-    let wolframNode = windowify(`${reformulatedQuery} - Wolfram Alpha Result`, content, toZ(mousePos), (zoom.mag2() ** settings.zoomContentExp), scale);
-    htmlnodes_parent.appendChild(wolframNode.content);
-    registernode(wolframNode);
-    wolframNode.followingMouse = 1;
-    wolframNode.draw();
-    wolframNode.mouseAnchor = toDZ(new vec2(0, -wolframNode.content.offsetHeight / 2 + 6));
-}
+// function createWolframNode(wolframData) {
+//     const { pods, reformulatedQuery } = wolframData;
+//     const table = document.createElement("table");
+//     table.style = "width: 100%; border-collapse: collapse;";
+//
+//     for (const pod of pods) {
+//         const row = document.createElement("tr");
+//
+//         const titleCell = document.createElement("td");
+//         titleCell.textContent = pod.title;
+//         titleCell.style = "padding: 10px; background-color: #222226;";
+//
+//         const imageCell = document.createElement("td");
+//         imageCell.style = "padding: 10px; text-align: center; background-color: white";
+//
+//         for (let i = 0; i < pod.images.length; i++) {
+//             const imageUrl = pod.images[i];
+//
+//             const img = document.createElement("img");
+//             img.alt = `${reformulatedQuery} - ${pod.title}`;
+//             img.style = "display: block; margin: auto; border: none;";
+//             img.src = imageUrl;
+//
+//             imageCell.appendChild(img);
+//         }
+//
+//         row.appendChild(titleCell);
+//         row.appendChild(imageCell);
+//         table.appendChild(row);
+//     }
+//     let content = [table];
+//     let scale = 1;
+//
+//     let wolframNode =  new WindowedNode({title:`${reformulatedQuery} - Wolfram Alpha Result`, content, pos: toZ(mousePos), scale: (zoom.mag2() ** settings.zoomContentExp), intrinsicScale: scale});
+//     // let wolframNode = windowify(`${reformulatedQuery} - Wolfram Alpha Result`, content, toZ(mousePos), (zoom.mag2() ** settings.zoomContentExp), scale);
+//     htmlnodes_parent.appendChild(wolframNode.content);
+//     registernode(wolframNode);
+//     wolframNode.followingMouse = 1;
+//     wolframNode.draw();
+//     wolframNode.mouseAnchor = toDZ(new vec2(0, -wolframNode.content.offsetHeight / 2 + 6));
+// }
 
 const wolframmessage = `Based off the user message, arrive at a valid query to Wolfram Alpha.
 - Quotation marks delimit the Wolfram Query that is extracted from your response.
@@ -21,7 +50,6 @@ let wolframCallCounter = 0;
 
 async function fetchWolfram(message, isAINode = false, node = null, wolframContext = "") {
     let wolframAlphaResult = "not-enabled";
-    let wolframAlphaTextResult = "";
 
     // Initialize recentcontext based on node or default zettelkasten logic
     const recentcontext = wolframContext || getLastPromptsAndResponses(2, 300);
@@ -117,39 +145,5 @@ async function fetchWolfram(message, isAINode = false, node = null, wolframConte
         return;
     }
 
-    const table = document.createElement("table");
-    table.style = "width: 100%; border-collapse: collapse;";
-
-    for (const pod of data.pods) {
-        const row = document.createElement("tr");
-
-        const titleCell = document.createElement("td");
-        titleCell.textContent = pod.title;
-        titleCell.style = "padding: 10px; background-color: #222226;";
-
-        const imageCell = document.createElement("td");
-        imageCell.style = "padding: 10px; text-align: center; background-color: white";
-
-        for (let i = 0; i < pod.images.length; i++) {
-            const imageUrl = pod.images[i];
-            const plaintext = pod.plaintexts[i];
-
-            // Adding plaintext to wolframAlphaTextResult
-            wolframAlphaTextResult += `${pod.title}: ${plaintext}\n`;
-
-            const img = document.createElement("img");
-            img.alt = `${reformulatedQuery} - ${pod.title}`;
-            img.style = "display: block; margin: auto; border: none;";
-            img.src = imageUrl;
-
-            imageCell.appendChild(img);
-        }
-
-        row.appendChild(titleCell);
-        row.appendChild(imageCell);
-        table.appendChild(row);
-    }
-
-
-    return { table, wolframAlphaTextResult, reformulatedQuery };
+    return { pods: data.pods, reformulatedQuery };
 }

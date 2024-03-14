@@ -49,7 +49,7 @@ function easeInOutCubic(t) {
 
 
 
-function neuriteZoom(zoomFactor, targetX = window.innerWidth / 2, targetY = window.innerHeight / 2, duration = 1000) {
+function neurideZoom(zoomFactor, targetX = window.innerWidth / 2, targetY = window.innerHeight / 2, duration = 1000) {
     const dest = toZ(new vec2(targetX, targetY));
     const adjustedZoomFactor = 1 / zoomFactor;
 
@@ -65,7 +65,7 @@ function neuriteZoom(zoomFactor, targetX = window.innerWidth / 2, targetY = wind
     }, easeInOutCubic);
 }
 
-function neuritePan(deltaX, deltaY, duration = 1000) {
+function neuridePan(deltaX, deltaY, duration = 1000) {
     const dp = toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
     const startPan = pan;
     const endPan = startPan.plus(dp);
@@ -76,7 +76,7 @@ function neuritePan(deltaX, deltaY, duration = 1000) {
     }, easeInOutCubic);
 }
 
-function neuriteRotate(rotationAngle, pivotX, pivotY, duration = 1000) {
+function neurideRotate(rotationAngle, pivotX, pivotY, duration = 1000) {
     const p = toZ(new vec2(pivotX, pivotY));
     const zc = p.minus(pan);
     const r = new vec2(Math.cos(rotationAngle), Math.sin(rotationAngle));
@@ -107,7 +107,7 @@ const defaultMovements = {
     // Add more default movements as needed
 };
 
-function neuriteMovement(movementTypes = [], customZoomParams = {}, customPanParams = {}, customRotateParams = {}, customDuration = 1000) {
+function neurideMovement(movementTypes = [], customZoomParams = {}, customPanParams = {}, customRotateParams = {}, customDuration = 1000) {
     return new Promise((resolve, reject) => {
         activeAnimationsCount++;
 
@@ -198,7 +198,7 @@ autopilotReferenceFrame = this;
 panToI = new vec2(0, 0); */
 
 
-function neuriteSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, speed = 0.1) {
+function neurideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, speed = 0.1) {
     return new Promise((resolve) => {
         let animate = true
 
@@ -266,7 +266,7 @@ vec2.prototype.closeEnough = function (target, autopilotThreshold) {
 };
 
 
-function neuriteZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
+function neurideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
     return new Promise((resolve) => {
         activeAnimationsCount++;
         autopilotReferenceFrame = undefined;
@@ -323,7 +323,7 @@ function neuriteZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
     });
 }
 
-async function neuriteSearchNotes(searchTerm, maxNodesOverride = null) {
+async function neurideSearchNotes(searchTerm, maxNodesOverride = null) {
     const nodesArray = Object.values(nodes); // Assuming this contains full node objects
 
     // Clear previous search highlights
@@ -358,17 +358,17 @@ async function neuriteSearchNotes(searchTerm, maxNodesOverride = null) {
 }
 
 
-async function neuriteSearchAndZoom(searchTerm, maxNodesOverride = null, zoomLevel = 1.0, delayBetweenNodes = 2000) {
+async function neurideSearchAndZoom(searchTerm, maxNodesOverride = null, zoomLevel = 1.0, delayBetweenNodes = 2000) {
     return new Promise(async (resolve, reject) => {
         try {
             activeAnimationsCount++;
 
             // Search for nodes based on the searchTerm
-            const matchedNodes = await neuriteSearchNotes(searchTerm, maxNodesOverride);
+            const matchedNodes = await neurideSearchNotes(searchTerm, maxNodesOverride);
 
             // Loop through each matched node and zoom to it
             for (const node of matchedNodes) {
-                await neuriteZoomToNodeTitle(node, zoomLevel);
+                await neurideZoomToNodeTitle(node, zoomLevel);
 
                 // Wait for the specified delay before moving to the next node
                 await new Promise(r => setTimeout(r, delayBetweenNodes));
@@ -387,9 +387,9 @@ async function neuriteSearchAndZoom(searchTerm, maxNodesOverride = null, zoomLev
 
 
 // Example usage
-// neuriteSearchAndZoom("desired search term", null, 1.0, 3000);
+// neurideSearchAndZoom("desired search term", null, 1.0, 3000);
 
-function neuriteResetView(animate = true, duration = 2000) {
+function neurideResetView(animate = true, duration = 2000) {
     return new Promise((resolve, reject) => {
         const defaultZoomMagnitude = 1.3;
         const defaultPanReal = -0.3;
@@ -422,7 +422,7 @@ function neuriteResetView(animate = true, duration = 2000) {
     });
 }
 
-function neuriteGetMandelbrotCoords(forFunctionCall = false) {
+function neurideGetMandelbrotCoords(forFunctionCall = false) {
     // Extract and format zoom and pan values
     const zoomValue = zoom.x.toString();
     const panReal = pan.x.toString();
@@ -441,12 +441,12 @@ function neuriteGetMandelbrotCoords(forFunctionCall = false) {
     }
 }
 
-function neuriteReceiveCurrentView() {
+function neurideReceiveCurrentView() {
     // Get current coordinates in standard format
-    const standardCoords = neuriteGetMandelbrotCoords();
+    const standardCoords = neurideGetMandelbrotCoords();
 
     // Get current coordinates in function call format
-    const functionCallFormat = neuriteGetMandelbrotCoords(true);
+    const functionCallFormat = neurideGetMandelbrotCoords(true);
 
     // Prompt user for a title for the saved view
     const title = prompt("Enter a title for the saved view:");
@@ -570,7 +570,7 @@ function getSavedViewsFromCache() {
     return cachedViews ? JSON.parse(cachedViews) : null;
 }
 
-// Function to initialize saved views
+// Function to _initialize saved views
 function initializeSavedViews() {
     const cachedViews = getSavedViewsFromCache();
     savedViews = cachedViews ? cachedViews : [...defaultSavedViews];
@@ -578,8 +578,8 @@ function initializeSavedViews() {
 
 initializeSavedViews();
 
-function neuriteSaveCurrentView() {
-    const view = neuriteReceiveCurrentView();
+function neurideSaveCurrentView() {
+    const view = neurideReceiveCurrentView();
 
     if (view === null) {
         console.log("View save cancelled by user.");
@@ -602,18 +602,18 @@ function neuriteSaveCurrentView() {
 }
 
 document.getElementById('saveCoordinatesBtn').addEventListener('click', function () {
-    neuriteSaveCurrentView();
+    neurideSaveCurrentView();
 });
 
 document.getElementById('deleteCoordinatesBtn').addEventListener('click', function () {
     if (selectedCoordinateIndex !== null) {
-        neuriteDeleteSavedView(selectedCoordinateIndex);
+        neurideDeleteSavedView(selectedCoordinateIndex);
     } else {
         alert('No coordinate selected for deletion.');
     }
 });
 
-function neuriteDeleteSavedView(index) {
+function neurideDeleteSavedView(index) {
     // Check if the index is within bounds
     if (index !== null && savedViews[index]) {
         // Remove the selected view from the array
@@ -637,15 +637,15 @@ function neuriteDeleteSavedView(index) {
 }
 
 
-function neuriteReturnToSavedView(savedView, animate = true, speed = 0.0001) {
+function neurideReturnToSavedView(savedView, animate = true, speed = 0.0001) {
     if (savedView && savedView.standardCoords) {
         // Extract real and imaginary parts from pan
         const panParts = savedView.standardCoords.pan.split('+i');
         const panReal = parseFloat(panParts[0]);
         const panImaginary = panParts.length > 1 ? parseFloat(panParts[1]) : 0;
 
-        // Call neuriteSetMandelbrotCoords with the parsed coordinates
-        neuriteSetMandelbrotCoords(
+        // Call neurideSetMandelbrotCoords with the parsed coordinates
+        neurideSetMandelbrotCoords(
             parseFloat(savedView.standardCoords.zoom),
             panReal,
             panImaginary,
@@ -677,7 +677,7 @@ function selectAndReturnToSavedView(animate = true, speed = 0.1) {
 
     // Return to the selected view with specified animation settings
     if (selectedView) {
-        neuriteReturnToSavedView(selectedView, animate, speed);
+        neurideReturnToSavedView(selectedView, animate, speed);
     } else {
         console.log("View not found with title:", selectedTitle);
     }
@@ -711,7 +711,7 @@ async function exploreBoundaryPoints({
 async function promptToSaveView() {
     const save = confirm("Save this view?");
     if (save) {
-        neuriteSaveCurrentView();
+        neurideSaveCurrentView();
     }
 }
 
@@ -724,7 +724,7 @@ function shuffleArray(array) {
 }
 
 
-function neuriteCaptureScreenshot() {
+function neurideCaptureScreenshot() {
     if (window.startedViaPlaywright) {
         // Playwright controlled session, use fetch to request screenshot
         fetch('http://localhost:8081/screenshot')
@@ -744,12 +744,12 @@ function neuriteCaptureScreenshot() {
     }
 }
 
-function neuriteDelay(delay) {
+function neurideDelay(delay) {
     return new Promise(resolve => setTimeout(resolve, delay));
 }
 
 // Verbose Schema
-async function neuriteAnimationQueue(animations) {
+async function neurideAnimationQueue(animations) {
     for (const animation of animations) {
         const { action, params, delayBefore = 0, delayAfter = 0 } = animation;
 
@@ -770,7 +770,7 @@ async function neuriteAnimationQueue(animations) {
 }
 
 // Enchanced to reduce size of request format.
-async function neuriteQueueAnimations(animations) {
+async function neurideQueueAnimations(animations) {
     // Artificially increment the animation count
     activeAnimationsCount++;
 
@@ -787,7 +787,7 @@ async function neuriteQueueAnimations(animations) {
         };
     });
 
-    await neuriteAnimationQueue(transformedAnimations);
+    await neurideAnimationQueue(transformedAnimations);
 
     // Artificially decrement the animation count
     activeAnimationsCount--;
@@ -809,10 +809,10 @@ async function waitForAllAnimations(additionalDelay = 0) {
     });
 }
 
-document.getElementById('screenshotButton').addEventListener('click', neuriteCaptureScreenshot);
+document.getElementById('screenshotButton').addEventListener('click', neurideCaptureScreenshot);
 
 
-async function neuriteReturnScreenshot() {
+async function neurideReturnScreenshot() {
     return new Promise(async (resolve, reject) => {
         if (window.startedViaPlaywright) {
             // Playwright controlled session, use fetch to request screenshot
@@ -839,9 +839,9 @@ async function neuriteReturnScreenshot() {
 }
 
 
-async function neuriteCallMovementAi(movementIntention, totalIterations = 1, currentIteration = 0) {
+async function neurideCallMovementAi(movementIntention, totalIterations = 1, currentIteration = 0) {
     if (currentIteration < totalIterations) {
-        const screenshotBase64 = await neuriteReturnScreenshot();
+        const screenshotBase64 = await neurideReturnScreenshot();
 
         if (screenshotBase64) {
 
@@ -850,7 +850,7 @@ async function neuriteCallMovementAi(movementIntention, totalIterations = 1, cur
             let messages = [
                 {
                     role: 'system',
-                    content: neuriteNeuralVisionPrompt
+                    content: neurideNeuralVisionPrompt
                 },
                 {
                     role: 'system',
@@ -873,13 +873,13 @@ async function neuriteCallMovementAi(movementIntention, totalIterations = 1, cur
 
             try {
                 await callVisionModel(messages, async () => {
-                    runNeuriteCode(true); // Run code with increment and decrement of activeAnimations.
+                    runNeurideCode(true); // Run code with increment and decrement of activeAnimations.
 
                     // Wait for all animations to complete
                     await waitForAllAnimations();
                     console.log(`awaited`);
                     // Recursive call for the next iteration
-                    await neuriteCallMovementAi(movementIntention, totalIterations, currentIteration + 1);
+                    await neurideCallMovementAi(movementIntention, totalIterations, currentIteration + 1);
                 });
             } catch (error) {
                 console.error("Error in API call:", error);
@@ -895,7 +895,7 @@ async function neuriteCallMovementAi(movementIntention, totalIterations = 1, cur
 /* 
 
 const autopilotThreshold2 = 0.1;
-function neuriteZoomToNodeTitle(nodeTitle, zoomLevel = 1.5) {
+function neurideZoomToNodeTitle(nodeTitle, zoomLevel = 1.5) {
     return new Promise((resolve, reject) => {
         const cm = window.myCodemirror;
         const node = scrollToTitle(nodeTitle, cm);
@@ -958,7 +958,7 @@ function resolveAiMessageIfAppropriate(response, isError = false) {
     }
 }
 
-async function neuritePromptZettelkasten(message) {
+async function neuridePromptZettelkasten(message) {
     activeAnimationsCount++;
     isPromiseResolved = false;
 
@@ -994,7 +994,7 @@ async function neuritePromptZettelkasten(message) {
     return streamedResponse;
 }
 
-function neuriteGetUserResponse(message) {
+function neurideGetUserResponse(message) {
     // Display a prompt dialog with the specified message
     let userResponse = prompt(message);
 
@@ -1003,11 +1003,11 @@ function neuriteGetUserResponse(message) {
 }
 
 
-function neuriteAddNote(nodeTitle, nodeText) {
+function neurideAddNote(nodeTitle, nodeText) {
     return new Promise((resolve) => {
         activeAnimationsCount++;
         let formattedNodeTitle = nodeTitle.replace(/\n/g, ' ');
-        formattedNodeTitle = neuriteGetUniqueNodeTitle(formattedNodeTitle);
+        formattedNodeTitle = neurideGetUniqueNodeTitle(formattedNodeTitle);
 
         if (nodeText === undefined || nodeText === null) {
             nodeText = '';
@@ -1042,7 +1042,7 @@ function neuriteAddNote(nodeTitle, nodeText) {
     });
 }
 
-function neuriteGetUniqueNodeTitle(baseTitle) {
+function neurideGetUniqueNodeTitle(baseTitle) {
     let counter = 2;
     let uniqueTitle = baseTitle;
     while (nodeTitleToLineMap.has(uniqueTitle)) {
@@ -1075,63 +1075,63 @@ function initializeFunctionMappings() {
 // Register the base function with its alternate names
 registerFunctions([
     {
-        baseFunctionName: 'neuriteAddNote',
-        baseFunction: neuriteAddNote,
+        baseFunctionName: 'neurideAddNote',
+        baseFunction: neurideAddNote,
         alternateNames: ['addNote', 'createNote', 'zettelkastenAddNote', `promptNote`]
     },
     {
-        baseFunctionName: 'neuritePromptZettelkasten',
-        baseFunction: neuritePromptZettelkasten,
+        baseFunctionName: 'neuridePromptZettelkasten',
+        baseFunction: neuridePromptZettelkasten,
         alternateNames: ['promptZettelkasten', 'zettelkastenPrompt', 'promptZettelkastenAi', 'callZettelkastenAi', `zettelkastenAi`]
     },
     {
-        baseFunctionName: 'neuriteGetUserResponse',
-        baseFunction: neuriteGetUserResponse,
+        baseFunctionName: 'neurideGetUserResponse',
+        baseFunction: neurideGetUserResponse,
         alternateNames: ['getUserResponse', 'promptUser', 'requestUserResponse']
     },
     {
-        baseFunctionName: 'neuriteZoomToNodeTitle',
-        baseFunction: neuriteZoomToNodeTitle,
+        baseFunctionName: 'neurideZoomToNodeTitle',
+        baseFunction: neurideZoomToNodeTitle,
         alternateNames: ['zoomToNodeTitle', 'focusNode', 'zoomToNote', 'zoomToNoteByTitle', `zoomToNode`]
     },
     {
-        baseFunctionName: 'neuriteCallMovementAi',
-        baseFunction: neuriteCallMovementAi,
+        baseFunctionName: 'neurideCallMovementAi',
+        baseFunction: neurideCallMovementAi,
         alternateNames: ['callMovementAi', 'promptMovementAi', 'initiateMovementAi']
     },
     {
-        baseFunctionName: 'neuriteQueueAnimations',
-        baseFunction: neuriteQueueAnimations,
-        alternateNames: ['queueAnimations', 'performSequence', 'neuritePerformSequence']
+        baseFunctionName: 'neurideQueueAnimations',
+        baseFunction: neurideQueueAnimations,
+        alternateNames: ['queueAnimations', 'performSequence', 'neuridePerformSequence']
     },
     {
-        baseFunctionName: 'neuriteResetView',
-        baseFunction: neuriteResetView,
+        baseFunctionName: 'neurideResetView',
+        baseFunction: neurideResetView,
         alternateNames: ['resetView', 'returnToStart', 'reinitializeView']
     },
     {
-        baseFunctionName: 'neuriteSetMandelbrotCoords',
-        baseFunction: neuriteSetMandelbrotCoords,
+        baseFunctionName: 'neurideSetMandelbrotCoords',
+        baseFunction: neurideSetMandelbrotCoords,
         alternateNames: ['setMandelbrotCoords', 'updateMandelbrotPosition', 'mandelbrotCoords']
     },
     {
-        baseFunctionName: 'neuriteMovement',
-        baseFunction: neuriteMovement,
+        baseFunctionName: 'neurideMovement',
+        baseFunction: neurideMovement,
         alternateNames: ['movement', 'startMovement', 'performMovement']
     },
     {
-        baseFunctionName: 'neuriteDelay',
-        baseFunction: neuriteDelay,
+        baseFunctionName: 'neurideDelay',
+        baseFunction: neurideDelay,
         alternateNames: ['delay', 'setDelay']
     },
     {
-        baseFunctionName: 'neuriteSearchNotes',
-        baseFunction: neuriteSearchNotes,
+        baseFunctionName: 'neurideSearchNotes',
+        baseFunction: neurideSearchNotes,
         alternateNames: ['searchNotes', 'returnSearchedNodes', `searchNodes`]
     },
     {
-        baseFunctionName: 'neuriteSearchAndZoom',
-        baseFunction: neuriteSearchAndZoom,
+        baseFunctionName: 'neurideSearchAndZoom',
+        baseFunction: neurideSearchAndZoom,
         alternateNames: ['searchAndZoom', 'searchZoom', `zoomToRelevantNodes`]
     },
 

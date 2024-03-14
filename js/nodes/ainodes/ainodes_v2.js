@@ -206,6 +206,32 @@ class ResponseHandler {
             });
     }
 
+    saveAiResponseDiv() {
+        const children = this.node.aiResponseDiv.children;
+        let saveObj = []
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+
+            // Check if the child contains a user-prompt div
+            const userPromptDiv = child.querySelector('.user-prompt');
+            if (userPromptDiv) {
+                // Initialize the user prompt div found within the child
+                saveObj.push({role: "user", message: userPromptDiv.innerText})
+            } else if (child.classList.contains('response-wrapper')) {
+                // For AI responses, find the .ai-response div within the wrapper
+                const responseDiv = child.querySelector('.ai-response');
+                if (responseDiv) {
+                    saveObj.push({role: "ai", message: responseDiv.innerText})
+                }
+            } else if (child.classList.contains('code-block-container')) {
+                // For code blocks, pass the container div
+                let language = child.querySelector('div.language-label').childNodes[0].textContent;
+                let code = child.querySelector('pre.code-block').innerText;
+                saveObj.push({role: "ai", code, language})
+            }
+        }
+        return saveObj;
+    }
     restoreAiResponseDiv() {
         // Iterate through each child element in the AI response div
         const children = this.node.aiResponseDiv.children;

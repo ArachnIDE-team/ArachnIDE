@@ -1,74 +1,43 @@
 ﻿
-function handleSaveConfirmation(title, saveData, existingTitle) {
-    let saves = JSON.parse(localStorage.getItem("saves") || "[]");
-    const existingSaves = saves.filter(save => save.title === title);
+function handleSaveConfirmation(title, saveData) { //, existingTitle) {
+    FileManagerAPI.loadWorkspaces().then((workspaces) => {
+        if (workspaces.hasOwnProperty(title)) {// && !existingTitle) {
+            let confirmMessage = `A save with the title "${title}" already exists. Click 'OK' to overwrite, or 'Cancel' to cancel save.`;
 
-    if (existingSaves.length > 0 && !existingTitle) {
-        let confirmMessage = existingSaves.length === 1 ?
-            `A save with the title "${title}" already exists. Click 'OK' to overwrite, or 'Cancel' to create a duplicate.` :
-            `${existingSaves.length} saves with the title "${title}" already exist. Click 'OK' to overwrite all, or 'Cancel' to create a duplicate.`;
-
-        if (confirm(confirmMessage)) {
-            // Overwrite logic - update all saves with the matching title
-            saves = saves.map(save => save.title === title ? { ...save, data: saveData } : save);
-            console.log(`Updated all saves with title: ${title}`);
+            if (confirm(confirmMessage)) {
+                // Overwrite logic - update all saves with the matching title
+                FileManagerAPI.saveWorkspace(title, saveData).then(() => {
+                    console.log(`Updated all saves with title: ${title}`);
+                });
+            }
         } else {
-            // Duplicate logic
-            let newTitle = title;
-            saves.push({ title: newTitle, data: saveData });
-            console.log(`Created duplicate save: ${newTitle}`);
-            title = newTitle; // Update title to reflect new save
-        }
-    } else {
-        // Add new save
-        saves.push({ title: title, data: saveData });
-        console.log(`Created new save: ${title}`);
-    }
+            new FilePicker("Choose the workspace folder for " + title, ".", (folder) => {
+                console.log("Selected folder for save", folder);
+                // Add new save
+                FileManagerAPI.createWorkspace(title, folder, saveData).then(() => {
+                    console.log(`Updated all saves with title: ${title}`);
+                });
+                console.log(`Created new save: ${title}`);
+            })
 
-    try {
-        localStorage.setItem("saves", JSON.stringify(saves));
-        updateSavedNetworks();
-    } catch (e) {
-        if (confirm("Local storage is full, download the data as a .txt file?")) {
-            downloadData(title, JSON.stringify({ data: saveData, zettelkastenSave: zettelkastenContent }));
         }
-    }
+        updateSavedNetworks();
+    });
 }
 
 function collectAdditionalSaveObjects() {
+    let additionalSaveObjects = {}
     // Collecting slider values
-    const inputValues = localStorage.getItem('inputValues') || '{}';
-    const savedInputValues = `<div id="saved-input-values" style="display:none;">${encodeURIComponent(inputValues)}</div>`;
+    additionalSaveObjects.savedInputValues = JSON.parse(localStorage.getItem('inputValues')) || {};
 
     // Collecting saved views
-    const savedViewsString = JSON.stringify(savedViews);
-    const savedViewsElement = `<div id="saved-views" style="display:none;">${encodeURIComponent(savedViewsString)}</div>`;
+    additionalSaveObjects.savedViews = savedViews
 
     // Combine both slider values and saved views in one string
-    return savedInputValues + savedViewsElement;
+    return additionalSaveObjects;
 }
 
 const NEWLINE_PLACEHOLDER = "__NEWLINEplh__";
-
-function replaceNewLinesInLLMSaveData(nodeData) {
-    let tempDiv = document.createElement('div');
-    tempDiv.innerHTML = nodeData;
-
-    tempDiv.querySelectorAll('[data-node_json]').forEach(node => {
-        try {
-            let nodeJson = JSON.parse(node.getAttribute('data-node_json'));
-            if (nodeJson.isLLM) {
-                node.querySelectorAll('pre').forEach(pre => {
-                    pre.innerHTML = pre.innerHTML.replace(/\n/g, NEWLINE_PLACEHOLDER);
-                });
-            }
-        } catch (error) {
-            console.warn('Error parsing node JSON:', error);
-        }
-    });
-
-    return tempDiv.innerHTML;
-}
 
 function restoreNewLinesInPreElements(nodeElement) {
     nodeElement.querySelectorAll('pre').forEach(pre => {
@@ -76,20 +45,18 @@ function restoreNewLinesInPreElements(nodeElement) {
     });
 }
 
-function neuriteSaveEvent(existingTitle = null) {
+function savenet(existingTitle = null) {
     nodes.map((n) => n.updateEdgeData());
     clearNodeSelection();
 
-    let nodeData = document.getElementById("nodes").innerHTML;
+    // get the save object from Node class, WindowedUI return null
+    let nodeList = nodes.map((node) => node.save()).filter((node) => node !== null);
 
-    // Replace new lines in nodeData for LLM nodes
-    nodeData = replaceNewLinesInLLMSaveData(nodeData);
-
-    let zettelkastenContent = window.myCodemirror.getValue();
-    let zettelkastenSaveElement = `<div id="zettelkasten-save" style="display:none;">${encodeURIComponent(zettelkastenContent)}</div>`;
+    let zettelkastenSaveElement = window.myCodemirror.getValue();
 
     let additionalSaveData = collectAdditionalSaveObjects();
-    let saveData = nodeData + zettelkastenSaveElement + additionalSaveData;
+    // let nodesJSON = nodes.map((n) => JSON.parse(n.json()));
+    let saveData = { nodes: nodeList, zettelkastenSaveElement, additionalSaveData};
 
     let title = existingTitle || prompt("Enter a title for this save:");
     if (title) {
@@ -97,14 +64,24 @@ function neuriteSaveEvent(existingTitle = null) {
     }
 }
 
-// Attach the neuriteSaveEvent to the save button
-document.getElementById("save-button").addEventListener("click", () => neuriteSaveEvent());
+function savenetFile(){
+    let saveName = document.getElementById("save-or-load").value;
+    if(saveName.trim() === "") {
+        savenet()
+    }else{
+        savenet(saveName)
+    }
+}
+
+// Attach the savenet to the save button
+// document.getElementById("save-button").addEventListener("click", () => savenet());
+document.getElementById("save-button").addEventListener("click", () => savenetFile());
 
 
 function downloadData(title, data) {
-    var blob = new Blob([data], { type: 'text/plain' });
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     var tempAnchor = document.createElement('a');
-    tempAnchor.download = title + '.txt';
+    tempAnchor.download = title + '.json';
     tempAnchor.href = window.URL.createObjectURL(blob);
     tempAnchor.click();
     setTimeout(function () {
@@ -113,86 +90,105 @@ function downloadData(title, data) {
 }
 
 let selectedSaveIndex = null; // Global variable to track the selected save
+let selectedWorkspacePath = null; // Global variable to track the selected workspace directory
 
+// DONE
 function updateSavedNetworks() {
-    let saves = JSON.parse(localStorage.getItem("saves") || "[]");
-    let container = document.getElementById("saved-networks-container");
-    container.innerHTML = '';
 
-    for (let [index, save] of saves.entries()) {
-        let div = document.createElement("div");
+    function restoreSavedWorkspaces(workspaces){
+        let container = document.getElementById("saved-networks-container");
+        container.innerHTML = '';
+        let names = Object.keys(workspaces);
+        for (let index in names) {
+            let saveName = names[index]
+            console.log("Updating saves: ", index, " name: ", saveName, " directory: ", workspaces[saveName])
+            let div = document.createElement("div");
 
-        // Add a class to the div if it's the selected save
-        if (index === selectedSaveIndex) {
-            div.classList.add("selected-save");
+            // Add a class to the div if it's the selected save
+            if (index === selectedSaveIndex) {
+                div.classList.add("selected-save");
+            }
+            let titleInput = document.createElement("input");
+            let data = document.createElement("span");
+            let loadButton = document.createElement("button");
+            let deleteButton = document.createElement("button");
+            let addContentButton = document.createElement("button");
+
+            titleInput.type = "text";
+            titleInput.value = saveName;
+            titleInput.style.border = "none"
+            titleInput.style.width = "125px"
+            titleInput.addEventListener('change', function () {
+                // save.title = titleInput.value;
+                // localStorage.setItem("saves", JSON.stringify(saves));
+            });
+
+            data.textContent = workspaces[saveName];
+            data.style.display = "none";
+
+            loadButton.textContent = "Select";
+            loadButton.className = 'linkbuttons';
+            loadButton.addEventListener('click', function () {
+                document.getElementById("save-or-load").value = titleInput.value;
+                selectedSaveIndex = index; // Update the selected save index
+                updateSavedNetworks(); // Refresh the UI
+            });
+
+
+            deleteButton.textContent = "X";
+            deleteButton.className = 'linkbuttons';
+            deleteButton.addEventListener('click', function () {
+                let confirmMessage = `Click 'OK' to delete the save, or 'Cancel' to cancel.`;
+
+                if (confirm(confirmMessage)) {
+                    let softDeleteMessage = `Click 'OK' to remove the workspace from the list, or 'Cancel' to delete the .neurIDE folder and saved files from the workspace.`;
+                    if (confirm(softDeleteMessage)) {
+                        // Overwrite logic - update all saves with the matching title
+                        FileManagerAPI.deleteWorkspace(titleInput.value).then(()=> {
+                            updateSavedNetworks();
+                        });
+                    }else{
+                        FileManagerAPI.deleteWorkspace(titleInput.value, false).then(()=> {
+                            updateSavedNetworks();
+                        });
+                    }
+
+                }
+            });
+
+            addContentButton.textContent = "+";
+            addContentButton.className = 'linkbuttons';
+            addContentButton.addEventListener('click', function () {
+                // // Create a blob from the data
+                // var blob = new Blob([JSON.stringify(save.data, null, 2)], { type: 'application/json' });
+                //
+                // // Create a temporary anchor and URL
+                // var tempAnchor = document.createElement('a');
+                // tempAnchor.download = save.title + '.json';
+                // tempAnchor.href = window.URL.createObjectURL(blob);
+                //
+                // // Simulate a click on the anchor
+                // tempAnchor.click();
+                //
+                // // Clean up by revoking the object URL
+                // setTimeout(function () {
+                //     window.URL.revokeObjectURL(tempAnchor.href);
+                // }, 1);
+            });
+
+            div.appendChild(titleInput);
+            div.appendChild(data);
+            div.appendChild(loadButton);
+            div.appendChild(addContentButton);
+            div.appendChild(deleteButton);
+            container.appendChild(div);
         }
-        let titleInput = document.createElement("input");
-        let data = document.createElement("span");
-        let loadButton = document.createElement("button");
-        let deleteButton = document.createElement("button");
-        let downloadButton = document.createElement("button");
-
-        titleInput.type = "text";
-        titleInput.value = save.title;
-        titleInput.style.border = "none"
-        titleInput.style.width = "125px"
-        titleInput.addEventListener('change', function () {
-            save.title = titleInput.value;
-            localStorage.setItem("saves", JSON.stringify(saves));
-        });
-
-        data.textContent = save.data;
-        data.style.display = "none";
-
-        loadButton.textContent = "Select";
-        loadButton.className = 'linkbuttons';
-        loadButton.addEventListener('click', function () {
-            document.getElementById("save-or-load").value = data.textContent;
-            selectedSaveIndex = index; // Update the selected save index
-            updateSavedNetworks(); // Refresh the UI
-        });
-
-
-        deleteButton.textContent = "X";
-        deleteButton.className = 'linkbuttons';
-        deleteButton.addEventListener('click', function () {
-            // Remove the save from the array
-            saves.splice(index, 1);
-
-            // Update local storage
-            localStorage.setItem("saves", JSON.stringify(saves));
-
-            // Update the saved networks container
-            updateSavedNetworks();
-        });
-
-        downloadButton.textContent = "↓";
-        downloadButton.className = 'linkbuttons';
-        downloadButton.addEventListener('click', function () {
-            // Create a blob from the data
-            var blob = new Blob([save.data], { type: 'text/plain' });
-
-            // Create a temporary anchor and URL
-            var tempAnchor = document.createElement('a');
-            tempAnchor.download = save.title + '.txt';
-            tempAnchor.href = window.URL.createObjectURL(blob);
-
-            // Simulate a click on the anchor
-            tempAnchor.click();
-
-            // Clean up by revoking the object URL
-            setTimeout(function () {
-                window.URL.revokeObjectURL(tempAnchor.href);
-            }, 1);
-        });
-
-        div.appendChild(titleInput);
-        div.appendChild(data);
-        div.appendChild(loadButton);
-        div.appendChild(downloadButton);
-        div.appendChild(deleteButton);
-        container.appendChild(div);
     }
+    FileManagerAPI.loadWorkspaces().then((workspaces) => {
+        // console.log("Updating saves:", workspaces)
+        restoreSavedWorkspaces(workspaces);
+    })
+
 }
 
 // Call updateSavedNetworks on page load to display previously saved networks
@@ -283,7 +279,8 @@ document.getElementById("clearLocalStorage").onclick = function () {
 
 
 for (let n of htmlnodes) {
-    let node = new Node(undefined, n, true);  // Indicate edge creation with `true`
+    // let node = new Node(undefined, n, true);  // Indicate edge creation with `true`
+    let node = new WindowedNode({title: n.dataset.title, content: n, scale: true});
     registernode(node);
 }
 for (let n of nodes) {
@@ -311,26 +308,19 @@ function clearnet() {
     window.myCodemirror.setValue('');
 }
 
-function restoreAdditionalSaveObjects(d) {
+function restoreAdditionalSaveObjects(data) {
 
-    let savedViewsElement = d.querySelector("#saved-views");
-    if (savedViewsElement) {
-        let savedViewsContent = decodeURIComponent(savedViewsElement.innerHTML);
-        savedViews = JSON.parse(savedViewsContent);
-        if (savedViews) {
-            // Update the cache
-            updateSavedViewsCache();
-
-            displaySavedCoordinates();
-        }
-        savedViewsElement.remove();
+    let savedViewsEntry = data.additionalSaveData.savedViews;
+    if (savedViewsEntry) {
+        savedViews = savedViewsEntry;
+        updateSavedViewsCache();
+        displaySavedCoordinates();
     }
 
-    let sliderValuesElement = d.querySelector("#saved-input-values");
-    if (sliderValuesElement) {
-        const sliderValuesContent = decodeURIComponent(sliderValuesElement.innerHTML);
-        localStorage.setItem('inputValues', sliderValuesContent);
-        sliderValuesElement.remove();
+
+    let sliderValuesEntry = data.savedInputValues;
+    if (sliderValuesEntry) {
+        localStorage.setItem('inputValues', sliderValuesEntry);
     }
 
     // Restore sliders immediately after their values have been set
@@ -338,42 +328,35 @@ function restoreAdditionalSaveObjects(d) {
 }
 
 document.getElementById("load-button").addEventListener("click", function () {
-    loadnet(document.getElementById("save-or-load").value, true);
+    // loadnet(document.getElementById("save-or-load").value, true);
+    loadnetFile(document.getElementById("save-or-load").value, true);
 
 });
+
 
 function loadnet(text, clobber, createEdges = true) {
     if (clobber) {
         clearnet();
     }
 
-    let d = document.createElement("div");
-    d.innerHTML = text;
+    let data = JSON.parse(text);
 
     // Temporarily store Zettelkasten content but don't set it in myCodeMirror yet
-    let zettelkastenSaveElement = d.querySelector("#zettelkasten-save");
     let zettelkastenContent;
-    if (zettelkastenSaveElement) {
-        zettelkastenContent = decodeURIComponent(zettelkastenSaveElement.innerHTML);
-        //console.log("Zettelkasten Content:", zettelkastenContent);
-        // Remove the Zettelkasten save element to process the rest of the nodes
-        zettelkastenSaveElement.remove();
+    if (data.zettelkastenSaveElement) {
+        zettelkastenContent = data.zettelkastenSaveElement;
     }
 
-    restoreAdditionalSaveObjects(d);
-
+    restoreAdditionalSaveObjects(data);
     let newNodes = [];
-    for (let n of d.children) {
-        let node = new Node(undefined, n, true, undefined, createEdges);
+    for (let nodeJSON of data.nodes) {
+        let node = restoreNode(nodeJSON);
         newNodes.push(node);
-        registernode(node);
     }
 
-    populateDirectionalityMap(d, nodeMap);
+    populateDirectionalityMap(newNodes.map((node) => node.content), nodeMap);
 
     for (let n of newNodes) {
-        htmlnodes_parent.appendChild(n.content);
-
         n.init(nodeMap); // Initialize the node
 
         reconstructSavedNode(n); // Reconstruct the saved node
@@ -386,9 +369,16 @@ function loadnet(text, clobber, createEdges = true) {
     }
 }
 
-function populateDirectionalityMap(d, nodeMap) {
-    const nodes = Array.from(d.children);
-    nodes.forEach(nodeElement => {
+
+function loadnetFile(name, clobber) {
+    FileManagerAPI.loadWorkspace(name).then((workspaceData) => {
+        selectedWorkspacePath = workspaceData.rootFolder;
+        loadnet(JSON.stringify(workspaceData.diagram), clobber)
+    })
+}
+
+function populateDirectionalityMap(nodeElements, nodeMap) {
+    nodeElements.forEach(nodeElement => {
         if (nodeElement.hasAttribute('data-edges')) {
             const edgesData = JSON.parse(nodeElement.getAttribute('data-edges'));
             edgesData.forEach(edgeData => {
@@ -404,7 +394,7 @@ function populateDirectionalityMap(d, nodeMap) {
     });
 }
 
-function reconstructSavedNode(node) {
+function reconstructSavedNode(node, savedV2=true) {
     // Restore the title
     let titleInput = node.content.querySelector('.title-input');
     if (titleInput) {
@@ -413,21 +403,12 @@ function reconstructSavedNode(node) {
             titleInput.value = savedTitle;
         }
     }
-
-    if (node.isTextNode) {
-        initTextNode(node)
+    let hasType = !nodeClasses.every((nodeClass) => !(node instanceof nodeClass));
+    if (hasType && !savedV2) {
+        node.afterInit();
     }
-
-    if (node.isLLM) {
-        initAiNode(node);
+    if (node instanceof LLMNode) {
         restoreNewLinesInPreElements(node.aiResponseDiv);
     }
 
-    if (node.isLink) {
-        initLinkNode(node);
-    }
-
-    if (isEditorNode(node)) {
-        initEditorNode(node)
-    }
 }

@@ -283,7 +283,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
 
     if (wolframData) {
         const { wolframAlphaTextResult } = wolframData;
-        createWolframNode(wolframData);
+        createWolframNode("", wolframData);
 
         const wolframAlphaMessage = {
             role: "system",
@@ -407,7 +407,7 @@ class AiNodeMessageLoop {
     constructor(node, allConnectedNodes, clickQueues) {
         this.node = node;
         this.allConnectedNodes = allConnectedNodes;
-        this.clickQueues = clickQueues || {}; // If clickQueues is not passed, initialize as an empty object
+        this.clickQueues = clickQueues || {}; // If clickQueues is not passed, _initialize as an empty object
     }
 
     updateConnectedNodes() {
