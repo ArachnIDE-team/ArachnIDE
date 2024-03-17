@@ -1,11 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const fetch = require('node-fetch');
-const { JSDOM } = require('jsdom');
 const fs = require('./fsNode')
 const path = require('path')
 const app = express();
 const { v4: uuidv4 } = require('uuid');
+
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -142,47 +141,100 @@ app.get('/read-file', async (req, res) => {
         console.error('Error GET fs-tree:', error);
         res.status(500).send('Error GET fs-tree');
     }
-
 });
-// app.post('/store-embedding-and-text', (req, res) => {
-//     const { key, embedding, text, source } = req.body;
-//     db.run('INSERT OR REPLACE INTO embeddings (key, embedding, source) VALUES (?, ?, ?)', [key, JSON.stringify(embedding), source], (err) => {
-//         if (err) {
-//             console.error(err.message);
-//             res.status(500).send('Error storing embedding');
-//         } else {
-//             console.log('Embedding stored successfully');
-//             db.run('INSERT OR REPLACE INTO webpage_text (url, text) VALUES (?, ?)', [key, text], (err) => {
-//                 if (err) {
-//                     console.error(err.message);
-//                     res.status(500).send('Error storing web page text');
-//                 } else {
-//                     console.log('Web page text stored successfully');
-//                     res.send('Embedding and text stored successfully');
-//                 }
-//             });
-//         }
-//     });
-// });
+
+
+app.post('/write-file', (req, res) => {
+    const filePath = req.body.path;
+    const fileContent = req.body.content;
+    let file = new fs.Node(filePath);
+    file.content = fileContent;
+    res.send({message: "success"})
+})
+
+
+
+let autoLoadedFiles = [];
+
+// app.get('/file-observer', async (req, res) => {
+//     try {
+//         const filePath = req.query.path;
+//         let fsNode = new fs.Node(filePath);
 //
-// // Delete all chunks for a key
-// app.delete('/delete-chunks', (req, res) => {
-//     // The key should be provided as a query parameter
-//     const key = req.query.key;
-//
-//     // Delete all rows where the key starts with the provided key followed by "_chunk_"
-//     db.run('DELETE FROM embeddings WHERE key LIKE ?', [`${key}_chunk_%`], function (err) {
-//         if (err) {
-//             console.error(err.message);
-//             res.status(500).send('Error deleting chunks');
-//         } else {
-//             res.send(`Deleted ${this.changes} chunks`);
+//         if(!fsNode.exists) {
+//             console.error('Error GET file-observer: the file does not exist');
+//             return res.status(404).send("Error getting the file: '" + filePath +"' not found");
 //         }
-//     });
+//         if(!fsNode.isFile){
+//             console.error('Error GET file-observer: the file is not a file. It is a directory.');
+//             return res.status(404).send("Error getting the file: '" + filePath +"' is a directory");
+//         }
+//         let fileObserver = {
+//             path: fsNode.path,
+//             id: autoLoadedFiles.length
+//         }
+//         autoLoadedFiles.push(fileObserver)
+//         res.send(fileObserver);
+//     } catch (error) {
+//         console.error('Error GET file-observer:', error);
+//         res.status(500).send('Error GET file-observer');
+//     }
 // });
+
 
 // Start the server
 const PORT = process.env.PORT || 7000;
-app.listen(PORT, () => {
+let server = app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
+});
+
+
+var WebSocketServer = require('websocket').server;
+// File change observer websocket
+fileObserverWebsocket = new WebSocketServer({
+    httpServer: server
+});
+
+
+fileObserverWebsocket.on('request', function(request) {
+    var connection = request.accept(null, request.origin);
+    connection.on('message', function(message) {
+        console.log('Received a message: ' + message.utf8Data);
+        let observer = JSON.parse(message.utf8Data);
+        let fsNode = new fs.Node(observer.path);
+        if(observer.create){
+            let fileObserver = {
+                path: fsNode.path,
+                key: observer.key
+            }
+            autoLoadedFiles.push(fileObserver)
+            connection.sendUTF(JSON.stringify(fileObserver));
+            fileObserver.onchange = function() {
+                console.log("Observed a change:", fsNode.path)
+                this.contentUpdate = true;
+                connection.sendUTF(JSON.stringify(this));
+            }.bind(fileObserver);
+            fsNode.watch(fileObserver.onchange)
+            console.log("START observing file: ", fsNode.path)
+        } else if(observer.remove){
+            let fileObserver = autoLoadedFiles.find((autoLoadedFile) => autoLoadedFile.path === observer.path && autoLoadedFile.key === observer.key);
+            if(fileObserver) {
+                fsNode.unwatchFile(fileObserver.onchange);
+                console.log("STOP observing file: ", fsNode.path)
+            }
+            connection.sendUTF(JSON.stringify(observer)); // Send it back for front-end removal
+        }
+
+
+
+        // connection.sendBytes(message.binaryData);
+    });
+    connection.on('close', function(connection) {
+        console.log("Connection closed, closing", autoLoadedFiles )
+        for(let autoLoadedFile of autoLoadedFiles) {
+            let fsNode = new fs.Node(autoLoadedFile.path);
+            fsNode.unwatchFile(autoLoadedFile.onchange);
+        }
+        autoLoadedFiles = [];
+    });
 });

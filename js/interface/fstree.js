@@ -6,14 +6,19 @@ class FileSystemTree extends Tree {
         fsTree: undefined,
         root: undefined,
         selection: true,
-        multiple: true,
+        multiple: false,
         selectFiles: true,
         selectFolders: true,
+        eventListeners: {
+            switcher: [],
+            value: []
+        },
         afterInit: () => {}
     }
     // constructor(container, fsTree, root, selection=true) {
     constructor(configuration= FileSystemTree.DEFAULT_CONFIGURATION) {
         configuration = {...FileSystemTree.DEFAULT_CONFIGURATION, ...configuration}
+        if(configuration.multiple && configuration.selectFolders && !configuration.selectFiles) throw new Error("Multiple folders excluding files is not supported")
         const treeData = FileSystemTree._build_tree(configuration.fsTree, configuration.root);
         super(configuration.container, {
             data: treeData,
@@ -24,6 +29,7 @@ class FileSystemTree extends Tree {
                 this.selectFiles = configuration.selectFiles;
                 this.selectFolders = configuration.selectFolders;
                 this.rootPath = configuration.root;
+                this.eventListeners = configuration.eventListeners;
                 this.afterInit = configuration.afterInit;
                 // Don't worry about the warning
                 this.onLoaded();
@@ -54,11 +60,14 @@ class FileSystemTree extends Tree {
         } else {
             super.onSwitcherClick(switcherElement);
         }
+        for(let listener of this.eventListeners.switcher){
+            listener(found)
+        }
     }
 
     async reloadNode(rootPath, liElement){
         this.lastSelection = [...this.values];
-        let {fsTree, root} = await FileSystemTree.getFSTree(rootPath);
+        let {fsTree, root} = await FileSystemTree.getFSTree(rootPath.length > 0 && rootPath.length < 3 && !rootPath.endsWith("/") ? rootPath + "/" :rootPath);
         const treeData = FileSystemTree._build_tree(fsTree, root);
         // Node data replacement
         this.nodesById[rootPath].children = treeData;
@@ -83,18 +92,60 @@ class FileSystemTree extends Tree {
 
     onChanged(){
         console.log("Checkbox changed: ", this.values);
+
+        let newSelection = [...this.values]
+        for(let prevId of this.lastSelection){
+            if(newSelection.includes(prevId)) newSelection.splice(newSelection.indexOf(prevId), 1)
+        }
+        this.lastSelection = [...this.values];
+        function callListeners() {
+            for (let listener of this.eventListeners.value) {
+                listener(this.values, newSelection)
+            }
+        }
         if(!this.multiple) {
             if(this.values.length > 1) {
-                let newSelection = [...this.values]
-                for(let prevId of this.lastSelection){
-                    if(newSelection.includes(prevId)) newSelection.splice(newSelection.indexOf(prevId), 1)
+                if(this.selectFiles || (this.selectFolders && newSelection.length === 1)){
+                    newSelection = [newSelection[newSelection.length - 1]];
+                    this.values = newSelection;
+                } else if(this.selectFolders && newSelection.length > 1) {
+                    // Unselect all is not possible, keep all selected
                 }
-                newSelection = [newSelection[newSelection.length - 1]];
-                this.values = newSelection;
+            }else{
+                callListeners.call(this);
             }
-            this.lastSelection = [...this.values];
+        } else{
+            callListeners.call(this);
         }
     }
+    // override walkDown
+    walkDown(node, changeState) {
+        if (node.children && node.children.length) {
+            node.children.forEach(child => {
+                if ((changeState === 'status' && child.disabled) || (!this.multiple && this.selectFolders)) return; // Added || (!this.multiple && this.selectFolders)
+                child[changeState] = node[changeState];
+                this.markWillUpdateNode(child);
+                this.walkDown(child, changeState);
+            });
+        }
+    };
+    // override getValues
+    getValues() {
+        const values = [];
+        for (let id in this.nodesById) {
+            if (this.nodesById.hasOwnProperty(id)) {
+                const node = this.nodesById[id];
+                if (
+                    (node.status === 1 ||
+                    node.status === 2) &&
+                    node.children.every(child => child.status !== 1 && child.status !== 2)
+                ) {
+                    values.push(id);
+                }
+            }
+        }
+        return values;
+    };
 
     onLoaded(){
         this.collapseAll();
@@ -122,6 +173,10 @@ class FileSystemTree extends Tree {
         for (let id of Object.keys(this.liElementsById)){
             let liElement = this.liElementsById[id];
             let node = this.nodesById[id];
+            if(!node) {
+                console.log("Node not found for ID:" , id)
+                continue;
+            }
             let iconSpan = liElement.querySelector(".treejs-icons");
             if(!iconSpan){
                 iconSpan = document.createElement("span");
@@ -181,6 +236,14 @@ class FileSystemTree extends Tree {
         }
     }
 
+    addEventListener(event, callback){
+        this.eventListeners[event].push(callback);
+    }
+
+    removeEventListener(event, callback){
+        this.eventListeners[event].splice(this.eventListeners[event].indexOf(callback), 1)
+    }
+
     static _build_tree(fsTree, currentPosition=""){
         let tree_root = [];
         for(let node of Object.keys(fsTree)){
@@ -188,10 +251,6 @@ class FileSystemTree extends Tree {
             let item = {
                 id: currentNode,
                 text:  node,
-                // attributes: {
-                //     isNew: difference.isNew,
-                //     isDeleted: difference.isDeleted
-                // }
             };
             if(typeof fsTree[node] === "string"){
                 item.children = [];
@@ -213,7 +272,7 @@ class FileSystemTree extends Tree {
     }
 }
 
-async function createFSTree(elementID, afterInit){
+async function createWorkspaceFSTree(elementID, afterInit){
     let {fsTree, root} = await FileSystemTree.getFSTree(selectedWorkspacePath);
     return new FileSystemTree({
         container: "#" + elementID,
@@ -222,7 +281,21 @@ async function createFSTree(elementID, afterInit){
         selection: true,
         multiple: false,
         selectFiles: true,
-        selectFolders: true,
+        selectFolders: false,
+        afterInit
+    })
+    // return new FileSystemTree("#" + elementID, fsTree, root, true)
+}
+async function createFilePickerFSTree(elementID, root, multiple, files, folders, afterInit){
+    let tree = await FileSystemTree.getFSTree(root);
+    return new FileSystemTree({
+        container: "#" + elementID,
+        fsTree: tree.fsTree,
+        root: tree.root,
+        selection: true,
+        multiple: multiple,
+        selectFiles: files,
+        selectFolders: folders,
         afterInit
     })
     // return new FileSystemTree("#" + elementID, fsTree, root, true)

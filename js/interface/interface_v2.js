@@ -49,18 +49,22 @@ function nextUUID() {
 }
 
 class Node {
+    // Default constructor single Object argument
     static DEFAULT_CONFIGURATION = {
         pos: undefined,
         content: undefined,
         scale: 1,
         intrinsicScale: 1,
         createEdges: true,
-        saveElements: [],
+        files: [],
         saved: false,
         saveData: null
     }
+    // An array for properties that need to be restored as vectors
     static VECTOR_PROPERTIES = ['anchor', 'mouseAnchor', 'vel', 'pos', 'force'];
-    static SAVE_PROPERTIES = ['scale', 'intrinsicScale', 'removed', 'createdAt', 'uuid', 'type'];
+    // The SAVE_PROPERTIES array, for each Node type, defines the properties saved as JSON and restored on load.
+    // This happens in the Node constructor that follows, usage of restored properties must follow "super" constructor call.
+    static SAVE_PROPERTIES = ['scale', 'intrinsicScale', 'removed', 'createdAt', 'uuid', 'type', 'files'];
 
     // constructor(pos, content, scale = 1, intrinsicScale = 1, createEdges = true) {
     constructor(configuration=Node.DEFAULT_CONFIGURATION) {
@@ -71,38 +75,12 @@ class Node {
         this.mouseAnchor = new vec2(0, 0);
         this.edges = [];
         this.createdAt = new Date().toISOString();
+        this.files = [...configuration.files];
         this.init = (nodeMap) => { };
         this.type = this.constructor.name;
-        this.saveElements = configuration.saveElements;
         // console.log("Restoring Node: ", configuration.saved)
         // if (configuration.pos === undefined) { // saved node
-        if (configuration.saved) { // saved node
-            // let n = configuration.content;
-            // let o = JSON.parse(n.dataset.node_json)
-            // for (const k of Node.VECTOR_PROPERTIES) {
-            //     o[k] = new vec2(o[k]);
-            // }
-            // for (const k in o) {
-            //     this[k] = o[k];
-            // }
-            // this.save_extras = [];
-            // this.content = configuration.content;
-            // if (n.dataset.node_extras) {
-            //     o = JSON.parse(n.dataset.node_extras);
-            //     for (const e of o) {
-            //         NodeExtensions[e.f](this, e.a);
-            //     }
-            // }
-            // this.attach();
-            // this.content.setAttribute("data-uuid", this.uuid);
-            // if (n.dataset.edges !== undefined && configuration.createEdges) {
-            //     let es = JSON.parse(n.dataset.edges);
-            //     this.init = ((nodeMap) => {
-            //         for (let e of es) {
-            //             edgeFromJSON(e, nodeMap);
-            //         }
-            //     }).bind(this);
-            // }
+        if (configuration.saved) {
             let o = configuration.saveData.json;
             for (const k of Node.VECTOR_PROPERTIES) {
                 o[k] = new vec2(o[k]);
@@ -514,18 +492,6 @@ class Node {
         this.content.remove();
     }
 
-    addSaveElements(propertyName){
-        this.saveElements.push(propertyName);
-    }
-    removeSaveElements(propertyName){
-        let propertyIndex = this.saveElements.indexOf(propertyName);
-        if(propertyIndex !== -1) {
-            this.saveElements.splice(propertyIndex, 1)
-            return true;
-        }
-        return false;
-    }
-
     // save(){
     //     let nodeElement = this.content.cloneNode(true);
     //     let node = {
@@ -553,23 +519,65 @@ class Node {
         };
     }
 
+    // Files
+    autoSaveFile(fileObject) {
+        FileManagerAPI.addFileToAutoSave(this, fileObject);
+    }
+    stopAutoSaveFile(fileObject) {
+        FileManagerAPI.removeFileFromAutoSave(this, fileObject);
+    }
+    autoLoadFile(fileObject) {
+        FileManagerAPI.addFileToAutoLoad(this, fileObject);
+    }
+    stopAutoLoadFile(fileObject) {
+        FileManagerAPI.removeFileFromAutoLoad(this, fileObject);
+    }
 
-    toSave() {
-        return {
-            pos: this.pos,
-            scale: this.scale,
-            intrinsicScale: this.intrinsicScale
+    savePropertyToFile(key, path){
+        FileManagerAPI.saveFile(path, this[key]).then((response) => {console.log("Saved file. Server response: " + response)})
+    }
+
+    loadPropertyFromFile(key, path){
+        FileManagerAPI.loadFile(path).then((file) => {
+            this[key] = file.content;
+        });
+    }
+
+    observeProperty(property, callback){
+        for (let extendedClass of this.getExtendedClasses()){
+            console.log("Searching for property " + property + " in class: " + extendedClass.name)
+            if(extendedClass.hasOwnProperty("OBSERVERS") && extendedClass.OBSERVERS.hasOwnProperty(property)){
+                console.log("   Found OBSERVER in class: ", extendedClass.name, ": ", extendedClass.OBSERVERS[property])
+                extendedClass.OBSERVERS[property].add.bind(this)(callback)
+            }
         }
     }
-    static fromSave(nodeJSON, content){
-        content.setAttribute('data-node_json', JSON.stringify(nodeJSON.json))
-        content.setAttribute('data-edges', JSON.stringify(nodeJSON.edges))
-        content.setAttribute('data-node_extras', JSON.stringify(nodeJSON.node_extras))
-        content.setAttribute('data-init', 'window')
-        content.setAttribute('data-title', nodeJSON.title)
-        content.setAttribute('data-uuid', nodeJSON.json.uuid)
 
+    stopObservingProperty(property, callback) {
+        for (let extendedClass of this.getExtendedClasses()){
+            console.log("Searching for property " + property + " in class: " + extendedClass.name)
+            if(extendedClass.hasOwnProperty("OBSERVERS") && extendedClass.OBSERVERS.hasOwnProperty(property)){
+                console.log("   Found OBSERVER in class: ", extendedClass.name, ": ", extendedClass.OBSERVERS[property])
+                extendedClass.OBSERVERS[property].remove.bind(this)(callback)
+            }
+        }
     }
+    getExtendedClasses(){
+        let extendedClasses = [];
+        let extendedClassConstructor = this.constructor;
+        let extendedClassPrototype = this.__proto__;
+        while (extendedClassConstructor.name !== "Object"){
+            extendedClasses.push(extendedClassConstructor);
+            extendedClassPrototype = extendedClassPrototype.__proto__;
+            extendedClassConstructor = extendedClassPrototype.constructor;
+        }
+        return extendedClasses;
+    }
+
+    getSaveFile(key){
+        return this.files.find((file) => file.key === key);
+    }
+
 }
 
 globalThis.Node = Node;// override Node

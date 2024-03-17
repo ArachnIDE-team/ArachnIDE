@@ -14,6 +14,11 @@ class TextNode extends WindowedNode {
 
     static SAVE_PROPERTIES = ['text', 'addCodeButton', 'isTextNode'];
 
+    static OBSERVERS = { 'text': {
+        'add': function (callback) { this.contentEditableDiv.addEventListener("input", callback) },
+        'remove': function (callback) { this.contentEditableDiv.removeEventListener("input", callback) }
+    }}
+
     // constructor(name = '', content = undefined, text = '', sx = undefined, sy = undefined, x = undefined, y = undefined, addCodeButton = false){
 
     constructor(configuration = TextNode.DEFAULT_CONFIGURATION){
@@ -30,6 +35,8 @@ class TextNode extends WindowedNode {
         this._initialize(textarea, configuration.sx, configuration.sy, configuration.x, configuration.y, configuration.addCodeButton)
         if(configuration.text) this.text = configuration.text;
     }
+
+
 
     get text() {
         return this.contentEditableDiv.innerText;
@@ -53,9 +60,16 @@ class TextNode extends WindowedNode {
         textarea.setAttribute("size", "11");
         //textarea.setAttribute("style", "background-color: #222226; color: #bbb; overflow-y: scroll; resize: both; width: 259px; line-height: 1.4; display: none;");
         textarea.style.position = "absolute";
-        //        var jsEditor = CodeMirror(document.getElementById('jsEditor'), {
-        //                 mode: 'javascript', theme: 'dracula', lineNumbers: true, lineWrapping: false, scrollbarStyle: 'simple'
-        //             });
+        // var jsEditor = CodeMirror(document.getElementById('jsEditor'), {
+        //    mode: 'javascript', theme: 'dracula', lineNumbers: true, lineWrapping: false, scrollbarStyle: 'simple'
+        // });
+        // jsEditor.display.wrapper.style.clipPath = 'inset(0px)';
+        // jsEditor.display.wrapper.style.backgroundColor = 'rgb(34, 34, 38)';
+        // jsEditor.display.wrapper.style.borderStyle = 'inset';
+        // jsEditor.display.wrapper.style.borderColor = 'rgba(136, 136, 136, 0.133)';
+        // jsEditor.display.wrapper.style.fontSize = '15px';
+        // jsEditor.display.wrapper.style.resize = 'vertical';
+        // jsEditor.display.wrapper.style.userSelect = 'none';
         return textarea;
     }
 
@@ -133,9 +147,7 @@ class TextNode extends WindowedNode {
         this.codeButton = this.content.querySelector('.code-button');
         this.textarea = this.content.querySelector('textarea');
         this.htmlView = this.content.querySelector('#html-iframe');
-        this.addSaveElements("htmlView")
         this.pythonView = this.content.querySelector('#python-frame')
-        this.addSaveElements("pythonView")
         this._addEventListeners();
         super.afterInit();
     }
@@ -192,13 +204,7 @@ class TextNode extends WindowedNode {
         return JSON.stringify(json, replacer);
     }
 
-    toSave() {
-        let json = super.toSave();
-    }
 
-    static fromSave(json){
-
-    }
 }
 
 function createTextNode(name = '', text = '', sx = undefined, sy = undefined, x = undefined, y = undefined, addCodeButton = false) {
@@ -1618,6 +1624,7 @@ class AudioNode extends WindowedNode {
         configuration = {...AudioNode.DEFAULT_CONFIGURATION, ...configuration}
         if (!configuration.saved) {// Create AudioNode
             super({ title: configuration.name, content: AudioNode._getContentElement(configuration.audioUrl, configuration.blob), ...WindowedNode.getNaturalScaleParameters() });
+            this.followingMouse = 1;
         } else {// Restore AudioNode
             configuration.audioUrl = configuration.saveData.json.audioUrl;
             super({ title: configuration.name, content: AudioNode._getContentElement(configuration.audioUrl, configuration.blob), scale: true, saved: true, saveData: configuration.saveData })
@@ -1648,7 +1655,6 @@ class AudioNode extends WindowedNode {
 
 
     _initialize(audioUrl, blob, saved){
-        this.followingMouse = 1;
         this.draw();
         if(!saved){
             this.audioUrl = audioUrl;
@@ -1706,6 +1712,7 @@ class VideoNode extends WindowedNode {
         configuration = {...VideoNode.DEFAULT_CONFIGURATION, ...configuration}
         if (!configuration.saved) {// Create VideoNode
             super({ title: configuration.name, content: VideoNode._getContentElement(configuration.videoUrl, configuration.blob), ...WindowedNode.getNaturalScaleParameters() });
+            this.followingMouse = 1;
         } else {// Restore VideoNode
             configuration.videoUrl = configuration.saveData.json.videoUrl;
             super({ title: configuration.name, content: VideoNode._getContentElement(configuration.videoUrl, configuration.blob), scale: true, saved: true, saveData: configuration.saveData })
@@ -1772,7 +1779,6 @@ class VideoNode extends WindowedNode {
 
 
     _initialize(videoUrl, blob, saved){
-        this.followingMouse = 1;
         this.draw();
         if(!saved){
             this.videoUrl = videoUrl;
@@ -1830,6 +1836,7 @@ class WolframNode extends WindowedNode {
         if (!configuration.saved) {// Create WolframNode
             if(!configuration.name) configuration.name = `${configuration.wolframData.reformulatedQuery} - Wolfram Alpha Result`;
             super({ title: configuration.name, content: WolframNode._getContentElement(configuration.wolframData), ...WindowedNode.getNaturalScaleParameters() });
+            this.followingMouse = 1;
         } else {// Restore WolframNode
             configuration.wolframData = configuration.saveData.json.wolframData;
             super({ title: configuration.name, content: WolframNode._getContentElement(configuration.wolframData), scale: true, saved: true, saveData: configuration.saveData })
@@ -1875,7 +1882,6 @@ class WolframNode extends WindowedNode {
 
 
     _initialize(wolframData, saved){
-        this.followingMouse = 1;
         this.draw();
         if(!saved){
             this.wolframData = wolframData;
@@ -1920,7 +1926,7 @@ class WorkspaceExplorerNode extends WindowedNode {
         saved: undefined,
         saveData: undefined
     }
-    static SAVE_PROPERTIES = ['index'];
+    static SAVE_PROPERTIES = ['index', 'selectedFile'];
     // constructor(name = '', content = undefined, imageSrc = '', sx = undefined, sy = undefined, x = undefined, y = undefined, isUrl = false){
 
 
@@ -1929,12 +1935,14 @@ class WorkspaceExplorerNode extends WindowedNode {
         if(!selectedWorkspacePath) throw new Error("Please load a workspace before creating a WorkspaceExplorerNode")
         if (!configuration.saved) {// Create WorkspaceExplorerNode
             configuration.index = workspaceExplorerNodeCount;
-            super({ title: configuration.name, content: WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index), addSettingsButton:false, ...WindowedNode.getNaturalScaleParameters() });
+            super({ title: configuration.name, content: WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index), addFileButton:false, ...WindowedNode.getNaturalScaleParameters() });
             workspaceExplorerNodeCount++;
+            this.followingMouse = 1;
         } else {// Restore WorkspaceExplorerNode
             configuration.index = configuration.saveData.json.index;
-            super({ title: configuration.name, content: WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index), addSettingsButton:false, scale: true, saved: true, saveData: configuration.saveData })
+            super({ title: configuration.name, content: WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index), addFileButton:false, scale: true, saved: true, saveData: configuration.saveData })
         }
+
         htmlnodes_parent.appendChild(this.content);
         registernode(this);
         this._initialize(configuration.index, configuration.saved);
@@ -1964,10 +1972,10 @@ class WorkspaceExplorerNode extends WindowedNode {
         this.toggleWindowAnchored(true);
         // this.windowDiv.style.maxHeight =  "600px";
 
-        this.followingMouse = 1;
         this.draw();
         if(!saved){
             this.index = index;
+            this.selectedFile = "";
         }
         this.setMinSize(420)
         // this.innerContent.style.minWidth = "400px"
@@ -1984,9 +1992,13 @@ class WorkspaceExplorerNode extends WindowedNode {
         let saveFileSelectionButton = document.createElement("button");
         saveFileSelectionButton.innerText = "→ SAVE";
         saveFileSelectionButton.className = "footer-button";
+        saveFileSelectionButton.disabled = true;
+        saveFileSelectionButton.onclick = this.onSaveFile.bind(this);
         let loadFileSelectionButton = document.createElement("button");
         loadFileSelectionButton.innerText = "LOAD →";
         loadFileSelectionButton.className = "footer-button";
+        loadFileSelectionButton.disabled = true;
+        loadFileSelectionButton.onclick = this.onLoadFile.bind(this);
 
         footerContainerLeftContainer.appendChild(saveFileSelectionButton);
         footerContainerRightContainer.appendChild(loadFileSelectionButton);
@@ -2002,7 +2014,7 @@ class WorkspaceExplorerNode extends WindowedNode {
         this.innerContent.style.width = "100%";
         this.innerContent.style.height = "100%";
 
-        createFSTree(elementID, function makeTreeScrollable(){
+        createWorkspaceFSTree(elementID, function makeTreeScrollable(){
             for (let liElement of Object.values(this.liElementsById)) {
                 WindowedNode.makeContentScrollable(liElement);
                 let ulElement = liElement.querySelector("ul.treejs-nodes");
@@ -2010,11 +2022,37 @@ class WorkspaceExplorerNode extends WindowedNode {
             }
         }).then((fileSystemTree) => {
             this.fileSystemTree = fileSystemTree;
-            // WindowedNode.makeContentScrollable(this.innerContent, true)
-            // WindowedNode.makeContentScrollable(treeContainer, true)
-            // this.innerContent.className.add("header-content-footer");
+            this.fileSystemTree.addEventListener("value", (selected, newSelection) => {
+                console.log("Selected: ", selected, " newSelection: ", newSelection)
+                if(selected.length === 0){
+                    saveFileSelectionButton.disabled = true;
+                    loadFileSelectionButton.disabled = true;
+                    this.selectedFile = "";
+                } else {
+                    saveFileSelectionButton.disabled = false;
+                    loadFileSelectionButton.disabled = false;
+                    this.selectedFile = selected[0];
+                }
+            })
             this.afterInit();
         })
+    }
+
+    async readFileAndCreateTextNode(filePath, fileName){
+        let file = await FileManagerAPI.loadFile(filePath);
+        let textNode = createNodeFromWindow('', file.content, true)
+        textNode.files.push({ key: "text", path: filePath, type: "string", name: fileName, autoLoad: false, autoSave: false});
+    }
+
+    onLoadFile(){
+        if(this.selectedFile !== ""){
+            let fileName = this.fileSystemTree.nodesById[this.selectedFile].text
+            this.readFileAndCreateTextNode(this.selectedFile, fileName).then(() => {});
+        }
+    }
+
+    onSaveFile(){
+
     }
 
     afterInit() {

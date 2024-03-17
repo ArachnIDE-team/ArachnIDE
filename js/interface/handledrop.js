@@ -306,18 +306,6 @@ addEventListener("paste", (event) => {
         node.draw();
         node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
     } else {
-        // Existing code for handling other pasted content
-        // let content = document.createElement("div");
-        // content.innerHTML = pastedData;
-        // let t = document.createElement("input");
-        // t.setAttribute("type", "text");
-        // t.setAttribute("value", "untitled");
-        // t.setAttribute("style", "background:none;");
-        // t.classList.add("title-input");
-        // let node =  new WindowedNode({title: "untitled", content: [content], pos: toZ(mousePos),scale: (zoom.mag2() ** settings.zoomContentExp), intrinsicScale: 1});
-        // // let node = windowify("untitled", [content], toZ(mousePos), (zoom.mag2() ** settings.zoomContentExp), 1);
-        // htmlnodes_parent.appendChild(node.content);
-        // registernode(node);
         let node = createNodeFromWindow('', pastedData, true);
         node.followingMouse = 1;
         node.draw();

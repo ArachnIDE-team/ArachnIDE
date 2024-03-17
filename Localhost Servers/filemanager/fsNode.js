@@ -140,4 +140,16 @@ proto.delete = async function () {
         fs.rmSync(this.path);
     }
 }
+proto.watch = function (callback){
+    if (this.isDirectory) {
+        fs.watch(this.path, callback);
+    } else {
+        fs.watchFile(this.path, callback);
+    }
+}
+proto.unwatchFile = function (callback){
+    if (this.isFile) {
+        fs.unwatchFile(this.path, callback);
+    }
+}
 module.exports = fs;

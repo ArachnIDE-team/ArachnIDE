@@ -43,6 +43,7 @@ function createNodeFromWindow(title = null, content = null, followMouse = false)
         followMouseFromWindow = true;
     }
     addNodeTagToZettelkasten(defaultTitle, content);
+    return getNodeByTitle(defaultTitle);
 }
 
 function addNodeTagToZettelkasten(title, content = null) {

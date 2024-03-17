@@ -11,10 +11,11 @@ class WindowedNode extends Node {
         addFullScreenButton: true,
         addCollapseButton: true,
         addSettingsButton: true,
+        addFileButton: true,
         saved: undefined,
         saveData: undefined
     }
-    static SAVE_PROPERTIES = ['title', 'addCloseButton', 'addFullScreenButton', 'addCollapseButton', 'addSettingsButton'];
+    static SAVE_PROPERTIES = ['title', 'addCloseButton', 'addFullScreenButton', 'addCollapseButton', 'addSettingsButton', 'addFileButton'];
     // constructor(title, content, pos, scale, iscale, link) {
     constructor(configuration= WindowedNode.DEFAULT_CONFIGURATION) {
         configuration = {...WindowedNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -34,6 +35,7 @@ class WindowedNode extends Node {
         this.addFullScreenButton = configuration.addFullScreenButton;
         this.addCollapseButton = configuration.addCollapseButton;
         this.addSettingsButton = configuration.addSettingsButton;
+        this.addFileButton = configuration.addFileButton;
         this.rewindowify();
     }
     static makeContentScrollable(content, addScrollbar=false){
@@ -110,9 +112,14 @@ class WindowedNode extends Node {
 
         let w = this.content;
 
+        let buttonPosition = new vec2(1, 1);
+        const buttonDistance = new vec2(20, 0);
+
         let deleteButton = w.querySelector("#button-delete");
         if(this.addCloseButton || this.addCloseButton === undefined){ // retro-compatibility for saves
             deleteButton.classList.add('windowbutton');
+            deleteButton.setAttribute("transform", "scale(0.125 0.125) translate(" + buttonPosition.x + " " + buttonPosition.y + ")");
+            buttonPosition = buttonPosition.cadd(buttonDistance)
         } else {
             if(deleteButton) deleteButton.remove()
         }
@@ -120,6 +127,8 @@ class WindowedNode extends Node {
         let fullScreenButton = w.querySelector("#button-fullscreen");
         if(this.addFullScreenButton || this.addFullScreenButton === undefined){ // retro-compatibility for saves
             fullScreenButton.classList.add('windowbutton');
+            fullScreenButton.setAttribute("transform", "scale(0.125 0.125) translate(" + buttonPosition.x + " " + buttonPosition.y + ")");
+            buttonPosition = buttonPosition.cadd(buttonDistance)
         } else {
             if(fullScreenButton) fullScreenButton.remove()
         }
@@ -127,6 +136,8 @@ class WindowedNode extends Node {
         let collapseButton = w.querySelector("#button-collapse");
         if(this.addCollapseButton || this.addCollapseButton === undefined){ // retro-compatibility for saves
             collapseButton.classList.add('windowbutton');
+            collapseButton.setAttribute("transform", "scale(0.125 0.125) translate(" + buttonPosition.x + " " + buttonPosition.y + ")");
+            buttonPosition = buttonPosition.cadd(buttonDistance)
         } else {
             if(collapseButton) collapseButton.remove()
         }
@@ -134,14 +145,25 @@ class WindowedNode extends Node {
         let settingsButton = w.querySelector("#button-settings");
         if(this.addSettingsButton || this.addSettingsButton === undefined){ // retro-compatibility for saves
             settingsButton.classList.add('windowbutton');
+            settingsButton.setAttribute("transform", "scale(0.125 0.125) translate(" + buttonPosition.x + " " + buttonPosition.y + ")");
+            buttonPosition = buttonPosition.cadd(buttonDistance)
         } else {
             if(settingsButton) settingsButton.remove()
+        }
+
+        let fileButton = w.querySelector("#button-file");
+        if(this.addFileButton || this.addFileButton === undefined){ // retro-compatibility for saves
+            fileButton.classList.add('windowbutton');
+            fileButton.setAttribute("transform", "scale(0.125 0.125) translate(" + buttonPosition.x + " " + buttonPosition.y + ")");
+        } else {
+            if(fileButton) fileButton.remove()
         }
 
         let numberOfButtons = (this.addCloseButton || this.addCloseButton === undefined) +
             (this.addFullScreenButton || this.addFullScreenButton === undefined) +
             (this.addCollapseButton || this.addCollapseButton === undefined) +
-            (this.addSettingsButton || this.addSettingsButton === undefined);
+            (this.addSettingsButton || this.addSettingsButton === undefined) +
+            (this.addFileButton || this.addFileButton === undefined);
 
 
         let buttonContainer = this.windowDiv.querySelector(".header-container > svg.button-container");
@@ -184,7 +206,8 @@ class WindowedNode extends Node {
         if(this.addCloseButton) initializeWindowButton(deleteButton, this.onDelete.bind(this));
         if(this.addFullScreenButton) initializeWindowButton(fullScreenButton, this.onFullScreen.bind(this));
         if(this.addCollapseButton) initializeWindowButton(collapseButton, this.onCollapse.bind(this), "stroke");
-        if(this.addSettingsButton) initializeWindowButton(settingsButton,() => {});
+        if(this.addSettingsButton) initializeWindowButton(settingsButton,this.onSettings.bind(this));
+        if(this.addFileButton) initializeWindowButton(fileButton,this.onFiles.bind(this));
 
         // Add the "mouseup" event listener to the document
         document.addEventListener('mouseup', () => {
@@ -231,6 +254,14 @@ class WindowedNode extends Node {
         this.remove();
         // Delete the this from CodeMirror
         deleteNodeByTitle(title);
+    }
+
+    onSettings(){
+
+    }
+
+    onFiles(){
+        new NodeFilesUI({node: this})
     }
 
     setMinSize(minWidth, minHeight) {

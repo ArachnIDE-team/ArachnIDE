@@ -11,14 +11,16 @@ function handleSaveConfirmation(title, saveData) { //, existingTitle) {
                 });
             }
         } else {
-            new FilePicker("Choose the workspace folder for " + title, ".", (folder) => {
-                console.log("Selected folder for save", folder);
-                // Add new save
-                FileManagerAPI.createWorkspace(title, folder, saveData).then(() => {
-                    console.log(`Updated all saves with title: ${title}`);
-                });
-                console.log(`Created new save: ${title}`);
-            })
+            new FilePicker({title: "Choose the workspace folder for " + title, home: "", multiple: false, selectFiles: false, selectFolders: true,
+                onSelect: (folder) => {
+                    console.log("Selected folder for save", folder[0]);
+                    // Add new save
+                    FileManagerAPI.createWorkspace(title, folder[0], saveData).then(() => {
+                        console.log(`Updated all saves with title: ${title}`);
+                    });
+                    console.log(`Created new save: ${title}`);
+                }
+            });
 
         }
         updateSavedNetworks();

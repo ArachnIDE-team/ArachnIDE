@@ -2361,10 +2361,72 @@ textarea[id^='custom-instructions-textarea-'] {
     border: inset;
     border-color: #8882;
 }
+
+.footer-button:disabled {
+    background-color: #5b5b5d;
+    cursor: not-allowed;
+}
+
+
 .header-content-footer {
     display: flex;
     flex-direction: column;
     height: 100%;
+}
+
+
+.node-file-container {
+    margin: 5px;
+    background: #222226;
+    border-radius: 3px;
+    padding: 5px;
+    display: flex;
+
+}
+.node-file-left-container {
+    flex-grow: 1;
+
+}
+.node-file-right-container {
+    position: relative;
+    float: right;
+    display: inline-block;
+}
+.node-file-right-inner-container {
+    display: flex;
+    flex-direction: column;
+}
+.node-file-button-container:first-child {
+    margin-bottom: 5px;
+}
+.node-file-button-container {
+    display: flex;
+}
+.node-file-plus-container {
+    width: 100%;
+    text-align: center;
+}
+.node-file-button {
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #222226;
+    transition: background-color 0.3s;
+    border: inset;
+    border-color: #8882;
+}
+.node-file-button:active,
+.node-file-button:has(+ input[type="checkbox"]:checked){
+    background-color: #38383a;
+}
+.node-file-auto-label{
+    margin-top: 4px;
+    margin-left: 5px;
+}
+.node-file-key-container {
+    font-size: large;
+    font-weight: 700;
+    font-family: monospace;
+    margin-bottom: 5px;
 }
 /*.content-sticky-header + div {*/
 /*    margin-top: 30px;*/
