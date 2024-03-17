@@ -54,6 +54,13 @@ function savenet(existingTitle = null) {
     // get the save object from Node class, WindowedUI return null
     let nodeList = nodes.map((node) => node.save()).filter((node) => node !== null);
 
+    // Remove properties already saved to file
+    for (let node of nodeList) {
+        for (let file of node.json.files){
+            if(node.json.hasOwnProperty(file.key)) delete node.json[file.key]
+        }
+    }
+
     let zettelkastenSaveElement = window.myCodemirror.getValue();
 
     let additionalSaveData = collectAdditionalSaveObjects();
@@ -291,6 +298,9 @@ for (let n of nodes) {
 
 function clearnet() {
     clearNodeSelection()
+
+    // Remove automatic load/save from/to files
+    FileManagerAPI.clearAutoFiles();
 
     // Remove all edges
     while (edges.length > 0) {

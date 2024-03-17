@@ -88,14 +88,27 @@ class Node {
             for (const k in o) {
                 this[k] = o[k];
             }
-            this.save_extras = [];
-            this.content = configuration.content;
-            if (configuration.saveData.node_extras) {
-                o = configuration.saveData.node_extras;
-                for (const e of o) {
-                    NodeExtensions[e.f](this, e.a);
+            // START FILES
+            for(let file of this.files){
+                if(file.autoSave) {
+                    this.autoSaveFile(file);
+                    // this.savePropertyToFile(file.key, file.path)
+                }
+                if(file.autoLoad) {
+                    this.autoLoadFile(file);
+                    this.loadPropertyFromFile(file.key, file.path)
+
                 }
             }
+            // END FILES
+            this.content = configuration.content;
+            // this.save_extras = [];
+            // if (configuration.saveData.node_extras) {
+            //     o = configuration.saveData.node_extras;
+            //     for (const e of o) {
+            //         NodeExtensions[e.f](this, e.a);
+            //     }
+            // }
             this.attach();
             this.content.setAttribute("data-uuid", this.uuid);
             if (configuration.saveData.edges !== undefined && configuration.createEdges) {
@@ -126,7 +139,7 @@ class Node {
 
             this.content.setAttribute("data-uuid", this.uuid);
             this.attach();
-            this.save_extras = [];
+            // this.save_extras = [];
         }
     }
 
@@ -157,8 +170,12 @@ class Node {
     }
     json() {
         let json = {}
-        for(let key of Node.VECTOR_PROPERTIES.concat(Node.SAVE_PROPERTIES)){
-            json[key] = this[key];
+        for (let extendedClass of this.getExtendedClasses()) {
+            let vectorProperties = extendedClass.hasOwnProperty("VECTOR_PROPERTIES") ? extendedClass.VECTOR_PROPERTIES : [];
+            let saveProperties = extendedClass.hasOwnProperty("SAVE_PROPERTIES") ? extendedClass.SAVE_PROPERTIES : [];
+            for (let key of vectorProperties.concat(saveProperties)) {
+                json[key] = this[key];
+            }
         }
         const replacer = (k, v) => {
             if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
@@ -168,9 +185,9 @@ class Node {
         };
         return JSON.stringify(json, replacer);
     }
-    push_extra_cb(f) {
-        this.save_extras.push(f);
-    }
+    // push_extra_cb(f) {
+    //     this.save_extras.push(f);
+    // }
     push_extra(func_name, args = undefined) {
         this.save_extras.push({
             f: func_name,
@@ -188,12 +205,10 @@ class Node {
             // this.content.setAttribute('data-title', titleInput.value);
         }
 
-        // this.content.setAttribute("data-node_json", this.json());
-        let se = [];
-        for (let e of this.save_extras) {
-            se.push(typeof e === "function" ? e(this) : e);
-        }
-        // this.content.setAttribute("data-node_extras", JSON.stringify(se));
+        // let se = [];
+        // for (let e of this.save_extras) {
+        //     se.push(typeof e === "function" ? e(this) : e);
+        // }
     }
 
     step(dt) {
@@ -514,7 +529,7 @@ class Node {
         return {
             json: JSON.parse(this.json()),
             edges:  this.edges.map((e) => e.dataObj()),
-            node_extras: this.save_extras.map((e) => typeof e === "function" ? e(this) : e),
+            // node_extras: this.save_extras.map((e) => typeof e === "function" ? e(this) : e),
             // title: nodeElement.dataset.title
         };
     }

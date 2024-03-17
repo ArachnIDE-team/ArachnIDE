@@ -484,20 +484,6 @@ class WebEditorNode extends WindowedNode {
         return htmlContent + iframeScript;
     }
 
-
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of WebEditorNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
 }
 
 // DONE WebEditorNode._createEditorInterface

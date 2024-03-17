@@ -81,18 +81,18 @@ class FileManagerAPI {
             path: fileObject.path,
             batchTime
         };
-        autoSaveFile.save = function() {
+        autoSaveFile.saveFile = function() {
             if(this.timeout) clearTimeout(this.timeout)
             this.timeout = setTimeout(() => this.node.savePropertyToFile(this.key, this.path), this.batchTime)
         }.bind(autoSaveFile);
         autoSavedFiles.push(autoSaveFile);
-        node.observeProperty(fileObject.key, autoSaveFile.save)
+        node.observeProperty(fileObject.key, autoSaveFile.saveFile)
     }
     static removeFileFromAutoSave(node, fileObject){
         let removeIndex = autoSavedFiles.findIndex((autoSavedFile) => autoSavedFile.node === node);
         if(removeIndex !== -1) {
             let autoSaveFile = autoSavedFiles[removeIndex];
-            node.stopObservingProperty(fileObject.key, autoSaveFile.save);
+            node.stopObservingProperty(fileObject.key, autoSaveFile.saveFile);
             autoSavedFiles.splice(removeIndex, 1);
         }
     }
@@ -124,6 +124,21 @@ class FileManagerAPI {
             let deadObserver =  autoLoadedFiles.findIndex((autoLoadedFile) => autoLoadedFile.key === cancelObserver.key && autoLoadedFile.path === cancelObserver.path);
             if(deadObserver !== -1) autoLoadedFiles.splice(deadObserver, 1)
         }
+    }
+    static clearAutoFiles(){
+        for (let autoSavedFile of autoSavedFiles){
+            autoSavedFile.node.stopObservingProperty(autoSavedFile.key, autoSavedFile.saveFile);
+        }
+        autoSavedFiles = [];
+        for(let autoLoadedFile of autoLoadedFiles){
+            const cancelObserver = {
+                path: autoLoadedFile.path,
+                key: autoLoadedFile.key,
+                remove: true
+            };
+            autoLoadWebsocket.send(JSON.stringify(cancelObserver));
+        }
+        autoLoadedFiles = [];
     }
 }
 

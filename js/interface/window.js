@@ -108,7 +108,7 @@ class WindowedNode extends Node {
         // Initialize window properties
         this._initWindow();
 
-        this.push_extra("window");
+        // this.push_extra("window");
 
         let w = this.content;
 
@@ -593,19 +593,7 @@ class WindowedNode extends Node {
         this.toggleWindowAnchored(this.anchorForce === 1);
     }
 
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of WindowedNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
+
 
     // save(){
     //     let node = super.save();
@@ -707,28 +695,28 @@ function put(element, p, scale = 1) {
 // }
 
 // used in interfaces_v2 Node.constructor method
-const NodeExtensions = {
-    "window": (node, a) => {
-        node.rewindowify();
-    },
-    "textarea": (node, o) => {
-        let e = node.content;
-        for (let w of o.p) {
-            e = e.children[w];
-        }
-        let p = o.p;
-        e.value = o.v;
-        node.push_extra_cb((n) => {
-            return {
-                f: "textarea",
-                a: {
-                    p: p,
-                    v: e.value
-                }
-            };
-        });
-    },
-}
+// const NodeExtensions = {
+//     "window": (node, a) => {
+//         node.rewindowify();
+//     },
+//     "textarea": (node, o) => {
+//         let e = node.content;
+//         for (let w of o.p) {
+//             e = e.children[w];
+//         }
+//         let p = o.p;
+//         e.value = o.v;
+//         node.push_extra_cb((n) => {
+//             return {
+//                 f: "textarea",
+//                 a: {
+//                     p: p,
+//                     v: e.value
+//                 }
+//             };
+//         });
+//     },
+// }
 
 // // TODO replace with  "new WindowedNode"
 // function windowify(title, content, pos, scale, iscale, link) {

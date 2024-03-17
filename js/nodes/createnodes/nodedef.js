@@ -117,26 +117,6 @@ class TextNode extends WindowedNode {
             this.pos.y = y;
         }
 
-        this.push_extra_cb((node) => {
-            return {
-                f: "textarea",
-                a: {
-                    p: [0, 0, 1],
-                    v: this.titleInput.value
-                }
-            };
-        })
-
-        this.push_extra_cb((node) => {
-            return {
-                f: "textarea",
-                a: {
-                    p: [0, 1, 0],
-                    v: textarea.value
-                }
-            };
-        })
-
         this.isTextNode = true;
 
         this.afterInit()
@@ -190,19 +170,6 @@ class TextNode extends WindowedNode {
         }
     }
 
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of TextNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
 
 
 }
@@ -535,19 +502,6 @@ class LinkNode extends WindowedNode {
         });
     }
 
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of LinkNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
 }
 
 function createLinkNode(name = '', text = '', link = '', sx = undefined, sy = undefined, x = undefined, y = undefined) {
@@ -1477,19 +1431,6 @@ class LLMNode extends WindowedNode {
     //     return node;
     // }
 
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of LLMNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
 }
 
 function createLLMNode(name = '', sx = undefined, sy = undefined, x = undefined, y = undefined) {
@@ -1580,19 +1521,7 @@ class ImageNode extends WindowedNode {
         super.afterInit();
     }
 
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of ImageNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
+
 }
 
 function createImageNode(imageSrc, title, isUrl = false) {
@@ -1668,19 +1597,6 @@ class AudioNode extends WindowedNode {
         super.afterInit();
     }
 
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of AudioNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
 }
 
 function createAudioNode(name, blob=undefined, url=undefined){
@@ -1792,19 +1708,6 @@ class VideoNode extends WindowedNode {
         super.afterInit();
     }
 
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of VideoNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
 }
 
 function createVideoNode(name, blob=undefined, url=undefined){
@@ -1894,19 +1797,6 @@ class WolframNode extends WindowedNode {
         super.afterInit();
     }
 
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of WolframNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
 }
 
 function createWolframNode(name, wolframData){
@@ -2059,19 +1949,6 @@ class WorkspaceExplorerNode extends WindowedNode {
         super.afterInit();
     }
 
-    json() {
-        let json = JSON.parse(super.json())
-        for(let key of WorkspaceExplorerNode.SAVE_PROPERTIES){
-            json[key] = this[key];
-        }
-        const replacer = (k, v) => {
-            if (v instanceof HTMLElement || v instanceof HTMLCollection) { // Exclude windowDiv as well
-                return undefined;
-            }
-            return v;
-        };
-        return JSON.stringify(json, replacer);
-    }
 }
 
 
