@@ -36,13 +36,19 @@ class TextNode extends WindowedNode {
         if(configuration.text) this.text = configuration.text;
     }
 
-
-
     get text() {
         return this.contentEditableDiv.innerText;
     }
 
     set text(v) {
+        if(v instanceof Blob) {
+            var reader = new FileReader();
+            reader.onload = (event) => {
+                this.text = event.target.result // Recursive call
+            }
+            reader.readAsText(v);
+            return; // Wait for the reader to complete
+        }
         if(this.initialized){
             this.contentEditableDiv.innerText = v;
         } else {
@@ -71,6 +77,10 @@ class TextNode extends WindowedNode {
         // jsEditor.display.wrapper.style.resize = 'vertical';
         // jsEditor.display.wrapper.style.userSelect = 'none';
         return textarea;
+    }
+
+    setMainContentFile(filePath, fileName){
+        this.files.push({ key: "text", path: filePath, name: fileName, autoLoad: false, autoSave: false})
     }
 
     _initialize(textarea, sx, sy, x, y, addCodeButton){
@@ -1456,7 +1466,7 @@ class ImageNode extends WindowedNode {
         saved: undefined,
         saveData: undefined,
     }
-    static SAVE_PROPERTIES = ['imageUrl', 'imageData', 'isImageNode'];
+    static SAVE_PROPERTIES = ['imageUrl', 'imageBlob', 'isImageNode'];
     // constructor(name = '', content = undefined, imageSrc = '', sx = undefined, sy = undefined, x = undefined, y = undefined, isUrl = false){
 
 
@@ -1489,28 +1499,77 @@ class ImageNode extends WindowedNode {
         return img;
     }
 
+
+
+    get imageBlob() {
+        return this._imageBlob;
+    }
+
+    set imageBlob(v) {
+        if(v === null || !(v instanceof Blob)) return;
+        const setProperty = () => {
+            this._imageBlob = v;
+            const imageSrc = this.innerContent.querySelector("img[src]");
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                // this.imageUrl = e.target.result;
+                this.imageData = e.target.result;
+                imageSrc.src = e.target.result;
+            }
+            reader.readAsDataURL(v);
+            // this.imageUrl = URL.createObjectURL(v);
+            //
+            // imageSrc.src = this.imageUrl
+            // convertImageToBase64(imageSrc, base64String => {
+            //     this.imageData = base64String;
+            //     this.imageUrl =  base64String;
+            //     imageSrc.src = base64String;
+            //
+            //     console.log("Image converted to base64", base64String);
+            // });
+        }
+        if(this.initialized){
+            setProperty();
+        } else {
+            this.addAfterInitCallback(setProperty);
+        }
+    }
+
+    setMainContentFile(filePath, fileName){
+        this.files.push({ key: "imageBlob", path: filePath, name: fileName, autoLoad: false, autoSave: false})
+    }
+
     _initialize(name, imageSrc, isUrl, saved){
         if(!saved){
+            const setImageBlob = () => {
+                fetch(this.innerContent.querySelector("img[src]").src)
+                    .then(response => response.blob()
+                        .then((blob) =>  this._imageBlob = blob));
+            }
             if(isUrl){
                 this.isImageNode = true;
                 this.imageUrl = imageSrc;
-                this.imageData = null;
+                this._imageBlob = null;
                 console.log("URL Found", this.imageUrl);
+                // setImageBlob();
             }else{
                 this.isImageNode = true;
                 this.imageData = null; // Placeholder for base64 data
-
+                this.imageUrl = null;
                 // Determine whether the source is a blob URL or a Data URL (base64)
                 if (imageSrc.src.startsWith('blob:')) {
                     // Convert blob URL to base64 because the OpenAI API cannot access blob URLs
                     convertImageToBase64(imageSrc.src, base64String => {
                         this.imageData = base64String;
                         console.log("Image converted to base64", base64String);
+                        setImageBlob();
                     });
                 } else {
                     // If it's not a blob, we can use the src directly (data URL or external URL)
-                    this.imageUrl = imageSrc.src;
+                    // this.imageUrl = imageSrc.src;
+                    this.imageData =  imageSrc.src;
                     console.log("Image URL or Data URL found", imageSrc.src);
+                    setImageBlob();
                 }
             }
         }
@@ -1545,7 +1604,7 @@ class AudioNode extends WindowedNode {
         saved: undefined,
         saveData: undefined
     }
-    static SAVE_PROPERTIES = ['audioUrl', 'videoBuffer'];
+    static SAVE_PROPERTIES = ['audioUrl', 'audioBlob'];
     // constructor(name = '', content = undefined, imageSrc = '', sx = undefined, sy = undefined, x = undefined, y = undefined, isUrl = false){
 
 
@@ -1565,6 +1624,28 @@ class AudioNode extends WindowedNode {
         this._initialize(configuration.audioUrl, configuration.blob, configuration.saved);
     }
 
+    get audioBlob() {
+        return this._audioBlob;
+    }
+
+    set audioBlob(v) {
+        if(v === null || !(v instanceof Blob)) return;
+        if(this.initialized){
+            this.audioUrl = URL.createObjectURL(v);
+            this._audioBlob = v;
+            this.innerContent.querySelector("audio[src]").src = this.audioUrl
+        } else {
+            this.addAfterInitCallback(() => {
+                this.audioUrl = URL.createObjectURL(v);
+                this._audioBlob = v;
+                this.innerContent.querySelector("audio[src]").src = this.audioUrl
+            })
+        }
+    }
+
+    setMainContentFile(filePath, fileName){
+        this.files.push({ key: "audioBlob", path: filePath, name: fileName, autoLoad: false, autoSave: false})
+    }
 
     static _getContentElement(url, blob){
         if(!url) url = URL.createObjectURL(blob);
@@ -1586,9 +1667,17 @@ class AudioNode extends WindowedNode {
     _initialize(audioUrl, blob, saved){
         this.draw();
         if(!saved){
-            this.audioUrl = audioUrl;
-            blob.arrayBuffer().then((videoBuffer) => this.videoBuffer = videoBuffer);
+            if(audioUrl) {
+                this.audioUrl = audioUrl;
+                fetch(this.audioUrl).then(response =>
+                    response.blob().then((extracted) =>
+                        this._audioBlob = extracted));
+            } else {
+                this.audioUrl = this.innerContent.querySelector("audio[src]").src
+                this._audioBlob = blob;
+            }
         }
+
         this.mouseAnchor = toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
         this.afterInit();
     }
@@ -1620,7 +1709,7 @@ class VideoNode extends WindowedNode {
         saved: undefined,
         saveData: undefined,
     }
-    static SAVE_PROPERTIES = ['videoUrl', 'videoBuffer'];
+    static SAVE_PROPERTIES = ['videoUrl', 'videoBlob'];//, 'videoBlob'
     // constructor(name = '', content = undefined, imageSrc = '', sx = undefined, sy = undefined, x = undefined, y = undefined, isUrl = false){
 
 
@@ -1630,10 +1719,9 @@ class VideoNode extends WindowedNode {
             super({ title: configuration.name, content: VideoNode._getContentElement(configuration.videoUrl, configuration.blob), ...WindowedNode.getNaturalScaleParameters() });
             this.followingMouse = 1;
         } else {// Restore VideoNode
-            configuration.videoUrl = configuration.saveData.json.videoUrl;
+            // configuration.videoUrl = configuration.saveData.json.videoUrl;
             super({ title: configuration.name, content: VideoNode._getContentElement(configuration.videoUrl, configuration.blob), scale: true, saved: true, saveData: configuration.saveData })
         }
-
 
         htmlnodes_parent.appendChild(this.content);
         registernode(this);
@@ -1641,9 +1729,34 @@ class VideoNode extends WindowedNode {
     }
 
 
-    static _getContentElement(url, blob){
-        if(!url) url = URL.createObjectURL(blob);
+    get videoBlob() {
+        return this._videoBlob;
+    }
 
+    set videoBlob(v) {
+        if(v === null || !(v instanceof Blob)) return;
+        if(this.initialized){
+            this.videoUrl = URL.createObjectURL(v);
+            this._videoBlob = v;
+            this.innerContent.querySelector("video[src]").src = this.videoUrl
+            this.innerContent.querySelector("a[href]").href = this.videoUrl
+        } else {
+            this.addAfterInitCallback(() => {
+                this.videoUrl = URL.createObjectURL(v);
+                this._videoBlob = v;
+                this.innerContent.querySelector("video[src]").src = this.videoUrl
+                this.innerContent.querySelector("a[href]").href = this.videoUrl
+            })
+        }
+    }
+
+    setMainContentFile(filePath, fileName){
+        this.files.push({ key: "videoBlob", path: filePath, name: fileName, autoLoad: false, autoSave: false})
+    }
+
+    static _getContentElement(url, blob){
+        if(!url && blob) url = URL.createObjectURL(blob);
+        if(!url) url = "";
         // Create a video element to play the blob
         const video = document.createElement('video');
         video.src = url;
@@ -1697,8 +1810,15 @@ class VideoNode extends WindowedNode {
     _initialize(videoUrl, blob, saved){
         this.draw();
         if(!saved){
-            this.videoUrl = videoUrl;
-            blob.arrayBuffer().then((videoBuffer) => this.videoBuffer = videoBuffer);
+            if(videoUrl) {
+                this.videoUrl = videoUrl;
+                fetch(this.videoUrl).then(response =>
+                    response.blob().then((extracted) =>
+                        this._videoBlob = extracted));
+            } else {
+                this.videoUrl = this.innerContent.querySelector("video[src]").src
+                this._videoBlob = blob;
+            }
         }
         this.mouseAnchor = toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
         this.afterInit();
@@ -1929,9 +2049,15 @@ class WorkspaceExplorerNode extends WindowedNode {
     }
 
     async readFileAndCreateTextNode(filePath, fileName){
-        let file = await FileManagerAPI.loadFile(filePath);
-        let textNode = createNodeFromWindow('', file.content, true)
-        textNode.files.push({ key: "text", path: filePath, type: "string", name: fileName, autoLoad: false, autoSave: false});
+        let file = await FileManagerAPI.loadBinary(filePath);
+        createNodesFromFiles([file], (node) => {
+            node.setMainContentFile(filePath, fileName);
+            // node.files.push({ key: "text", path: filePath, binary: false, name: fileName, autoLoad: false, autoSave: false});
+        })
+
+        // let file = await FileManagerAPI.loadFile(filePath);
+        // let textNode = createNodeFromWindow('', file.content, true)
+        // textNode.files.push({ key: "text", path: filePath, binary: false, name: fileName, autoLoad: false, autoSave: false});
     }
 
     onLoadFile(){

@@ -108,7 +108,6 @@ class WindowedNode extends Node {
         // Initialize window properties
         this._initWindow();
 
-        // this.push_extra("window");
 
         let w = this.content;
 

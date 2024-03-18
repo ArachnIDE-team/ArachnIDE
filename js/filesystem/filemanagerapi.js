@@ -58,6 +58,11 @@ class FileManagerAPI {
     static async loadFile(filePath){
         return await (await fetch("http://localhost:7000/read-file?path=" + encodeURIComponent(filePath))).json()
     }
+    static async loadBinary(filePath){
+        const blob = await (await fetch("http://localhost:7000/read-binary?path=" + encodeURIComponent(filePath))).blob();
+        blob.name = path.basename(filePath);
+        return blob;
+    }
 
     // NodeFilesUI
     static async saveFile(filePath, fileContent){
@@ -72,6 +77,18 @@ class FileManagerAPI {
             })
         })).json()
     }
+    static async saveBinary(filePath, fileContent) {
+        if(typeof fileContent === "string") fileContent = new Blob([fileContent], {type: 'text/plain'});
+        if(!(fileContent instanceof Blob) && typeof fileContent === "object") fileContent = new Blob([JSON.stringify(fileContent)], {type: 'application/json'});
+        const formData = new FormData();
+        formData.append('path', filePath); // Add text parameter
+        formData.append('file', fileContent, filePath); // Add file content and filename
+
+        return await fetch("http://localhost:7000/write-binary", { // Update endpoint to match server-side setup
+            method: "POST",
+            body: formData
+        }).then(response => response.json());
+    }
 
     static addFileToAutoSave(node, fileObject, batchTime=4000) {
         let autoSaveFile = {
@@ -81,23 +98,22 @@ class FileManagerAPI {
             path: fileObject.path,
             batchTime
         };
-        autoSaveFile.saveFile = function() {
+        autoSaveFile.saveToFile = function() {
             if(this.timeout) clearTimeout(this.timeout)
             this.timeout = setTimeout(() => this.node.savePropertyToFile(this.key, this.path), this.batchTime)
         }.bind(autoSaveFile);
         autoSavedFiles.push(autoSaveFile);
-        node.observeProperty(fileObject.key, autoSaveFile.saveFile)
+        node.observeProperty(fileObject.key, autoSaveFile.saveToFile)
     }
     static removeFileFromAutoSave(node, fileObject){
         let removeIndex = autoSavedFiles.findIndex((autoSavedFile) => autoSavedFile.node === node);
         if(removeIndex !== -1) {
             let autoSaveFile = autoSavedFiles[removeIndex];
-            node.stopObservingProperty(fileObject.key, autoSaveFile.saveFile);
+            node.stopObservingProperty(fileObject.key, autoSaveFile.saveToFile);
             autoSavedFiles.splice(removeIndex, 1);
         }
     }
     static async addFileToAutoLoad(node, fileObject, batchTime=4000) {
-        // let observer = await (await fetch("http://localhost:7000/file-observer?path=" + encodeURIComponent(fileObject.path))).json()
         const observer = {
             path: fileObject.path,
             key: fileObject.key,
@@ -105,7 +121,7 @@ class FileManagerAPI {
             batchTime
         };
         observer.load = function() {
-            node.loadPropertyFromFile(fileObject.key, fileObject.path)
+            node.loadPropertyFromFile(fileObject.key, fileObject.path);
         }
         autoLoadedFiles.push(observer) // Setup on open connection
         if(autoLoadWebsocket.readyState === 1) autoLoadWebsocket.send(JSON.stringify(observer));
@@ -127,7 +143,7 @@ class FileManagerAPI {
     }
     static clearAutoFiles(){
         for (let autoSavedFile of autoSavedFiles){
-            autoSavedFile.node.stopObservingProperty(autoSavedFile.key, autoSavedFile.saveFile);
+            autoSavedFile.node.stopObservingProperty(autoSavedFile.key, autoSavedFile.saveToFile);
         }
         autoSavedFiles = [];
         for(let autoLoadedFile of autoLoadedFiles){

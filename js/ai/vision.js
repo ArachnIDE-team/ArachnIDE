@@ -33,12 +33,23 @@ function convertImageToBase64(imageElement, callback) {
     let ctx = canvas.getContext('2d');
     ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
 
-    // Convert the canvas content to a base64 string (assuming png format)
-    let base64String = canvas.toDataURL('image/png');
-    callback(base64String);
+    // Get the image type
+    fetch(imageElement.src)
+        .then(response => response.blob()
+            .then((blob) =>  {
+                // Convert the canvas content to a base64 string
+                let base64String = canvas.toDataURL(blob.type);
+                callback(base64String);
+                // Clean up the canvas element
+                canvas = null;
+    }));
 
-    // Clean up the canvas element
-    canvas = null;
+    // // Convert the canvas content to a base64 string (assuming png format)
+    // let base64String = canvas.toDataURL('image/png');
+    // callback(base64String);
+    //
+    // // Clean up the canvas element
+    // canvas = null;
 }
 
 function getImageNodeData(node) {

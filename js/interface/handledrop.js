@@ -106,6 +106,142 @@ function handleIconDrop(event, iconName) {
     event.stopPropagation();
     event.preventDefault();
 }
+function uploadHandler(file, contentType){
+    let ev = {
+        dataTransfer: {
+            items: [
+                {
+                    kind: 'file',
+                    getAsFile: () => file,
+
+                }
+            ]
+        }
+    }
+}
+
+function getFileBaseType(file) {
+    let baseType;
+    if (file.type) {
+        return file.type.split("/")[0];
+    } else if (file.name.toLowerCase().endsWith(".txt")) {
+        return "text";
+    } else if (file.name.toLowerCase().endsWith(".md")) {
+        return "markdown";
+    } else {
+        console.log("Unhandled file type:", file);
+        return "unknown";
+    }
+}
+
+function createPDFNodeFromFile(content, file) {
+    let url = URL.createObjectURL(new Blob([content], {type: 'application/pdf'}));
+    let node = createLinkNode(file.name, file.name, url); // Pass file name
+    node.fileName = file.name; // Store file name in node
+    htmlnodes_parent.appendChild(node.content);
+    node.followingMouse = 1;
+    node.draw();
+    node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+    return node;
+}
+
+function createMarkdownNodeFromFile(mdText, file) {
+    let htmlContent = marked.parse(mdText, {mangle: false, headerIds: false});
+    let node = createTextNode(file.name, '');
+
+    let htmlContainer = document.createElement('div');
+    htmlContainer.innerHTML = htmlContent;
+    htmlContainer.style.maxWidth = '1000px';
+    htmlContainer.style.overflow = 'auto';
+    htmlContainer.style.height = '1400px';
+    htmlContainer.style.backgroundColor = '#222226'; // Set background color
+
+    // Check if there is a textarea being appended, if there is remove it.
+    if (node.content.children[0].children[1].getElementsByTagName('textarea').length > 0) {
+        node.content.children[0].children[1].removeChild(node.content.children[0].children[1].getElementsByTagName('textarea')[0]);
+    }
+
+    node.content.children[0].children[1].appendChild(htmlContainer);
+    htmlnodes_parent.appendChild(node.content);
+    return node;
+}
+
+function createTextNodeFromFile(text, file) {
+    return createNodeFromWindow(file.name, text);
+}
+
+function createImageNodeFromFile(base64DataUrl, file, callback) {
+    let imageElement = document.createElement('img');
+    imageElement.src = base64DataUrl;
+
+    // Once the image is loaded, create the node
+    imageElement.onload = function () {
+        let node = createImageNode(imageElement, file.name);
+        // Append the node to the DOM here, as the image data is now ready
+        htmlnodes_parent.appendChild(node.content);
+        node.followingMouse = 1;
+        node.draw();
+        node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        callback(node)
+    };
+}
+
+function createNodesFromFiles(files, callback=() => {}) {
+    for (let i = 0; i < files.length; i++) {
+
+        let reader = new FileReader();
+
+        let baseType = getFileBaseType(files[i]);
+
+        let url = URL.createObjectURL(files[i]);
+        console.log("loading " + baseType);
+        switch (baseType) {
+            case "image":
+                // We use a FileReader to read the dropped file and convert it to a Data URL (base64)
+                reader = new FileReader();
+                reader.onload = function (e) {
+                    createImageNodeFromFile(e.target.result, files[i], callback);
+                };
+                reader.readAsDataURL(files[i]); // Read the file as a Data URL
+                break;
+            case "audio":
+                callback(createAudioNode(files[i].name, undefined, url))
+                break;
+            case "video":
+                callback(createVideoNode(files[i].name, undefined, url))
+                break;
+            case "text":
+                reader = new FileReader();
+                reader.onload = function (e) {
+                    let text = e.target.result;
+                    callback(createTextNodeFromFile(text, files[i]));
+                }
+                reader.readAsText(files[i]);
+                break;
+            case "markdown":
+                let mdReader = new FileReader();
+                mdReader.onload = function (e) {
+                    callback(createMarkdownNodeFromFile(e.target.result, files[i]));
+                }
+                mdReader.readAsText(files[i]);
+                break;
+            case "application": // Handle PDF files
+                if (files[i].type.endsWith("pdf")) {
+                    reader = new FileReader();
+                    reader.readAsArrayBuffer(files[i]);
+
+                    reader.onload = function () {
+                        callback(createPDFNodeFromFile(reader.result, files[i]));
+                    };
+
+                    reader.onerror = function (err) {
+                        console.error('Error reading PDF file:', err);
+                    };
+                }
+                break;
+        }
+    }
+}
 
 function dropHandler(ev) {
     ev.preventDefault();
@@ -147,7 +283,7 @@ function dropHandler(ev) {
 
             const defaultTitle = getDefaultTitle();
             const fullTitle = title + ' ' + defaultTitle;
-            node = createNodeFromWindow(fullTitle, content, true);
+            let node = createNodeFromWindow(fullTitle, content, true);
 
             // Stop the drop event from being handled further
             return;
@@ -174,105 +310,7 @@ function dropHandler(ev) {
     console.log(files);
     //https://stackoverflow.com/questions/3814231/loading-an-image-to-a-img-from-input-file
     if (FileReader && files && files.length) {
-        for (let i = 0; i < files.length; i++) {
-
-            let reader = new FileReader();
-
-            let baseType;
-            if (files[i].type) {
-                baseType = files[i].type.split("/")[0];
-            } else if (files[i].name.toLowerCase().endsWith(".txt")) {
-                baseType = "text";
-            } else if (files[i].name.toLowerCase().endsWith(".md")) {
-                baseType = "markdown";
-            } else {
-                console.log("Unhandled file type:", files[i]);
-                baseType = "unknown";
-            }
-
-            let url = URL.createObjectURL(files[i]);
-            console.log("loading " + baseType);
-            switch (baseType) {
-                case "image":
-                    // We use a FileReader to read the dropped file and convert it to a Data URL (base64)
-                    reader = new FileReader();
-                    reader.onload = function (e) {
-                        let base64DataUrl = e.target.result;
-                        let imageElement = document.createElement('img');
-                        imageElement.src = base64DataUrl;
-
-                        // Once the image is loaded, create the node
-                        imageElement.onload = function () {
-                            let node = createImageNode(imageElement, files[i].name);
-                            // Append the node to the DOM here, as the image data is now ready
-                            htmlnodes_parent.appendChild(node.content);
-                            node.followingMouse = 1;
-                            node.draw();
-                            node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
-                        };
-                    };
-                    reader.readAsDataURL(files[i]); // Read the file as a Data URL
-                    break;
-                case "audio":
-                    createAudioNode(files[i].name, undefined, url)
-                    break;
-                case "video":
-                    createVideoNode(files[i].name, undefined, url)
-                    break;
-                case "text":
-                    reader = new FileReader();
-                    reader.onload = function (e) {
-                        let text = e.target.result;
-                        let node = createNodeFromWindow(files[i].name, text);
-                    }
-                    reader.readAsText(files[i]);
-                    break;
-                case "markdown":
-                    let mdReader = new FileReader();
-                    mdReader.onload = function (e) {
-                        let mdText = e.target.result;
-                        let htmlContent = marked.parse(mdText, { mangle: false, headerIds: false });
-                        let node = createTextNode(files[i].name, '');
-
-                        let htmlContainer = document.createElement('div');
-                        htmlContainer.innerHTML = htmlContent;
-                        htmlContainer.style.maxWidth = '1000px';
-                        htmlContainer.style.overflow = 'auto';
-                        htmlContainer.style.height = '1400px';
-                        htmlContainer.style.backgroundColor = '#222226'; // Set background color
-
-                        // Check if there is a textarea being appended, if there is remove it.
-                        if (node.content.children[0].children[1].getElementsByTagName('textarea').length > 0) {
-                            node.content.children[0].children[1].removeChild(node.content.children[0].children[1].getElementsByTagName('textarea')[0]);
-                        }
-
-                        node.content.children[0].children[1].appendChild(htmlContainer);
-                        htmlnodes_parent.appendChild(node.content);
-                    }
-                    mdReader.readAsText(files[i]);
-                    break;
-                case "application": // Handle PDF files
-                    if (files[i].type.endsWith("pdf")) {
-                        reader = new FileReader();
-                        reader.readAsArrayBuffer(files[i]);
-
-                        reader.onload = function () {
-                            let url = URL.createObjectURL(new Blob([reader.result], { type: 'application/pdf' }));
-                            let node = createLinkNode(files[i].name, files[i].name, url); // Pass file name
-                            node.fileName = files[i].name; // Store file name in node
-                            htmlnodes_parent.appendChild(node.content);
-                            node.followingMouse = 1;
-                            node.draw();
-                            node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
-                        };
-
-                        reader.onerror = function (err) {
-                            console.error('Error reading PDF file:', err);
-                        };
-                    }
-                    break;
-            }
-        }
+        createNodesFromFiles(files);
     } else {
         // fallback -- perhaps submit the input to an iframe and temporarily store
         // them on the server until the user's session ends.

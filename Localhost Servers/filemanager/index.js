@@ -1,11 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const fs = require('./fsNode')
-const path = require('path')
+import express from 'express';
+import cors from 'cors';
+import fs from './fsNode.js'
+import path from 'path'
 const app = express();
-const { v4: uuidv4 } = require('uuid');
-
-
+import { v4 as uuidv4 } from 'uuid';
+import multer from 'multer'; // For binary writes
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
@@ -41,6 +40,7 @@ app.put('/workspaces', (req, res) => {
     res.send();
 });
 
+// delete a workspace
 app.delete('/workspace', async (req, res) => {
     let { name, soft } = req.query;
     soft = soft === "true";
@@ -68,6 +68,7 @@ app.delete('/workspace', async (req, res) => {
     res.send();
 });
 
+// get a workspace network save file
 app.get('/workspace', (req, res) => {
     const { name } = req.query;
     let workspaces = JSON.parse(workspacesJSONFile.content);
@@ -82,6 +83,8 @@ app.get('/workspace', (req, res) => {
     }
     res.send(workspaceFile.content)
 });
+
+// create/save a workspace network file
 app.post('/workspace', (req, res) => {
     const { name, diagram } = req.body;
     let workspaces = JSON.parse(workspacesJSONFile.content);
@@ -100,6 +103,7 @@ app.post('/workspace', (req, res) => {
     res.send()
 })
 
+// Get the File-System tree rooted on the given path with files and folder at given dept
 app.get('/fs-tree', async (req, res) => {
     try {
         const folderPath = req.query.path;
@@ -119,6 +123,7 @@ app.get('/fs-tree', async (req, res) => {
 
 });
 
+// Reads a single file from FS as text
 app.get('/read-file', async (req, res) => {
     try {
         const filePath = req.query.path;
@@ -143,7 +148,32 @@ app.get('/read-file', async (req, res) => {
     }
 });
 
+// Reads a single file from FS as a binary buffer
+app.get('/read-binary', (req, res) => {
+    const filePath = req.query.path;
+    let fsNode = new fs.Node(filePath);
 
+    if(!fsNode.exists) {
+        console.error('Error GET read-binary: the file does not exist');
+        return res.status(404).send("Error getting the file: '" + filePath +"' not found");
+    }
+    if(!fsNode.isFile){
+        console.error('Error GET read-binary: the file is not a file. It is a directory.');
+        return res.status(404).send("Error getting the file: '" + filePath +"' is a directory");
+    }
+    const content = fsNode.contentType;
+    console.log("Serving file: ", fsNode.path, " with content type: ", content)
+    res.setHeader('Content-Type', content);//'application/octet-stream'); // Set generic binary content type
+    res.setHeader('Content-Disposition', `attachment; filename="${fsNode.name}"`); // Set attachment with filename
+    res.send(fsNode.binary); // Send the binary
+});
+
+const upload = multer({
+    dest: 'uploads/', // Set the destination directory for uploaded files
+    limits: { fileSize: 10000000 }, // Limit file size to 10MB (optional)
+});
+
+// Write a single file from FS as text at path
 app.post('/write-file', (req, res) => {
     const filePath = req.body.path;
     const fileContent = req.body.content;
@@ -152,35 +182,20 @@ app.post('/write-file', (req, res) => {
     res.send({message: "success"})
 })
 
+// Write a single file from FS as a binary buffer at path
+app.post('/write-binary',upload.single('file'), (req, res) => {
+    const filePath = req.body.path;
+    const fileContent = req.file;
+    let file = new fs.Node(filePath);
+    let uploaded = new fs.Node(fileContent.path)
+    console.log("file:", uploaded)
+    file.binary = uploaded.binary;// not working
+    uploaded.delete();
+    res.send({message: "success"})
+})
 
-
+// Keeps track of watched files
 let autoLoadedFiles = [];
-
-// app.get('/file-observer', async (req, res) => {
-//     try {
-//         const filePath = req.query.path;
-//         let fsNode = new fs.Node(filePath);
-//
-//         if(!fsNode.exists) {
-//             console.error('Error GET file-observer: the file does not exist');
-//             return res.status(404).send("Error getting the file: '" + filePath +"' not found");
-//         }
-//         if(!fsNode.isFile){
-//             console.error('Error GET file-observer: the file is not a file. It is a directory.');
-//             return res.status(404).send("Error getting the file: '" + filePath +"' is a directory");
-//         }
-//         let fileObserver = {
-//             path: fsNode.path,
-//             id: autoLoadedFiles.length
-//         }
-//         autoLoadedFiles.push(fileObserver)
-//         res.send(fileObserver);
-//     } catch (error) {
-//         console.error('Error GET file-observer:', error);
-//         res.status(500).send('Error GET file-observer');
-//     }
-// });
-
 
 // Start the server
 const PORT = process.env.PORT || 7000;
@@ -188,14 +203,13 @@ let server = app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
 
-
-var WebSocketServer = require('websocket').server;
 // File change observer websocket
-fileObserverWebsocket = new WebSocketServer({
+import {server as WebSocketServer} from 'websocket';
+// Create the websocket
+const fileObserverWebsocket = new WebSocketServer({
     httpServer: server
 });
-
-
+// On client connect
 fileObserverWebsocket.on('request', function(request) {
     var connection = request.accept(null, request.origin);
     connection.on('message', function(message) {

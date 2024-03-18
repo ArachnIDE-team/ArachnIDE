@@ -1,5 +1,9 @@
 //https://github.com/tc39/proposal-regex-escaping/blob/main/specInJs.js
 // this is a direct translation to code of the spec
+
+const DISABLE_FORCE = true;
+
+
 if (!RegExp.escape) {
     RegExp.escape = (S) => {
         // 1. let str be ToString(S).
@@ -92,23 +96,15 @@ class Node {
             for(let file of this.files){
                 if(file.autoSave) {
                     this.autoSaveFile(file);
-                    // this.savePropertyToFile(file.key, file.path)
+                    // this.savePropertyToFile(file.key, file.path, file.binary)
                 }
                 if(file.autoLoad) {
                     this.autoLoadFile(file);
-                    this.loadPropertyFromFile(file.key, file.path)
-
                 }
+                this.loadPropertyFromFile(file.key, file.path)
             }
             // END FILES
             this.content = configuration.content;
-            // this.save_extras = [];
-            // if (configuration.saveData.node_extras) {
-            //     o = configuration.saveData.node_extras;
-            //     for (const e of o) {
-            //         NodeExtensions[e.f](this, e.a);
-            //     }
-            // }
             this.attach();
             this.content.setAttribute("data-uuid", this.uuid);
             if (configuration.saveData.edges !== undefined && configuration.createEdges) {
@@ -139,7 +135,6 @@ class Node {
 
             this.content.setAttribute("data-uuid", this.uuid);
             this.attach();
-            // this.save_extras = [];
         }
     }
 
@@ -185,16 +180,6 @@ class Node {
         };
         return JSON.stringify(json, replacer);
     }
-    // push_extra_cb(f) {
-    //     this.save_extras.push(f);
-    // }
-    push_extra(func_name, args = undefined) {
-        this.save_extras.push({
-            f: func_name,
-            a: args
-        });
-    }
-
 
     draw() {
         put(this.content, this.pos, this.intrinsicScale * this.scale * (zoom.mag2() ** -settings.zoomContentExp));
@@ -204,11 +189,6 @@ class Node {
         if (titleInput) {
             // this.content.setAttribute('data-title', titleInput.value);
         }
-
-        // let se = [];
-        // for (let e of this.save_extras) {
-        //     se.push(typeof e === "function" ? e(this) : e);
-        // }
     }
 
     step(dt) {
@@ -219,7 +199,7 @@ class Node {
                 dt = 1;
             }
         }
-        if (!this.followingMouse) {
+        if (!this.followingMouse && !DISABLE_FORCE) {
             this.pos = this.pos.plus(this.vel.scale(dt / 2));
             this.vel = this.vel.plus(this.force.scale(dt));
             this.pos = this.pos.plus(this.vel.scale(dt / 2));
@@ -529,8 +509,6 @@ class Node {
         return {
             json: JSON.parse(this.json()),
             edges:  this.edges.map((e) => e.dataObj()),
-            // node_extras: this.save_extras.map((e) => typeof e === "function" ? e(this) : e),
-            // title: nodeElement.dataset.title
         };
     }
 
@@ -549,13 +527,24 @@ class Node {
     }
 
     savePropertyToFile(key, path){
-        FileManagerAPI.saveFile(path, this[key]).then((response) => {console.log("Saved file. Server response: " + response)})
+        const onSaved = (response) => {console.log("Saved file. Server response: ", response)};
+        // if(binary) {
+        FileManagerAPI.saveBinary(path, this[key]).then(onSaved);
+        // } else {
+        //     FileManagerAPI.saveFile(path, this[key]).then(onSaved);
+        // }
     }
 
     loadPropertyFromFile(key, path){
-        FileManagerAPI.loadFile(path).then((file) => {
-            this[key] = file.content;
-        });
+        const onLoaded = (file) => {
+            this[key] = file;
+            // this[key] = binary ? file : file.content;
+        };
+        // if(binary) {
+        FileManagerAPI.loadBinary(path).then(onLoaded);
+        // } else {
+        //     FileManagerAPI.loadFile(path).then(onLoaded);
+        // }
     }
 
     observeProperty(property, callback){

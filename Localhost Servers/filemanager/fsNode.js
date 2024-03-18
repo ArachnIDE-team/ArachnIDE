@@ -1,6 +1,9 @@
-const fs = require('fs')
-const path = require('path')
-const drivelist = require('drivelist');
+import fs from 'fs'
+import path from 'path'
+import drivelist from 'drivelist';
+import mime from 'mime';
+
+
 
 fs.DIRECTORY = "DIR"
 fs.FILE = "FILE"
@@ -36,6 +39,13 @@ Object.defineProperty(proto, "type", {
         }else{
             return fs.NONE;
         }
+    }
+});
+Object.defineProperty(proto, "contentType", {
+    get: function () {
+       if(this.isFile) return mime.getType(this.path);
+       if(!this.exists) return "none"
+       return "folder"
     }
 });
 
@@ -106,6 +116,22 @@ Object.defineProperty(proto, "content", {
     }
 
 });
+Object.defineProperty(proto, "binary", {
+    get: function() {
+        if(this.isFile){
+            return fs.readFileSync(this.path);
+        }
+        return null;
+    },
+    set: function(content){
+        if(!this.isDirectory){
+            fs.writeFileSync(this.path, content)
+            return true;
+        }
+        return false;
+    }
+
+});
 
 
 
@@ -152,4 +178,4 @@ proto.unwatchFile = function (callback){
         fs.unwatchFile(this.path, callback);
     }
 }
-module.exports = fs;
+export default fs;

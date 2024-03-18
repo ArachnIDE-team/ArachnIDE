@@ -2,7 +2,6 @@
   "name": "file-manager-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
@@ -11,11 +10,18 @@
     "drivelist": "^11.2.1",
     "express": "^4.18.2",
     "jsdom": "^16.7.0",
+    "mime": "^4.0.1",
+    "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.6.9",
     "uuid": "^9.0.1",
     "websocket": "^1.0.34"
   },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "type": "module",
+  "exports": "./index.js",
+  "engines": {
+    "node": ">=16"
+  }
 }
