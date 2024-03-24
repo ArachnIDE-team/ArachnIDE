@@ -1989,10 +1989,28 @@ textarea[id^='custom-instructions-textarea-'] {
     transition-duration: 0.4s;
 }
 
-    .code-button:hover {
-        background-color: #ddd;
-        color: #222226;
-    }
+.code-button:hover {
+    background-color: #ddd;
+    color: #222226;
+}
+.transform-button {
+    background-color: #222226;
+    color: #bbb;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 2px 2px;
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+.transform-button:hover {
+    background-color: #ddd;
+    color: #222226;
+}
 
 /*Node Panel*/
 .node-panel {
@@ -2322,6 +2340,9 @@ textarea[id^='custom-instructions-textarea-'] {
 
 /* WindowedNode */
 
+.window-ui {
+    background-color: rgb(50 51 62 / 95%);
+}
 .content-sticky-header {
     background-color: #222226;
     width: 100%;
@@ -2435,9 +2456,7 @@ textarea[id^='custom-instructions-textarea-'] {
     font-family: monospace;
     margin-bottom: 5px;
 }
-/*.content-sticky-header + div {*/
-/*    margin-top: 30px;*/
-/*}*/
+
 /* treejs */
 
 .treejs .treejs-switcher:before {

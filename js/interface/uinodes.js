@@ -25,7 +25,7 @@ class WindowedUI extends WindowedNode {
         // this.windowDiv.style.maxHeight = window.innerHeight * scaleProportions.y + "px";
         // this.windowDiv.style.height = window.innerHeight * scaleProportions.y + "px";
         this.setMinSize(420)
-
+        this.windowDiv.classList.add("window-ui")
         this.afterInit();
     }
     // First, remove mandelbrot
@@ -197,10 +197,6 @@ class NodeFilesUI extends WindowedUI {
 
     }
 
-    onEditFileConfiguration(key){
-
-    }
-
     _initialize(node){
         this.anchorForce = 1;
         this.toggleWindowAnchored(true);
@@ -250,6 +246,7 @@ class NodeFilesUI extends WindowedUI {
     getAllKeys() {
         return this.node.files.map((file) => file.key);
     }
+
     onDeleteFile(fileObject) {
         let fileIndex = this.node.files.findIndex((file) => file.key === fileObject.key);
         if(fileIndex !== -1) this.node.files.splice(fileIndex, 1);
@@ -267,13 +264,13 @@ class NodeFilesUI extends WindowedUI {
         this._updateAllKeyDropdown();
     }
 
-
     onKeyChange(oldKey, fileObject){
         console.log("Changed key:", oldKey, " file:: ", fileObject, " all files: ", this.node.files, " map: ", this.keyContainerMap)
         this.keyContainerMap[fileObject.key] = this.keyContainerMap[oldKey];
         delete this.keyContainerMap[oldKey];
         this._updateAllKeyDropdown()
     }
+
     getFileContainer(fileObject, allKeys){
         let container = document.createElement('div');
         container.className = "node-file-container";
@@ -418,9 +415,11 @@ class NodeFilesUI extends WindowedUI {
         container.append(plusButtonContainer);
         return container;
     }
+
     _updateAllKeyDropdown(){
         let allKeys = this.getAllKeys();
         let availableProperties = this._getAvailableProperties(allKeys);
+        this.windowDiv.querySelector("div.content-sticky-header").innerText = "File configuration: " + this.node.files.length + " files";
         if(availableProperties.length === 0 && !this.addFileButton.classList.contains("node-file-container-disabled")) {
             this.addFileButton.classList.replace("node-file-container", "node-file-container-disabled");
             this.addFileButton.onclick = () => {};
@@ -432,6 +431,7 @@ class NodeFilesUI extends WindowedUI {
             this._updateKeyDropdown(key, allKeys, this.keyContainerMap[key].querySelector("select.node-file-key-dropdown"));
         }
     }
+
     _createKeyDropdown(selectedKey, allKeys) {
         // Create the Local LLM dropdown
         let keyDropdown = document.createElement("select");
@@ -440,6 +440,7 @@ class NodeFilesUI extends WindowedUI {
         keyDropdown.style.border = "none";
         return this._updateKeyDropdown(selectedKey, allKeys, keyDropdown);
     }
+
     _updateKeyDropdown(selectedKey, allKeys, keyDropdown) {
         let availableProperties = [selectedKey, ...this._getAvailableProperties(allKeys)];
         let options = []

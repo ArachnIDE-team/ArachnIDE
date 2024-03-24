@@ -1,4 +1,12 @@
-
+window.initialProperties = Object.keys(window);
+window.getNewProperties = function(){
+    let newProperties = Object.keys(window).filter(property => !initialProperties.includes(property))
+    let newWindow = {}
+    for(let prop of newProperties){
+        newWindow[prop] = window[prop];
+    }
+    return newWindow;
+}
 window.startedViaPlaywright = window.startedViaPlaywright || false;
 
 var settings = {
@@ -256,3 +264,19 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
+
+// tree-sitter
+const Parser = window.TreeSitter;
+// (async () => {
+//     await Parser.init();
+//     const parser = new Parser();
+//     const Lang = await Parser.Language.load('tree-sitter-javascript.wasm');
+//     parser.setLanguage(Lang);
+//     const tree = parser.parse('let x = 1;');
+//     console.log(tree.rootNode.toString());
+// })();
+Parser.init().then(async function (){
+    window.jsParser = new Parser;
+    const JavaScript = await Parser.Language.load('/js/external/tree-sitter-javascript.wasm');
+    jsParser.setLanguage(JavaScript);
+});

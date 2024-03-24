@@ -158,7 +158,9 @@ class FileManagerAPI {
     }
 }
 
-
+window.getFSTree = async function (root, depth=1) {
+    return (await FileManagerAPI.getFSTree(root, depth))[root]
+}
 
 
 class AutoLoadWebsocket extends WebSocket{

@@ -92,6 +92,7 @@ let shouldAddCodeButton = false;
 
 
     class ZettelkastenProcessor {
+
         constructor() {
             this.prevNoteInputLines = [];
 
@@ -100,12 +101,12 @@ let shouldAddCodeButton = false;
             refTagInput.addEventListener('input', this.processInput.bind(this));
         }
 
-        findFirstChangedLine(lines) {
+        _findFirstChangedLine(lines) {
             return lines.findIndex((line, i) => line !== this.prevNoteInputLines[i]) || Math.min(this.prevNoteInputLines.length, lines.length);
         }
 
-        findChangedNode(lines) {
-            const firstChangedLine = this.findFirstChangedLine(lines);
+        _findChangedNode(lines) {
+            const firstChangedLine = this._findFirstChangedLine(lines);
 
             const nodeTitleRegex = new RegExp(`^${nodeTag}\\s*(.*)$`);
 
@@ -122,6 +123,7 @@ let shouldAddCodeButton = false;
             return null;  // If no matching node is found, return null or another default value
         }
 
+        // Called on any input change
         processInput() {
             if (bypassZettelkasten) {
                 bypassZettelkasten = false;
@@ -133,56 +135,56 @@ let shouldAddCodeButton = false;
             let currentNodeTitle = '';
 
             lines.forEach((line, index) => {
-                currentNodeTitle = this.processLine(line, lines, index, nodes, currentNodeTitle);
+                currentNodeTitle = this._processLine(line, lines, index, nodes, currentNodeTitle);
             });
 
             if (!processAll) { 
-                this.processChangedNode(lines, nodes);
+                this._processChangedNode(lines, nodes);
             }
 
-            this.cleanupNodes(nodes, nodeLines);
+            this._cleanupNodes(nodes, nodeLines);
             this.prevNoteInputLines = lines.slice();
 
             processAll = false;
             restoreZettelkastenEvent = false;
         }
 
-        processLine(line, lines, index, nodes, currentNodeTitle) {
+        _processLine(line, lines, index, nodes, currentNodeTitle) {
             const currentNode = nodes[currentNodeTitle];
             if (line.startsWith(nodeTag)) {
-                return this.handleNode(line, index, nodeLines, nodes, currentNodeTitle);
+                return this._handleNode(line, index, nodeLines, nodes, currentNodeTitle);
             }
 
             if (line.startsWith(LLM_TAG)) {
-                return this.handleLLM(line, index, nodeLines, nodes, currentNodeTitle, this.addLLMNodeInputListener);
+                return this._handleLLM(line, index, nodeLines, nodes, currentNodeTitle, this._addLLMNodeInputListener);
             }
 
             if (currentNode && currentNode.isLLM) {
-                return this.handleLLMPromptLine(line, nodeTag, refTag, currentNodeTitle, nodes);
+                return this._handleLLMPromptLine(line, nodeTag, refTag, currentNodeTitle, nodes);
             }
 
             if (processAll && !restoreZettelkastenEvent) {
-                // Call handlePlainTextAndReferences without the start and end lines
-                this.handlePlainTextAndReferences(line, currentNodeTitle, nodes, null, null, lines);
+                // Call _handlePlainTextAndReferences without the start and end lines
+                this._handlePlainTextAndReferences(line, currentNodeTitle, nodes, null, null, lines);
             }
 
             return currentNodeTitle;
         }
 
-        handlePlainTextAndReferences(line, currentNodeTitle, nodes, startLine = null, endLine = null, lines = null) {
+        _handlePlainTextAndReferences(line, currentNodeTitle, nodes, startLine = null, endLine = null, lines = null) {
             //this.removeStaleReferences(currentNodeTitle, nodes);
 
             if (line.includes(refTag)) {
-                // If startLine and endLine are null, handleReferenceLine will use its default behavior
-                this.handleReferenceLine(line, currentNodeTitle, nodes, lines, true, startLine, endLine);
+                // If startLine and endLine are null, _handleReferenceLine will use its default behavior
+                this._handleReferenceLine(line, currentNodeTitle, nodes, lines, true, startLine, endLine);
             } else if (nodes[currentNodeTitle]) {
-                this.handleTextWithoutTags(line, currentNodeTitle, nodes);
+                this._handleTextWithoutTags(line, currentNodeTitle, nodes);
             }
         }
 
-        // Updated to handle processChangedNode
-        processChangedNode(lines, nodes) {
-            const changedNode = this.findChangedNode(lines);
+        // Updated to handle _processChangedNode
+        _processChangedNode(lines, nodes) {
+            const changedNode = this._findChangedNode(lines);
             if (changedNode) {
                 const changedNodeTitle = changedNode.getTitle();
                 const { startLineNo, endLineNo } = getNodeSectionRange(changedNodeTitle, noteInput);
@@ -191,7 +193,7 @@ let shouldAddCodeButton = false;
                 let nodeReferencesCleared = false;
                 for (let i = startLineNo + 1; i <= endLineNo && i < lines.length; i++) {
                     // Process each line and update the nodeContainsReferences flag
-                    this.handlePlainTextAndReferences(lines[i], changedNodeTitle, nodes, startLineNo, endLineNo, lines);
+                    this._handlePlainTextAndReferences(lines[i], changedNodeTitle, nodes, startLineNo, endLineNo, lines);
                     if (lines[i].includes(refTag)) {
                         nodeContainsReferences = true;
                         nodeReferencesCleared = false;
@@ -200,28 +202,28 @@ let shouldAddCodeButton = false;
 
                 // Clear references if no references are found and they haven't been cleared already
                 if (!nodeContainsReferences && !nodeReferencesCleared) {
-                    this.handleRefTags([], changedNodeTitle, nodes, lines);
+                    this._handleRefTags([], changedNodeTitle, nodes, lines);
                     nodeReferencesCleared = true; // Indicate that references have been cleared
                     //console.log(`References cleared for node: ${changedNodeTitle}`);
                 }
             }
         }
 
-        cleanupNodes(nodes, nodeLines) {
-            this.deleteInactiveNodes(nodes);
-            this.deleteInactiveNodeLines(nodeLines);
+        _cleanupNodes(nodes, nodeLines) {
+            this._deleteInactiveNodes(nodes);
+            this._deleteInactiveNodeLines(nodeLines);
         }
 
 
         //Creates nodes either from the Zettelkasten or the window.
-        handleNode(line, i, nodeLines, nodes, currentNodeTitle) {
+        _handleNode(line, i, nodeLines, nodes, currentNodeTitle) {
             currentNodeTitle = line.substr(nodeTag.length).trim();
 
             if (restoreZettelkastenEvent) {
                 let savedNode = getNodeByTitle(currentNodeTitle);
 
                 if (savedNode) {
-                    const node = this.establishZettelkastenNode(savedNode, currentNodeTitle, nodeLines, nodes, noteInput);
+                    const node = this._establishZettelkastenNode(savedNode, currentNodeTitle, nodeLines, nodes, noteInput);
                     nodeLines[i] = node;
                     nodes[currentNodeTitle] = node;
                     return currentNodeTitle;
@@ -253,7 +255,7 @@ let shouldAddCodeButton = false;
                         nodeObject = createTextNode(currentNodeTitle, '', (Math.random() - 0.5) * 1.8, (Math.random() - 0.5) * 1.8);
                     }
 
-                    const node = this.establishZettelkastenNode(nodeObject, currentNodeTitle, nodeLines, nodes, noteInput);
+                    const node = this._establishZettelkastenNode(nodeObject, currentNodeTitle, nodeLines, nodes, noteInput);
                     nodeLines[i] = node;
                     nodes[currentNodeTitle] = node;
                 }
@@ -270,7 +272,7 @@ let shouldAddCodeButton = false;
             return currentNodeTitle;
         }
 
-        establishZettelkastenNode(domNode, currentNodeTitle, nodeLines, nodes, noteInput) {
+        _establishZettelkastenNode(domNode, currentNodeTitle, nodeLines, nodes, noteInput) {
             if (!domNode) {
                 console.warn('DOM node is undefined, cannot establish Zettelkasten node.');
                 return null;
@@ -286,24 +288,24 @@ let shouldAddCodeButton = false;
                 lineNum: null
             };
 
-            this.attachContentEventListenersToNode(node, nodes, noteInput, nodeLines);
+            this._attachContentEventListenersToNode(node, nodes, noteInput, nodeLines);
 
             return node;
         }
 
-        attachContentEventListenersToNode(node, nodes, noteInput, nodeLines) {
+        _attachContentEventListenersToNode(node, nodes, noteInput, nodeLines) {
             const inputElement = node.nodeObject.titleInput;
-            const titleInputEventHandler = this.createTitleInputEventHandler(node, nodes, noteInput, nodeLines, inputElement);
+            const titleInputEventHandler = this._createTitleInputEventHandler(node, nodes, noteInput, nodeLines, inputElement);
             inputElement.addEventListener('input', titleInputEventHandler);
 
             const textarea = node.nodeObject.textarea;
-            const bodyHandler = this.getHandleNodeBodyInputEvent(node, textarea);
+            const bodyHandler = this._getHandleNodeBodyInputEvent(node, textarea);
             textarea.addEventListener('input', bodyHandler);
         }
 
 
         //Syncs node titles and Zettelkasten
-        createTitleInputEventHandler(node, nodes, noteInput, nodeLines, inputElement) {
+        _createTitleInputEventHandler(node, nodes, noteInput, nodeLines, inputElement) {
             return (e) => {
                 processAll = true;
 
@@ -360,7 +362,7 @@ let shouldAddCodeButton = false;
 
 
         //Syncs node text and Zettelkasten
-        getHandleNodeBodyInputEvent(node, textarea) {
+        _getHandleNodeBodyInputEvent(node, textarea) {
             return (e) => {
                 if (e.target !== textarea) {
                     return;
@@ -386,7 +388,7 @@ let shouldAddCodeButton = false;
                 for (const line of nodeLines) {
                     if (line.startsWith(refTag)) {
                         // Passing startLineNo and endLineNo for more explicit reference handling
-                        this.handleReferenceLine(line, node.title, nodes, lines, false, startLineNo, endLineNo);
+                        this._handleReferenceLine(line, node.title, nodes, lines, false, startLineNo, endLineNo);
                     }
                 }
 
@@ -395,21 +397,21 @@ let shouldAddCodeButton = false;
             }
         }
 
-        extractAllReferencesFromRange(startLine, endLine, lines) {
+        _extractAllReferencesFromRange(startLine, endLine, lines) {
             let allReferences = [];
             for (let i = startLine; i <= endLine; i++) {
                 const line = lines[i];
                 // Only proceed if line is defined
                 if (line && line.includes(refTag)) {
-                    const extractedRefs = this.extractReferencesFromLine(line);
+                    const extractedRefs = this._extractReferencesFromLine(line);
                     allReferences.push(...extractedRefs);
                 }
             }
             return allReferences;
         }
 
-        // Modified handleReferenceLine to use optional given range or generate one if not provided
-        handleReferenceLine(line, currentNodeTitle, nodes, lines, shouldAppend = true, startLineIndex = null, endLineIndex = null) {
+        // Modified _handleReferenceLine to use optional given range or generate one if not provided
+        _handleReferenceLine(line, currentNodeTitle, nodes, lines, shouldAppend = true, startLineIndex = null, endLineIndex = null) {
             const currentNode = nodes[currentNodeTitle];
             if (!currentNode) return;
 
@@ -417,14 +419,14 @@ let shouldAddCodeButton = false;
 
             // Check if the startLineIndex and endLineIndex are within the bounds of the lines array
             if (startLineIndex !== null && endLineIndex !== null && startLineIndex >= 0 && endLineIndex < lines.length) {
-                allReferences = this.extractAllReferencesFromRange(startLineIndex, endLineIndex, lines);
+                allReferences = this._extractAllReferencesFromRange(startLineIndex, endLineIndex, lines);
             } else {
                 // Get node section range dynamically if not provided
                 const { startLineNo, endLineNo } = getNodeSectionRange(currentNodeTitle, noteInput);
-                allReferences = this.extractAllReferencesFromRange(startLineNo + 1, endLineNo, lines); // +1 to skip the title
+                allReferences = this._extractAllReferencesFromRange(startLineNo + 1, endLineNo, lines); // +1 to skip the title
             }
 
-            this.handleRefTags(allReferences, currentNodeTitle, nodes, lines);
+            this._handleRefTags(allReferences, currentNodeTitle, nodes, lines);
 
             // Build plain text for node after tags
             if (shouldAppend) {
@@ -436,13 +438,13 @@ let shouldAddCodeButton = false;
             }
         }
 
-        extractReferencesFromLine(line) {
+        _extractReferencesFromLine(line) {
             let references = [];
 
             if (sortedBrackets.includes(refTag)) {
                 const closingBracket = bracketsMap[refTag];
                 if (line.includes(closingBracket)) {
-                    const extracted = this.extractBracketedReferences(line, refTag, closingBracket);
+                    const extracted = this._extractBracketedReferences(line, refTag, closingBracket);
                     references = extracted.references;
                 }
             } else {
@@ -452,7 +454,7 @@ let shouldAddCodeButton = false;
             return references;
         }
 
-        handleRefTags(references, currentNodeTitle, nodes, lines) {
+        _handleRefTags(references, currentNodeTitle, nodes, lines) {
             const thisNodeWrapper = nodes[currentNodeTitle];
             if (!thisNodeWrapper || !thisNodeWrapper.nodeObject) {
                 return;
@@ -468,7 +470,7 @@ let shouldAddCodeButton = false;
             const connectedNodes = getConnectedNodes(thisNode);
             connectedNodes.forEach(node => {
                 const { startLineNo, endLineNo } = getNodeSectionRange(node.getTitle(), noteInput);
-                const nodeReferences = this.extractAllReferencesFromRange(startLineNo + 1, endLineNo, lines);
+                const nodeReferences = this._extractAllReferencesFromRange(startLineNo + 1, endLineNo, lines);
 
                 if (nodeReferences.includes(currentNodeTitle)) {
                     // If the connected node references the current node, add its UUID to the set
@@ -511,8 +513,7 @@ let shouldAddCodeButton = false;
             });
         }
 
-
-        extractBracketedReferences(line, openingBracket, closingBracket) {
+        _extractBracketedReferences(line, openingBracket, closingBracket) {
             const references = [];
             let buffer = "";
             let insideBrackets = false;
@@ -537,7 +538,7 @@ let shouldAddCodeButton = false;
             return { references, residualLine };
         }
 
-        handleTextWithoutTags(line, currentNodeTitle, nodes) {
+        _handleTextWithoutTags(line, currentNodeTitle, nodes) {
             let node = nodes[currentNodeTitle];
             let targetTextarea;
             if (node.isLLM) {
@@ -558,7 +559,7 @@ let shouldAddCodeButton = false;
             node.skipNewLine = false;
         }
 
-        deleteInactiveNodes(nodes) {
+        _deleteInactiveNodes(nodes) {
             const dels = [];
             for (const k in nodes) {
                 if (!nodes[k].live) {
@@ -571,7 +572,7 @@ let shouldAddCodeButton = false;
             }
         }
 
-        deleteInactiveNodeLines(nodeLines) {
+        _deleteInactiveNodeLines(nodeLines) {
             const nodeLineDels = [];
             for (const k in nodeLines) {
                 if (!nodeLines[k].live) {
@@ -584,7 +585,7 @@ let shouldAddCodeButton = false;
             }
         }
 
-        handleLLMPromptLine(line, nodeTag, refTag, currentNodeTitle, nodes) {
+        _handleLLMPromptLine(line, nodeTag, refTag, currentNodeTitle, nodes) {
             if (line.startsWith(nodeTag) || line.startsWith(refTag)) {
                 return '';
             } else {
@@ -595,7 +596,7 @@ let shouldAddCodeButton = false;
             }
         }
 
-        handleLLM(line, i, nodeLines, nodes, currentNodeTitle, addLLMNodeInputListener) {
+        _handleLLM(line, i, nodeLines, nodes, currentNodeTitle, addLLMNodeInputListener) {
             let llmNodeTitle = line.substr("LLM:".length).trim() || "Untitled";  // Default to "Untitled" if empty
             currentNodeTitle = llmNodeTitle;
 
@@ -631,7 +632,7 @@ let shouldAddCodeButton = false;
             return currentNodeTitle;
         }
 
-        addLLMNodeInputListener(node) {
+        _addLLMNodeInputListener(node) {
             node.nodeObject.content.children[0].children[0].children[1].addEventListener('input', (e) => {
                 const oldName = node.title;
                 let newName = e.target.value.trim().replace(",", "");

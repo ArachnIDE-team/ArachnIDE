@@ -15,7 +15,7 @@ class WindowedNode extends Node {
         saved: undefined,
         saveData: undefined
     }
-    static SAVE_PROPERTIES = ['title', 'addCloseButton', 'addFullScreenButton', 'addCollapseButton', 'addSettingsButton', 'addFileButton'];
+    static SAVE_PROPERTIES = ['title', 'addCloseButton', 'addFullScreenButton', 'addCollapseButton', 'addSettingsButton', 'addFileButton', 'width', 'height'];
     // constructor(title, content, pos, scale, iscale, link) {
     constructor(configuration= WindowedNode.DEFAULT_CONFIGURATION) {
         configuration = {...WindowedNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -57,6 +57,39 @@ class WindowedNode extends Node {
     // static getNaturalScaleParameters(scale = 1, nscale_mult = 1){
     //     return [toZ(mousePos), nscale_mult * (zoom.mag2() ** settings.zoomContentExp), scale]
     // }
+
+
+    get width() {
+        return this.getWindowSize()[0];
+    }
+
+    set width(v) {
+        if(this.initialized){
+            this.windowDiv.style.maxWidth = `${v}px`;
+            this.windowDiv.style.width = `${v}px`;
+        } else {
+            this.addAfterInitCallback(() => {
+                this.windowDiv.style.maxWidth = `${v}px`;
+                this.windowDiv.style.width = `${v}px`;
+            })
+        }
+    }
+    get height() {
+        return this.getWindowSize()[1];
+    }
+
+    set height(v) {
+        if(this.initialized){
+            this.windowDiv.style.height = `${v}px`;
+        } else {
+            this.addAfterInitCallback(() => {
+                this.windowDiv.style.height = `${v}px`;
+            })
+        }
+    }
+
+
+
     static _createWindow(title, content) {
         let odiv = document.createElement('div');
         let div = document.createElement('div');
@@ -229,6 +262,7 @@ class WindowedNode extends Node {
             });
         }
 
+
         return this;
     }
 
@@ -279,7 +313,6 @@ class WindowedNode extends Node {
         this.dropdown = document.querySelector('.dropdown');
         this.wrapperDivs = document.getElementsByClassName('wrapperDiv');
         this.titleInput = this.content.querySelector('.title-input');
-
         // Setup event listeners
         this._setupEventListeners();
     }
@@ -328,9 +361,7 @@ class WindowedNode extends Node {
         };
 
         let windowDiv = this.windowDiv;
-        // Find these elements once and store them for later use.
-        const editorWrapperDiv = windowDiv.querySelector('.editorWrapperDiv');
-        const editorIframe = editorWrapperDiv ? editorWrapperDiv.querySelector('iframe') : null;
+
 
 
         let startX;
@@ -356,62 +387,7 @@ class WindowedNode extends Node {
             // Calculate the change in position of the mouse considering the scaling factors
             const dx = 2 * (event.pageX - startX) / scaleX;
             const dy = 2 * (event.pageY - startY) / scaleY;
-
-            const content = this.innerContent;
-            const minWidth = content ?
-                (content.style.minWidth !== '' ?
-                    Number.parseInt(content.style.minWidth) :
-                    Number.parseInt(content.offsetWidth)) :
-                100;
-            const minHeight = content ?
-                (content.style.minHeight !== '' ?
-                Number.parseInt(content.style.minHeight) + 35 :
-                Number.parseInt(content.offsetHeight)) + 35 :
-                100;
-            const newWidth = Math.max(startWidth + dx, minWidth);
-            const newHeight = Math.max(startHeight + dy, minHeight);
-            windowDiv.style.maxWidth = `${newWidth}px`;
-            windowDiv.style.width = `${newWidth}px`;
-            windowDiv.style.height = `${newHeight}px`;
-
-            const contentEditable = this.contentEditableDiv;
-            if (contentEditable) {
-                if (newHeight > 300) {
-                    contentEditable.style.maxHeight = `${newHeight}px`;
-                } else {
-                    contentEditable.style.maxHeight = `300px`;
-                }
-                contentEditable.style.maxWidth = `${newWidth}px`
-            }
-
-            const htmlView = this.htmlView;
-            if (htmlView) {
-                htmlView.style.width = '100%';
-                htmlView.style.height = '100%';
-            }
-
-            // Find the aiNodeWrapperDiv for this specific node. Use a more specific selector if needed.
-            const aiNodeWrapperDiv = this.ainodewrapperDiv;
-
-            // If aiNodeWrapperDiv exists, set its dimensions
-            if (aiNodeWrapperDiv) {
-                aiNodeWrapperDiv.style.width = `${newWidth}px`;
-                aiNodeWrapperDiv.style.height = `${newHeight}px`;
-            }
-
-
-            if (editorWrapperDiv) {
-                const newEditorWidth = Math.max(startWidth + dx, 350);  //350 min width
-                const newEditorHeight = Math.max(startHeight + dy, 200);  //200 min height
-
-                // Set the new dimensions for the editor wrapper div
-                editorWrapperDiv.style.width = `${newEditorWidth}px`;
-                editorWrapperDiv.style.height = `${newEditorHeight}px`;
-
-                // Optional: You might want to update the iframe size here as well
-                editorIframe.style.width = `${newEditorWidth}px`;
-                editorIframe.style.height = `${newEditorHeight - 10}px`;
-            }
+            this.applyResize(startWidth, dx, startHeight, dy);
         };
 
         const handleMouseUp = () => {
@@ -419,13 +395,7 @@ class WindowedNode extends Node {
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
             document.body.style.cursor = 'auto'; // Reset the cursor style
-
-            // Re-enable pointer events on iframe
-            if (editorWrapperDiv) {
-                if (editorIframe) {
-                    editorIframe.style.pointerEvents = 'auto';
-                }
-            }
+            this.onMouseUp();
         };
 
         resizeHandle.addEventListener('mousedown', (event) => {
@@ -433,20 +403,49 @@ class WindowedNode extends Node {
             event.stopPropagation();
             startX = event.pageX;
             startY = event.pageY;
-            startWidth = parseInt(document.defaultView.getComputedStyle(windowDiv).width, 10);
-            startHeight = parseInt(document.defaultView.getComputedStyle(windowDiv).height, 10);
-
+            [startWidth, startHeight] = this.getWindowSize();
             isMouseMoving = true; // Flag to indicate that a resize operation is in progress
             document.addEventListener('mousemove', handleMouseMove);
             document.addEventListener('mouseup', handleMouseUp);
-
-            // Disable pointer events on iframe
-            if (editorWrapperDiv) {
-                if (editorIframe) {
-                    editorIframe.style.pointerEvents = 'none';
-                }
-            }
+            this.onMouseDown();
         });
+    }
+
+    getWindowSize() {
+        let startWidth = parseInt(document.defaultView.getComputedStyle(this.windowDiv).width, 10);
+        let startHeight = parseInt(document.defaultView.getComputedStyle(this.windowDiv).height, 10);
+        return [startWidth, startHeight];
+    }
+
+    applyResize(startWidth, dx, startHeight, dy) {
+        const content = this.innerContent;
+        const minWidth = content ?
+            (content.style.minWidth !== '' ?
+                Number.parseInt(content.style.minWidth) :
+                Number.parseInt(content.offsetWidth)) :
+            100;
+        const minHeight = content ?
+            (content.style.minHeight !== '' ?
+                Number.parseInt(content.style.minHeight) + 35 :
+                Number.parseInt(content.offsetHeight)) + 35 :
+            100;
+        const newWidth = Math.max(startWidth + dx, minWidth);
+        const newHeight = Math.max(startHeight + dy, minHeight);
+        this.onResize(newWidth, newHeight);
+    }
+
+    onMouseDown() {
+        // override in WebEditorNode
+    }
+
+    onMouseUp() {
+        // override in WebEditorNode
+    }
+
+    onResize(newWidth, newHeight) {
+        this.windowDiv.style.maxWidth = `${newWidth}px`;
+        this.windowDiv.style.width = `${newWidth}px`;
+        this.windowDiv.style.height = `${newHeight}px`;
     }
 
     static _extractScalingFactors(element) {
@@ -592,7 +591,11 @@ class WindowedNode extends Node {
         this.toggleWindowAnchored(this.anchorForce === 1);
     }
 
-
+    afterInit() {
+        super.afterInit();
+        let [startWidth, startHeight] = this.getWindowSize();
+        this.applyResize(startWidth, 0, startHeight, 0);
+    }
 
     // save(){
     //     let node = super.save();

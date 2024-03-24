@@ -18,6 +18,8 @@
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5/addon/mode/overlay.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5/addon/mode/loadmode.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5/addon/runmode/runmode.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5/addon/hint/show-hint.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5/addon/hint/anyword-hint.js"></script>
 
     <!-- Modes -->
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5/mode/meta.js"></script>
@@ -29,6 +31,8 @@
     <!--Themes-->
     <!-- Custom Scrollbars -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5/addon/scroll/simplescrollbars.css">
+    <!-- show-hint-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5/addon/hint/show-hint.css">
 
     <!--Prism.js-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
@@ -881,6 +885,7 @@
         }
     </script>-->
 
+    <script src="js/external/tree-sitter.js"></script>
 
     <script src="js/globals.js"></script>
 
@@ -907,8 +912,9 @@
     <script src="js/nodes/movenodes.js"></script>
 
     <script src="js/interface/interface_v2.js"></script>
-    <script src="js/interface/tree.min.js"></script>
+    <script src="js/external/tree.min.js"></script>
     <script src="js/interface/fsTree.js"></script>
+
 
     <script src="js/interface/window.js"></script>
     <script src="js/interface/uinodes.js"></script>

@@ -500,7 +500,7 @@ class ResponseHandler {
                 let message = promptDiv.innerHTML;
 
                 console.log(`Sending message: "${message}"`);
-                sendLLMNodeMessage(this.node, message);
+                this.node.sendLLMNodeMessage(message);
             }
         }.bind(this);
 

@@ -1,4 +1,705 @@
 
+class JavascriptNode extends WindowedNode {
+    static DEFAULT_CONFIGURATION = {
+        name: "",
+        code: "",
+        settings: {},
+        saved: undefined,
+        saveData: undefined,
+    }
+
+    static SAVE_PROPERTIES = ['code', 'settings'];
+
+    static OBSERVERS = { 'code': {
+            'add': function (callback) { this.contentEditableDiv.addEventListener("input", callback) },
+            'remove': function (callback) { this.contentEditableDiv.removeEventListener("input", callback) }
+        }}
+
+    constructor(configuration = JavascriptNode.DEFAULT_CONFIGURATION){
+        configuration = {...JavascriptNode.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.settings =  {...JavascriptNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
+        configuration.content = [JavascriptNode._getContentElement()];
+        if (!configuration.saved) {// Create JavascriptNode
+            super({ title: configuration.name, content: configuration.content, ...WindowedNode.getNaturalScaleParameters() });
+        } else {// Restore JavascriptNode
+            super({ title: configuration.name, content: configuration.content, scale: true, saved: true, saveData: configuration.saveData })
+        }
+        htmlnodes_parent.appendChild(this.content);
+        registernode(this);
+        this._initialize(configuration.name, configuration.code, configuration.settings, configuration.saved)
+    }
+
+    get code() {
+        let iframeElement = document.querySelector(`iframe[identifier='editor-${this.uuid}']`);
+        if (iframeElement && iframeElement.contentWindow) {
+            try {
+                //console.log(`save data`, this.editorSaveData);
+                let iframeWindow = iframeElement.contentWindow;
+                return iframeWindow.jsEditor.getValue();
+            } catch (error) {
+                console.error('Error restoring editor content:', error);
+                throw new Error('Error restoring editor content:', error)
+            }
+        } else {
+            console.warn('No iframe editor found for node.');
+            throw new Error('No iframe editor found for node.')
+        }
+    }
+
+    set code(v) {
+        if(v instanceof Blob) {
+            var reader = new FileReader();
+            reader.onload = (event) => {
+                this.code = event.target.result // Recursive call
+            }
+            reader.readAsText(v);
+            return; // Wait for the reader to complete
+        }
+
+        const setCode = (code) => {
+            let iframeElement = document.querySelector(`iframe[identifier='editor-${this.uuid}']`);
+            if (iframeElement && iframeElement.contentWindow) {
+                try {
+                    //console.log(`save data`, this.editorSaveData);
+                    let iframeWindow = iframeElement.contentWindow;
+                    iframeWindow.jsEditor.setValue(code);
+                } catch (error) {
+                    console.error('Error restoring editor content:', error);
+                    throw new Error('Error restoring editor content:', error)
+                }
+            } else {
+                console.warn('No iframe editor found for node.');
+                throw new Error('No iframe editor found for node.')
+            }
+        }
+
+        if(this.initialized){
+            // this.contentEditableDiv.innerText = v;
+            setCode(v);
+        } else {
+            this.addAfterInitCallback(() => {
+                // this.contentEditableDiv.innerText = v;
+                setCode(v);
+            })
+        }
+    }
+
+    static _getContentElement(){
+        // Create the wrapper div
+        let editorWrapperDiv = document.createElement('div');
+        editorWrapperDiv.className = 'editorWrapperDiv';
+        editorWrapperDiv.style.width = '800px'; // Set width of the wrapper
+        editorWrapperDiv.style.height = '400px'; // Set height of the wrapper
+        editorWrapperDiv.style.overflow = 'none';
+        editorWrapperDiv.style.position = 'relative';
+
+        // Create the iframe element with a data URI as the src attribute
+        let iframeElement = document.createElement('iframe');
+        iframeElement.style.overflow = `none`;
+        iframeElement.style.width = '800px';
+        iframeElement.style.height = '390px';
+        iframeElement.style.border = '0';
+        iframeElement.style.background = 'transparent';
+        iframeElement.sandbox = 'allow-same-origin allow-scripts';
+
+        // Append the iframe to the wrapper div
+        editorWrapperDiv.appendChild(iframeElement);
+
+
+        let footerButtonContainer = document.createElement('div');
+        footerButtonContainer.classList.add("content-sticky-footer");
+
+        let runButton = document.createElement("button");
+        runButton.innerHTML = "Run Code";
+        runButton.classList.add("code-button");
+
+        footerButtonContainer.append(runButton);
+
+        // Create the overlay div dynamically
+        let overlay = document.createElement('div');
+        overlay.id = "editorOverlay";
+        overlay.style.position = "absolute";  // Position relative to editorWrapperDiv
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100%";  // 100% of editorWrapperDiv
+        overlay.style.height = "100%";  // 100% of editorWrapperDiv
+        overlay.style.zIndex = "9999";
+        overlay.style.backgroundColor = "transparent";
+        overlay.style.display = "none";  // Initially hidden
+
+        // Append the overlay to the editorWrapperDiv
+        editorWrapperDiv.appendChild(overlay);
+        editorWrapperDiv.appendChild(footerButtonContainer);
+        return editorWrapperDiv;
+    }
+
+    setMainContentFile(filePath, fileName){
+        this.files.push({ key: "code", path: filePath, name: fileName, autoLoad: false, autoSave: false})
+    }
+
+    _initialize(name, code, settings, saved){
+        let iframeElement = this.content.querySelector('iframe')
+        iframeElement.setAttribute('identifier', 'editor-' + this.uuid); // Store the identifier
+        this.setMinSize(350,250)
+        if(!saved){
+            this.settings = settings;
+            this.code = code;// This will be delayed 500ms after iframeElement loads (see afterInit)
+        }
+        this.codeButton = this.content.querySelector('.code-button');
+        this._addEventListeners();
+        this.afterInit()
+    }
+
+    afterInit() {
+
+        let overlay = this.content.querySelector(`.editorWrapperDiv #editorOverlay`)
+        overlays.push(overlay);
+
+        let iframeElement = this.content.querySelector('.editorWrapperDiv iframe');
+        this.iframeElement = iframeElement;
+
+        iframeElement.onload = () => {
+            iframeElement.contentWindow.addEventListener('click', () => {
+                this.followingMouse = 0;
+            });
+            setTimeout(() =>  super.afterInit(), 500); // Delay restoration
+        };
+
+        let htmlContent = JavascriptNode._createEditorInterface();
+        iframeElement.src = `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
+        iframeElement.srcdoc = htmlContent;
+        // super.afterInit();
+    }
+
+    _addEventListeners() {
+        let button = this.codeButton;
+
+        // Reattach the handleCodeButton callback
+        if (button) {
+            // Assuming handleCodeButton sets up the button event listener
+            button.addEventListener('click', this.onClickRun.bind(this))
+        }
+    }
+
+    onClickRun(){
+        this.eval(this.code);
+        // if(!this.settings.local) {
+        //     eval(this.code);
+        // }
+    }
+
+    eval(js){
+        return async function() {
+            return await eval("(async () => {" + js + "})()");
+        }.call(this);
+    }
+
+    // From editor
+
+    onResize(newWidth, newHeight) {
+        super.onResize(newWidth, newHeight);
+
+        const editorWrapperDiv = this.windowDiv.querySelector('.editorWrapperDiv');
+        const editorIframe = editorWrapperDiv ? editorWrapperDiv.querySelector('iframe') : null;
+
+        if (editorWrapperDiv) {
+            // Set the new dimensions for the editor wrapper div
+            editorWrapperDiv.style.width = `${newWidth}px`;
+            editorWrapperDiv.style.height = `${newHeight - 65}px`;
+
+            // Optional: You might want to update the iframe size here as well
+            editorIframe.style.width = `${newWidth}px`;
+            editorIframe.style.height = `${newHeight - 55}px`;
+        }
+    }
+
+    onMouseUp() {
+        super.onMouseUp();
+
+        const editorWrapperDiv = this.windowDiv.querySelector('.editorWrapperDiv');
+        const editorIframe = editorWrapperDiv ? editorWrapperDiv.querySelector('iframe') : null;
+
+        // Re-enable pointer events on iframe
+        if (editorWrapperDiv) {
+            if (editorIframe) {
+                editorIframe.style.pointerEvents = 'auto';
+            }
+        }
+    }
+
+    onMouseDown() {
+        super.onMouseDown();
+
+        const editorWrapperDiv = this.windowDiv.querySelector('.editorWrapperDiv');
+        const editorIframe = editorWrapperDiv ? editorWrapperDiv.querySelector('iframe') : null;
+
+        // Disable pointer events on iframe
+        if (editorWrapperDiv) {
+            if (editorIframe) {
+                editorIframe.style.pointerEvents = 'none';
+            }
+        }
+    }
+
+    static _createEditorInterface() {
+        let htmlContent = `<!DOCTYPE html>
+<html lang="en" class="custom-scrollbar">
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5/lib/codemirror.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5/theme/dracula.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5/addon/scroll/simplescrollbars.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5/addon/hint/show-hint.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5/lib/codemirror.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/scroll/simplescrollbars.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/xml/xml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/css/css.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/hint/show-hint.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/hint/anyword-hint.js"></script>
+
+
+    <style type="text/css">
+        .editorcontainer {
+            box-sizing: border-box;
+            width: 100%;
+            min-width: 100%;
+            margin: auto;
+            /* Add any other styles you want for the container here... */
+        }
+
+        body {
+            background-color: transparent;
+            margin: 0;
+            padding: 0px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #editor-wrapper {
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            height: 95vh;
+            width: 96%; /* 10px margin on left and right side */
+            max-width: 100%;
+            margin-top: 10px;
+            margin-left: 15px; /* Left margin */
+            overflow: hidden; /* Contains the children */
+            resize:none;
+        }
+
+
+        .editor-container {
+            height: 100%; /* Take full height of parent */
+            margin: 0px 0px;
+            background-color: transparent;
+            padding: 0px;
+            position: relative; /* Ensuring the child takes this height */
+            flex: none; /* Ensure equal space division */
+        }
+
+        .editor-label {
+            color: #888;
+            font-size: 12px;
+            padding: 15px;
+            background-color: #262737;
+            display: inline;
+            margin: 0;
+            line-height: 30px;
+            user-select: none;
+        }
+
+        .CodeMirror {
+            font-size: 12px;
+            height: calc(100% - 32px); /* Adjusted for label height */
+            width: 100%;
+            position: absolute; /* Take full height of parent */
+            bottom: 0; /* Align to the bottom of the container */
+            overflow-x: hidden; /* Hide horizontal scrollbar */
+        }
+
+        .CodeMirror-simplescroll-horizontal {
+            display: none !important; /* Hide horizontal scrollbar */
+        }
+
+        .CodeMirror-simplescroll-vertical {
+            background: #222226 !important;
+        }
+
+            .CodeMirror-simplescroll-vertical div {
+                background: #3f3f3f !important;
+                border: 1px solid #555555;
+                width: 6px !important;
+            }
+
+        .CodeMirror-simplescroll-scrollbar div:hover {
+            background: #555 !important;
+        }
+
+        .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+            background-color: #222226;
+        }
+        .CodeMirror-hints.dracula {
+            background: #222226;
+            border: 1px solid #44444a;
+        }
+        .CodeMirror-hint {
+            color: #F3F3F3;
+        }
+        li.CodeMirror-hint-active {
+            background: #3d3d49;
+            color: #F3F3F3;
+        }
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="editor-container-wrapper" class="editorcontainer">
+        <div id="editor-wrapper">
+            <div class="editor-container">
+                <div class="editor-label">js</div>
+                <div id="jsEditor"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+            var WORD = /[\\w$]+/, RANGE = 500;
+            CodeMirror.registerHelper("hint", "anyword", function(editor, options) {
+                var word = options && options.word || WORD;
+                var range = options && options.range || RANGE;
+                var cur = editor.getCursor(), curLine = editor.getLine(cur.line);
+                var end = cur.ch, start = end;
+                while (start && word.test(curLine.charAt(start - 1))) --start;
+                var curWord = start !== end && curLine.slice(start, end);
+    
+                var list = options && options.list || [], seen = {};
+                var re = new RegExp(word.source, "g");
+                for (var dir = -1; dir <= 1; dir += 2) {
+                    var line = cur.line, endLine = Math.min(Math.max(line + dir * range, editor.firstLine()), editor.lastLine()) + dir;
+                    for (; line !== endLine; line += dir) {
+                        var text = editor.getLine(line), m;
+                        while (m = re.exec(text)) {
+                            if (line === cur.line && m[0] === curWord) continue;
+                            if ((!curWord || m[0].lastIndexOf(curWord, 0) === 0) && !Object.prototype.hasOwnProperty.call(seen, m[0])) {
+                                seen[m[0]] = true;
+                                list.push(m[0]);
+                            }
+                        }
+                    }
+                }
+                return {list: list, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end)};
+            });
+            CodeMirror.commands.autocomplete = function(cm) {
+                cm.showHint({hint: CodeMirror.hint.anyword});
+            }
+            var jsEditor = CodeMirror(document.getElementById('jsEditor'), {
+                mode: 'javascript', theme: 'dracula', lineNumbers: true, lineWrapping: true, scrollbarStyle: 'simple',  extraKeys: {"Ctrl-Space": "autocomplete"}
+            });
+
+            function refreshEditors() {
+                jsEditor.refresh();
+            }
+
+            window.requestAnimationFrame(refreshEditors);
+
+            const editorContainers = document.querySelectorAll('.editor-container');
+            const initialEditorWidth = editorContainers[0].parentElement.offsetWidth;
+
+            // Initialize isResized flag to false
+            let isResized = false;
+    
+            // Function to update editor widths
+            function updateEditorWidth() {
+                const editorWrapperWidth = editorContainers[0].parentElement.offsetWidth;
+                //const newDraggableBarWidths = updateDraggableBarWidths(); // Update the widths of draggable bars
+                const totalCurrentWidths = Array.from(editorContainers).reduce((total, el) => total + el.offsetWidth, 0);
+                const availableWidth = editorWrapperWidth// - newDraggableBarWidths;
+    
+                if (!isResized) {
+                    // First-time call: Initialize all editors to a uniform width
+                    const newWidth = availableWidth / 3;
+                    editorContainers.forEach(container => container.style.width = newWidth + 'px');
+                    isResized = true;  // Set the flag to true after the first invocation
+                } else {
+                    // Subsequent calls: Proportionally adjust the width of each editor
+                    const scalingFactor = availableWidth / totalCurrentWidths;
+                    editorContainers.forEach(container => {
+                        const newWidth = container.offsetWidth * scalingFactor;
+                        container.style.width = newWidth + 'px';
+                    });
+                }
+    
+                refreshEditors(); // Refresh the editors
+            }
+            updateEditorWidth();
+            // Event listener to update editor widths on window resize
+            window.addEventListener('resize', updateEditorWidth);
+
+            // Initial call to set the size
+            updateEditorWidth();
+    </script>
+</body>
+</html>`;
+
+        let iframeScript = `
+<script>
+    document.addEventListener('keydown', function(event) {
+        let nodeMode = 0;
+        if(event.altKey && event.shiftKey) {
+            nodeMode = 1;
+        }
+        window.parent.postMessage({ altHeld: event.altKey, shiftHeld: event.shiftKey, nodeMode: nodeMode }, '*');
+        if(event.altKey) event.preventDefault();  // Prevent default behavior only for Alt and Alt+Shift
+    });
+
+    document.addEventListener('keyup', function(event) {
+        window.parent.postMessage({ altHeld: event.altKey, shiftHeld: event.shiftKey, nodeMode: 0 }, '*');
+        if(!event.altKey) event.preventDefault();
+    });
+</script>
+`;
+
+        // Combine and return the full HTML content
+        return htmlContent + iframeScript;
+    }
+
+}
+
+
+function createJavascriptNode(name = '', code = '', settings=undefined) {
+    return new JavascriptNode({
+        name,
+        code,
+        settings
+    });
+}
+
+class MetaNode extends WindowedNode {
+    static DEFAULT_CONFIGURATION = {
+        name: "",
+        code: "",
+        settings: {language: "javascript"},
+        saved: undefined,
+        saveData: undefined,
+    }
+
+    static SAVE_PROPERTIES = ['code', 'settings'];
+
+    static OBSERVERS = { 'code': {
+            'add': function (callback) { this.contentEditableDiv.addEventListener("input", callback) },
+            'remove': function (callback) { this.contentEditableDiv.removeEventListener("input", callback) }
+        }}
+
+    constructor(configuration = MetaNode.DEFAULT_CONFIGURATION){
+        configuration = {...MetaNode.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.settings =  {...MetaNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
+        const textarea = MetaNode._getContentElement();
+        if(!configuration.saved) {// Create MetaNode
+            super({title: configuration.name, content: [textarea], ...WindowedNode.getNaturalScaleParameters()});
+        } else {// Restore MetaNode
+            super({title: configuration.name, content:  [textarea], scale: true, saved: true, saveData:  configuration.saveData});
+        }
+        htmlnodes_parent.appendChild(this.content);
+        registernode(this);
+        this._initialize(textarea, configuration.settings, configuration.saved)
+        if(configuration.code) this.code = configuration.code;
+    }
+
+    get code() {
+        return this.jsEditor.getValue();
+    }
+
+    set code(v) {
+        if(v instanceof Blob) {
+            var reader = new FileReader();
+            reader.onload = (event) => {
+                this.code = event.target.result // Recursive call
+            }
+            reader.readAsText(v);
+            return; // Wait for the reader to complete
+        }
+        if(this.initialized){
+            // this.contentEditableDiv.innerText = v;
+            this.jsEditor.setValue(v);
+        } else {
+            this.addAfterInitCallback(() => {
+                // this.contentEditableDiv.innerText = v;
+                this.jsEditor.setValue(v);
+            })
+        }
+    }
+
+    static _getContentElement(){
+        let textarea = document.createElement("textarea");
+        textarea.classList.add('custom-scrollbar', 'node-textarea');
+        textarea.onmousedown = cancel;
+        textarea.setAttribute("type", "text");
+        textarea.setAttribute("size", "11");
+        // textarea.setAttribute("style", "background-color: #222226; color: #bbb; overflow-y: scroll; resize: both; width: 259px; line-height: 1.4; display: none;");
+        textarea.style.position = "absolute";
+
+        return textarea;
+    }
+
+    setMainContentFile(filePath, fileName){
+        this.files.push({ key: "code", path: filePath, name: fileName, autoLoad: false, autoSave: false})
+    }
+
+    _initialize(textarea, settings, saved){
+        let windowDiv = this.windowDiv;  // Find the .content div
+        let editorDiv = document.createElement("div");
+
+        editorDiv.style = "width: 100%; height: 100%;"
+        let button = document.createElement("button");
+        button.innerHTML = "Run Code";
+        button.classList.add("code-button");
+
+
+        var WORD = /[\w$]+/, RANGE = 500;
+
+        CodeMirror.registerHelper("hint", "anyword", function(editor, options) {
+            var word = options && options.word || WORD;
+            var range = options && options.range || RANGE;
+            var cur = editor.getCursor(), curLine = editor.getLine(cur.line);
+            var end = cur.ch, start = end;
+            while (start && word.test(curLine.charAt(start - 1))) --start;
+            var curWord = start !== end && curLine.slice(start, end);
+
+            var list = options && options.list || [], seen = {};
+            var re = new RegExp(word.source, "g");
+            for (var dir = -1; dir <= 1; dir += 2) {
+                var line = cur.line, endLine = Math.min(Math.max(line + dir * range, editor.firstLine()), editor.lastLine()) + dir;
+                for (; line !== endLine; line += dir) {
+                    var text = editor.getLine(line), m;
+                    while (m = re.exec(text)) {
+                        if (line === cur.line && m[0] === curWord) continue;
+                        if ((!curWord || m[0].lastIndexOf(curWord, 0) === 0) && !Object.prototype.hasOwnProperty.call(seen, m[0])) {
+                            seen[m[0]] = true;
+                            list.push(m[0]);
+                        }
+                    }
+                }
+            }
+            return {list: list, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end)};
+        });
+        CodeMirror.commands.autocomplete = function(cm) {
+            cm.showHint({hint: CodeMirror.hint.anyword});
+        }
+        var jsEditor = CodeMirror(editorDiv, {
+            mode: settings.language, lineNumbers: true, lineWrapping: false, scrollbarStyle: 'simple', extraKeys: {"Ctrl-Space": "autocomplete"}
+        });
+
+
+        jsEditor.display.wrapper.style.clipPath = 'inset(0px)';
+        jsEditor.display.wrapper.style.backgroundColor = 'rgb(34, 34, 38)';
+        jsEditor.display.wrapper.style.borderStyle = 'inset';
+        jsEditor.display.wrapper.style.borderColor = 'rgba(136, 136, 136, 0.133)';
+        jsEditor.display.wrapper.style.fontSize = '15px';
+        jsEditor.display.wrapper.style.resize = 'vertical';
+        jsEditor.display.wrapper.style.userSelect = 'none';
+        this.jsEditor = jsEditor;
+
+        // Initially hide the button
+        windowDiv.appendChild(editorDiv);
+
+        windowDiv.appendChild(button);
+        this.setMinSize(300);
+        this.innerContent.style.maxWidth = "0";
+        this.innerContent.style.minWidth = "0";
+        this.innerContent.style.maxHeight = "0";
+        this.innerContent.style.minHeight = "0";
+        WindowedNode.makeContentScrollable(jsEditor.display.wrapper)
+        if(!saved){
+            this.settings = settings;
+        }
+
+        this.afterInit()
+    }
+
+    afterInit() {
+        this.codeButton = this.content.querySelector('.code-button');
+        this.textarea = this.content.querySelector('textarea');
+        this.pythonView = this.content.querySelector('#python-frame')
+        this._addEventListeners();
+        super.afterInit();
+    }
+
+    _addEventListeners() {
+        let button = this.codeButton;
+        let textarea = this.textarea;
+
+
+        // Attach events for contentEditable and textarea
+        // addEventsToContentEditable(contentEditableDiv, textarea, this);
+        // watchTextareaAndSyncWithContentEditable(textarea, contentEditableDiv);
+
+        // Reattach the handleCodeButton callback
+        if (button && textarea) {
+            // Assuming handleCodeButton sets up the button event listener
+            button.addEventListener('click', this.onClickRun.bind(this))
+        }
+    }
+
+    onResize(newWidth, newHeight) {
+        super.onResize(newWidth, newHeight);
+        const contentEditor = this.jsEditor.display.wrapper;
+        if (contentEditor) {
+            contentEditor.style.height = `${newHeight - 60}px`;
+            contentEditor.style.width = `${newWidth - 10}px`
+        }
+        this.jsEditor.refresh()
+
+    }
+
+    onClickRun(){
+        this.eval(this.code);
+        // if(!this.settings.local) {
+        //     eval(this.code);
+        // }
+    }
+
+    eval(js){
+        return async function() {
+            return await eval("(async () => {" + js + "})()");
+        }.call(this);
+    }
+
+    static _setupCodeCheckboxListener(button, addCodeButton) {
+        if (document.getElementById('code-checkbox')) {
+            document.getElementById('code-checkbox').addEventListener('change', (event) => {
+                if (addCodeButton) {
+                    button.style.display = "block";
+                    return;
+                }
+                //console.log(button, `button`);
+                button.style.display = event.target.checked ? "block" : "none";
+            });
+
+            if (document.getElementById('code-checkbox').checked) {
+                button.style.display = "block";
+            }
+        }
+    }
+}
+
+function createMetaNode(name = '', code = '', settings=undefined) {
+    return new MetaNode({
+        name,
+        code,
+        settings
+    });
+}
+
 class TextNode extends WindowedNode {
     static DEFAULT_CONFIGURATION = {
         name: "",
@@ -95,21 +796,27 @@ class TextNode extends WindowedNode {
         pythonView.id = 'python-frame';
         pythonView.classList.add('python-frame', 'hidden'); // Add hidden class
 
-        let button = document.createElement("button");
-        button.innerHTML = "Run Code";
-        button.classList.add("code-button");
+        let runButton = document.createElement("button");
+        runButton.innerHTML = "Run Code";
+        runButton.classList.add("code-button");
 
         // Initially hide the button
-        button.style.display = "none";
+        runButton.style.display = "none";
 
         if (addCodeButton) {
-            button.style.display = "block";
+            runButton.style.display = "block";
         }
+
+        let toJavascriptButton = document.createElement("button");
+        toJavascriptButton.classList.add("transform-button");
+        toJavascriptButton.innerText = "To JavascriptNode";
+        toJavascriptButton.onclick = this.toJavascriptNode.bind(this);
 
         windowDiv.appendChild(htmlView);
         windowDiv.appendChild(pythonView);
         windowDiv.appendChild(editableDiv);  // Append the contentEditable div to .content div
-        windowDiv.appendChild(button);
+        windowDiv.appendChild(runButton);
+        windowDiv.appendChild(toJavascriptButton);
 
         this.addCodeButton = addCodeButton;
 
@@ -130,6 +837,26 @@ class TextNode extends WindowedNode {
         this.isTextNode = true;
 
         this.afterInit()
+    }
+
+    toJavascriptNode(){
+        let code = this.text;
+        let title = this.title;
+        if(code.trim().startsWith("```")) {
+            code = code.substring(code.indexOf("```"));
+            code = code.substring(code.indexOf("\n"));
+        }
+        if(code.trim().endsWith("```")) {
+            code = code.substring(0, code.indexOf("```"));
+
+        }
+        let metaNode = createJavascriptNode(title, code)
+        metaNode.pos.x = this.pos.x
+        metaNode.pos.y = this.pos.y
+        metaNode.width = this.width;
+        metaNode.height = this.height;
+        metaNode.scale = this.scale;
+        this.onDelete();
     }
 
     afterInit() {
@@ -163,6 +890,25 @@ class TextNode extends WindowedNode {
         }
     }
 
+    onResize(newWidth, newHeight) {
+        super.onResize(newWidth, newHeight);
+        const contentEditable = this.contentEditableDiv;
+        if (contentEditable) {
+            if (newHeight > 300) {
+                contentEditable.style.maxHeight = `${newHeight}px`;
+            } else {
+                contentEditable.style.maxHeight = `300px`;
+            }
+            contentEditable.style.maxWidth = `${newWidth}px`
+        }
+
+        const htmlView = this.htmlView;
+        if (htmlView) {
+            htmlView.style.width = '100%';
+            htmlView.style.height = '100%';
+        }
+    }
+
     static _setupCodeCheckboxListener(button, addCodeButton) {
         if (document.getElementById('code-checkbox')) {
             document.getElementById('code-checkbox').addEventListener('change', (event) => {
@@ -179,8 +925,6 @@ class TextNode extends WindowedNode {
             }
         }
     }
-
-
 
 }
 
@@ -537,6 +1281,95 @@ const llmOptions = [
     { id: 'wiki', label: 'Wiki' }
 ];
 
+class AiNodeMessageLoop {
+    constructor(node, allConnectedNodes, clickQueues) {
+        this.node = node;
+        this.allConnectedNodes = allConnectedNodes;
+        this.clickQueues = clickQueues || {}; // If clickQueues is not passed, _initialize as an empty object
+    }
+
+    updateConnectedNodes() {
+        const useAllConnectedNodes = document.getElementById('use-all-connected-ai-nodes').checked;
+        this.allConnectedNodes = useAllConnectedNodes
+            ? getAllConnectedNodes(this.node)
+            : getAllConnectedNodes(this.node, true);
+    }
+
+    async processClickQueue(nodeId) {
+        const queue = this.clickQueues[nodeId] || [];
+        while (true) {
+            if (queue.length > 0) {
+                const connectedNode = queue[0].connectedNode;
+
+                // If the node is not connected or the response is halted,
+                // break out of the loop to stop processing this node's queue.
+                if (connectedNode.aiResponseHalted) {
+                    break;
+                }
+
+                // Check if AI is not responding to attempt the click again
+                if (!connectedNode.aiResponding) {
+                    const { sendButton } = queue.shift();
+                    sendButton.click();
+                }
+            }
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+
+    async questionConnectedAiNodes(lastLine) {
+        // Retrieve edge directionalities for the main node
+        const edgeDirectionalities = this.node.getEdgeDirectionalities();
+
+        this.updateConnectedNodes();
+
+        for (const connectedNode of this.allConnectedNodes) {
+            if (connectedNode.isLLMNode) {
+                let uniqueNodeId = connectedNode.index;
+
+                // Find the edge directionality related to the connected node
+                const edgeDirectionality = edgeDirectionalities.find(ed => ed.edge.pts.includes(connectedNode));
+
+                // Skip sending message if the directionality is outgoing from the main node
+                if (edgeDirectionality && edgeDirectionality.directionality === "outgoing") {
+                    console.log(`Skipping node ${uniqueNodeId} due to outgoing directionality.`);
+                    continue;
+                }
+
+                if (connectedNode.aiResponseHalted || this.node.aiResponseHalted) {
+                    console.warn(`AI response for node ${uniqueNodeId} or its connected node is halted. Skipping this node.`);
+                    continue;
+                }
+
+                let promptElement = document.getElementById(`nodeprompt-${uniqueNodeId}`);
+                let sendButton = document.getElementById(`prompt-form-${uniqueNodeId}`);
+
+                if (!promptElement || !sendButton) {
+                    console.error(`Elements for ${uniqueNodeId} are not found`);
+                    continue;
+                }
+
+                if (promptElement instanceof HTMLTextAreaElement) {
+                    promptElement.value += `\n${lastLine}`;
+                } else if (promptElement instanceof HTMLDivElement) {
+                    promptElement.innerHTML += `<br>${lastLine}`;
+                } else {
+                    console.error(`Element with ID prompt-${uniqueNodeId} is neither a textarea nor a div`);
+                }
+
+                promptElement.dispatchEvent(new Event('input', { 'bubbles': true, 'cancelable': true }));
+
+                if (!this.clickQueues[uniqueNodeId]) {
+                    this.clickQueues[uniqueNodeId] = [];
+                    this.processClickQueue(uniqueNodeId);  // Start processing this node's click queue
+                }
+
+                this.clickQueues[uniqueNodeId].push({ sendButton, connectedNode });
+            }
+        }
+    }
+}
+
 class LLMNode extends WindowedNode {
     static DEFAULT_CONFIGURATION = {
         name: "",
@@ -581,19 +1414,22 @@ class LLMNode extends WindowedNode {
     set chat(value){
         const setChat = function(chat) {
             const responseHandler = nodeResponseHandlers.get(this);
+            if(chat.length > 0){
+                if(chat[0].role === 'ai') this.aiResponding = true;
+            }
             for (let message of chat) {
                 if(message.role === 'user') {
+                    this.aiResponding = false;
                     responseHandler.handleUserPrompt(message.message);
-                    this.aiResponding = true
                 }
                 if(message.role === 'ai' && message.message) {
+                    this.aiResponding = true;
                     responseHandler.handleMarkdown(message.message);
-                    this.aiResponding = false;
                 }
                 if(message.role === 'ai' && message.code && message.language) {
+                    this.aiResponding = true;
                     responseHandler.currentLanguage = message.language;
-                    responseHandler.renderCodeBlock(message.code);
-                    this.aiResponding = false;
+                    responseHandler.renderCodeBlock("\n" + message.code, true);
                 }
 
             }
@@ -908,6 +1744,7 @@ class LLMNode extends WindowedNode {
     _initialize(ainodewrapperDiv, aiResponseTextArea, saved){
         let windowDiv = this.windowDiv;
         windowDiv.style.resize = 'both';
+
         // Append the ainodewrapperDiv to windowDiv of the node
         windowDiv.appendChild(ainodewrapperDiv);
         if(!saved){
@@ -1130,7 +1967,7 @@ class LLMNode extends WindowedNode {
         promptTextArea.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendLLMNodeMessage(this);
+                this.sendLLMNodeMessage();
             }
         });
         promptTextArea.addEventListener('keydown', (e) => {
@@ -1139,7 +1976,7 @@ class LLMNode extends WindowedNode {
                     // Allow the new line to be added
                 } else {
                     e.preventDefault();
-                    sendLLMNodeMessage(this);
+                    this.sendLLMNodeMessage();
                 }
             }
         });
@@ -1178,7 +2015,7 @@ class LLMNode extends WindowedNode {
                 haltCheckbox.checked = false;
             }
 
-            sendLLMNodeMessage(this);
+            this.sendLLMNodeMessage();
         });
 
         if (haltCheckbox) {
@@ -1357,7 +2194,7 @@ class LLMNode extends WindowedNode {
             maxTokensSlider.dispatchEvent(new Event('input'));
 
             maxTokensSlider.addEventListener('input', () => {
-                this.savedMaxTokens = maxTokensSlider.value;
+                this.savedMaxTokens = parseInt(maxTokensSlider.value, 10);
             });
         }
 
@@ -1366,18 +2203,18 @@ class LLMNode extends WindowedNode {
             maxContextSizeSlider.dispatchEvent(new Event('input'));
 
             maxContextSizeSlider.addEventListener('input', () => {
-                this.savedMaxContextSize = maxContextSizeSlider.value;
+                this.savedMaxContextSize = parseInt(maxContextSizeSlider.value, 10);
             });
         }
 
 
         // Event listener for maxContextSizeSlider
         if (maxContextSizeSlider) {
-            maxContextSizeSlider.addEventListener('input', function () {
+            maxContextSizeSlider.addEventListener('input', () => {
                 const maxContextSizeLabel = this.content.querySelector(`label[for='node-max-context-${this.index}']`);
                 if (maxContextSizeLabel) {
-                    const maxContextValue = parseInt(this.value, 10);
-                    const maxContextMax = parseInt(this.max, 10);
+                    const maxContextValue = parseInt(maxContextSizeSlider.value, 10);
+                    const maxContextMax = parseInt(maxContextSizeSlider.max, 10);
                     const ratio = Math.round((maxContextValue / maxContextMax) * 100);
                     maxContextSizeLabel.innerText = `Context: ${ratio}% (${maxContextValue} tokens)`;
                 }
@@ -1430,17 +2267,422 @@ class LLMNode extends WindowedNode {
         }
     }
 
-    // save(){
-    //     let node = super.save();
-    //     let element = document.createElement("div")
-    //     element.innerHTML = node.html;
-    //     element.querySelectorAll('pre').forEach(pre => {
-    //         pre.innerHTML = pre.innerHTML.replace(/\n/g, NEWLINE_PLACEHOLDER);
-    //     });
-    //     node.html = element.innerHTML;
-    //     return node;
-    // }
+    onResize(newWidth, newHeight) {
+        super.onResize(newWidth, newHeight);
+        // Find the aiNodeWrapperDiv for this specific node. Use a more specific selector if needed.
+        const aiNodeWrapperDiv = this.ainodewrapperDiv;
 
+        // If aiNodeWrapperDiv exists, set its dimensions
+        if (aiNodeWrapperDiv) {
+            aiNodeWrapperDiv.style.width = `${newWidth}px`;
+            aiNodeWrapperDiv.style.height = `${newHeight}px`;
+        }
+    }
+
+    async sendLLMNodeMessage( message = null) {
+        if (this.aiResponding) {
+            console.log('AI is currently responding. Please wait for the current response to complete before sending a new message.');
+            return;
+        }
+
+        const nodeIndex = this.index;
+
+        const maxTokensSlider = this.content.querySelector('#node-max-tokens-' + this.index);
+        //Initalize count for message trimming
+        let contextSize = 0;
+
+        // Checks if all connected nodes should be sent or just nodes up to the first found ai node in each branch. connected nodes (default)
+        const useAllConnectedNodes = document.getElementById('use-all-connected-ai-nodes').checked;
+
+        // Choose the function based on checkbox state
+        let allConnectedNodes = useAllConnectedNodes ? getAllConnectedNodes(this) : getAllConnectedNodes(this, true);
+
+        // Determine if there are any connected AI nodes
+        let hasConnectedAiNode = allConnectedNodes.some(n => n.isLLMNode);
+
+
+        //Use Prompt area if message is not passed.
+        this.latestUserMessage = message ? message : this.promptTextArea.value;
+        // Clear the prompt textarea
+        this.promptTextArea.value = '';
+        this.promptTextArea.dispatchEvent(new Event('input'));
+
+        //Initialize messages array.
+        let nodeTitle = this.getTitle();
+        let aiIdentity = nodeTitle ? `${nodeTitle} (Ai)` : "Ai";
+
+
+        let messages = [
+            {
+                role: "system",
+                content: `YOU (${aiIdentity}) are responding within an Ai node. CONNECTED NODES are SHARED as system messages. Triple backtick and label any codeblocks`
+            },
+        ];
+
+        let LocalLLMSelect = document.getElementById(this.LocalLLMSelectID);
+        const LocalLLMSelectValue = LocalLLMSelect.value;
+        let selectedModel;
+
+        // Logic for dynamic model switching based on connected nodes
+        const hasImageNodes = allConnectedNodes.some(node => node.isImageNode);
+        selectedModel = determineModel(LocalLLMSelectValue, hasImageNodes);
+
+        function determineModel(LocalLLMValue, hasImageNodes) {
+            if (hasImageNodes) {
+                return 'gpt-4-vision-preview'; // Switch to vision model if image nodes are present
+            } else if (LocalLLMValue === 'OpenAi') {
+                const globalModelSelect = document.getElementById('model-select');
+                return globalModelSelect.value; // Use global model selection
+            } else {
+                return LocalLLMValue; // Use the local model selection
+            }
+        }
+
+        const isVisionModel = selectedModel.includes('gpt-4-vision');
+        const isAssistant = selectedModel.includes('1106');
+        console.log('Selected Model:', selectedModel, "Vision", isVisionModel, "Assistant", isAssistant);
+        // Fetch the content from the custom instructions textarea using the nodeIndex
+        const customInstructionsTextarea = document.getElementById(`custom-instructions-textarea-${nodeIndex}`);
+        const customInstructions = customInstructionsTextarea ? customInstructionsTextarea.value.trim() : "";
+
+        // Append custom instructions if they exist.
+        if (customInstructions.length > 0) {
+            messages.push({
+                role: "system",
+                content: `RETRIEVE INSIGHTS FROM and ADHERE TO the following user-defined CUSTOM INSTRUCTIONS: ${customInstructions}`
+            });
+        }
+
+        if (hasConnectedAiNode) {
+            this.shouldAppendQuestion = true;
+        } else {
+            this.shouldAppendQuestion = false;
+        }
+
+        if (this.shouldAppendQuestion) {
+            messages.push({
+                role: "system",
+                content: `LAST LINE of your response PROMPTS CONNECTED Ai nodes.
+ARCHITECT profound, mission-critical QUERIES to Ai nodes.
+SYNTHESIZE cross-disciplinary CONVERSATIONS.
+Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
+            });
+        }
+
+
+        if (document.getElementById(`code-checkbox-${nodeIndex}`).checked) {
+            messages.push(aiNodeCodeMessage());
+        }
+
+        if (document.getElementById("instructions-checkbox").checked) {
+            messages.push(instructionsMessage());
+        }
+
+        const truncatedRecentContext = getLastPromptsAndResponses(2, 150, this.id);
+
+        let wikipediaSummaries;
+        let keywordsArray = [];
+        let keywords = '';
+
+        if (isWikipediaEnabled(nodeIndex)) {
+
+            // Call generateKeywords function to get keywords
+            const count = 3; // Change the count value as needed
+            keywordsArray = await generateKeywords(this.latestUserMessage, count, truncatedRecentContext);
+
+            // Join the keywords array into a single string
+            keywords = keywordsArray.join(' ');
+            const keywordString = keywords.replace("Keywords: ", "");
+            const splitKeywords = keywordString.split(',').map(k => k.trim());
+            const firstKeyword = splitKeywords[0];
+            // Convert the keywords string into an array by splitting on spaces
+
+            wikipediaSummaries = await getWikipediaSummaries([firstKeyword]);
+            console.log("wikipediasummaries", wikipediaSummaries);
+        } else {
+            wikipediaSummaries = "Wiki Disabled";
+        }
+
+
+        //console.log("Keywords array:", keywords);
+
+        const wikipediaMessage = {
+            role: "system",
+            content: `Wikipedia Summaries (Keywords: ${keywords}): \n ${Array.isArray(wikipediaSummaries)
+                ? wikipediaSummaries
+                    .filter(s => s !== undefined && s.title !== undefined && s.summary !== undefined)
+                    .map(s => s.title + " (Relevance Score: " + s.relevanceScore.toFixed(2) + "): " + s.summary)
+                    .join("\n\n")
+                : "Wiki Disabled"
+            } END OF SUMMARIES`
+        };
+
+        if (isWikipediaEnabled(nodeIndex)) {
+            messages.push(wikipediaMessage);
+        }
+
+        // Use the node-specific recent context when calling constructSearchQuery
+        const searchQuery = await constructSearchQuery(this.latestUserMessage, truncatedRecentContext, this);
+        if (searchQuery === null) {
+            return; // Return early if a link node was created directly
+        }
+
+        let searchResultsData = null;
+        let searchResults = [];
+
+        if (isGoogleSearchEnabled(nodeIndex)) {
+            searchResultsData = await performSearch(searchQuery);
+        }
+
+        if (searchResultsData) {
+            searchResults = processSearchResults(searchResultsData);
+            searchResults = await getRelevantSearchResults(this.latestUserMessage, searchResults);
+        }
+
+        displaySearchResults(searchResults);
+
+        const searchResultsContent = searchResults.map((result, index) => {
+            return `Search Result ${index + 1}: ${result.title} - ${result.description.substring(0, 100)}...\n[Link: ${result.link}]\n`;
+        }).join('\n');
+
+        const googleSearchMessage = {
+            role: "system",
+            content: "Google Search RESULTS displayed to user:" + searchResultsContent
+        };
+
+        if (document.getElementById(`google-search-checkbox-${nodeIndex}`).checked) {
+            messages.push(googleSearchMessage);
+        }
+
+        if (isEmbedEnabled(this.index)) {
+            // Obtain relevant keys based on the user message and recent context
+            const relevantKeys = await getRelevantKeys(this.latestUserMessage, truncatedRecentContext, searchQuery);
+
+            // Get relevant chunks based on the relevant keys
+            const relevantChunks = await getRelevantChunks(this.latestUserMessage, searchResults, topN, relevantKeys);
+            const topNChunksContent = groupAndSortChunks(relevantChunks, MAX_CHUNK_SIZE);
+
+            // Construct the embed message
+            const embedMessage = {
+                role: "system",
+                content: `Top ${topN} MATCHED chunks of TEXT from extracted WEBPAGES:\n` + topNChunksContent + `\n Use the given chunks as context. CITE your sources!`
+            };
+
+            messages.push(embedMessage);
+        }
+
+        let allConnectedNodesData = getAllConnectedNodesData(this, true);
+        let totalTokenCount = getTokenCount(messages);
+        let remainingTokens = Math.max(0, maxTokensSlider.value - totalTokenCount);
+        const maxContextSize = this.savedMaxContextSize;
+        // const maxContextSize = document.getElementById(`node-max-context-${nodeIndex}`).value;
+
+        let textNodeInfo = [];
+        let llmNodeInfo = [];
+        let imageNodeInfo = [];
+
+        const TOKEN_COST_PER_IMAGE = 150; // Flat token cost assumption for each image
+
+
+        if (isVisionModel) {
+            allConnectedNodes.forEach(connectedNode => {
+                if (connectedNode.isImageNode) {
+                    const imageData = getImageNodeData(connectedNode);
+                    if (imageData && remainingTokens >= TOKEN_COST_PER_IMAGE) {
+                        // Construct an individual message for each image
+                        messages.push({
+                            role: 'user',
+                            content: [imageData] // Contains only the image data
+                        });
+                        remainingTokens -= TOKEN_COST_PER_IMAGE; // Deduct the token cost for this image
+                    } else {
+                        console.warn('Not enough tokens to include the image:', connectedNode);
+                    }
+                }
+            });
+        }
+
+
+        let messageTrimmed = false;
+
+        allConnectedNodesData.sort((a, b) => a.isLLM - b.isLLM);
+
+        allConnectedNodesData.forEach(info => {
+            if (info.data && info.data.replace) {
+                let tempInfoList = info.isLLM ? llmNodeInfo : textNodeInfo;
+                [remainingTokens, totalTokenCount, messageTrimmed] = LLMNode._updateInfoList(
+                    info, tempInfoList, remainingTokens, totalTokenCount, maxContextSize
+                );
+            }
+        });
+
+        // For Text Nodes
+        if (textNodeInfo.length > 0) {
+            let intro = "Text nodes CONNECTED to MEMORY:";
+            messages.push({
+                role: "system",
+                content: intro + "\n\n" + textNodeInfo.join("\n\n")
+            });
+        }
+
+        // For LLM Nodes
+        if (llmNodeInfo.length > 0) {
+            let intro = "All AI nodes you are CONVERSING with:";
+            messages.push({
+                role: "system",
+                content: intro + "\n\n" + llmNodeInfo.join("\n\n")
+            });
+        }
+
+        if (messageTrimmed) {
+            messages.push({
+                role: "system",
+                content: "Previous messages trimmed."
+            });
+        }
+
+        totalTokenCount = getTokenCount(messages);
+        remainingTokens = Math.max(0, maxTokensSlider.value - totalTokenCount);
+
+        // calculate contextSize again
+        contextSize = Math.min(remainingTokens, maxContextSize);
+
+        // Init value of getLastPromptsAndResponses
+        let lastPromptsAndResponses;
+        lastPromptsAndResponses = getLastPromptsAndResponses(20, contextSize, this.id);
+
+        // Append the user prompt to the AI response area with a distinguishing mark and end tag
+        this.aiResponseTextArea.value += `\n\n${PROMPT_IDENTIFIER} ${this.latestUserMessage}\n`;
+        // Trigger the input event programmatically
+        this.aiResponseTextArea.dispatchEvent(new Event('input'));
+
+        let wolframData;
+        if (document.getElementById(`enable-wolfram-alpha-checkbox-${nodeIndex}`).checked) {
+            const wolframContext = getLastPromptsAndResponses(2, 300, this.id);
+            wolframData = await fetchWolfram(this.latestUserMessage, true, this, wolframContext);
+        }
+
+        if (wolframData) {
+            const { wolframAlphaTextResult } = wolframData;
+            createWolframNode("", wolframData);
+
+            const wolframAlphaMessage = {
+                role: "system",
+                content: `The Wolfram result has ALREADY been returned based off the current user message. INSTEAD of generating a new query, USE the following Wolfram result as CONTEXT: ${wolframAlphaTextResult}`
+            };
+
+            console.log("wolframAlphaTextResult:", wolframAlphaTextResult);
+            messages.push(wolframAlphaMessage);
+
+            // Redefine lastPromptsAndResponses after Wolfram's response.
+            lastPromptsAndResponses = getLastPromptsAndResponses(10, contextSize, this.id);
+        }
+
+        if (lastPromptsAndResponses.trim().length > 0) {
+            messages.push({
+                role: "system",
+                content: `CONVERSATION HISTORY:${lastPromptsAndResponses}`
+            });
+        }
+
+
+        //Finally, send the user message last.
+        messages.push({
+            role: "user",
+            content: this.latestUserMessage
+        });
+
+
+        this.aiResponding = true;
+        this.userHasScrolled = false;
+
+        // Get the loading and error icons
+        let aiLoadingIcon = document.getElementById(`aiLoadingIcon-${nodeIndex}`);
+        let aiErrorIcon = document.getElementById(`aiErrorIcon-${nodeIndex}`);
+
+        // Hide the error icon and show the loading icon
+        aiErrorIcon.style.display = 'none'; // Hide error icon
+        aiLoadingIcon.style.display = 'block'; // Show loading icon
+
+
+        // Re-evaluate the state of connected AI nodes
+        function updateConnectedAiNodeState() {
+            let allConnectedNodes = useAllConnectedNodes ? getAllConnectedNodes(this) : getAllConnectedNodes(this, true);
+            return allConnectedNodes.some(n => n.isLLMNode);
+        }
+
+        const clickQueues = {};  // Contains a click queue for each AI node
+        // Initiates helper functions for aiNode Message loop.
+        const aiNodeMessageLoop = new AiNodeMessageLoop(this, allConnectedNodes, clickQueues);
+
+        const haltCheckbox = this.haltCheckbox;
+
+        // Local LLM call
+        if (document.getElementById("localLLM").checked && selectedModel !== 'OpenAi') {
+            window.generateLocalLLMResponse(this, messages)
+                .then(async (fullMessage) => {
+                    this.aiResponding = false;
+                    aiLoadingIcon.style.display = 'none';
+
+                    hasConnectedAiNode = updateConnectedAiNodeState(); // Update state right before the call
+
+                    if (this.shouldContinue && this.shouldAppendQuestion && hasConnectedAiNode && !this.aiResponseHalted) {
+                        await aiNodeMessageLoop.questionConnectedAiNodes(fullMessage);
+                    }
+                })
+                .catch((error) => {
+                    if (haltCheckbox) {
+                        haltCheckbox.checked = true;
+                    }
+                    console.error(`An error occurred while getting response: ${error}`);
+                    aiErrorIcon.style.display = 'block';
+                });
+        } else {
+            // AI call
+            callchatLLMnode(messages, this, true, selectedModel)
+                .finally(async () => {
+                    this.aiResponding = false;
+                    aiLoadingIcon.style.display = 'none';
+
+                    hasConnectedAiNode = updateConnectedAiNodeState(); // Update state right before the call
+
+                    if (this.shouldContinue && this.shouldAppendQuestion && hasConnectedAiNode && !this.aiResponseHalted) {
+                        const aiResponseText = this.aiResponseTextArea.value;
+//                    const quotedTexts = await getQuotedText(aiResponseText);
+
+                        let textToSend = await getLastLineFromTextArea(this.aiResponseTextArea);
+
+                        await aiNodeMessageLoop.questionConnectedAiNodes(textToSend);
+                    }
+                })
+                .catch((error) => {
+                    if (haltCheckbox) {
+                        haltCheckbox.checked = true;
+                    }
+                    console.error(`An error occurred while getting response: ${error}`);
+                    aiErrorIcon.style.display = 'block';
+                });
+        }
+    }
+
+    static _updateInfoList(info, tempInfoList, remainingTokens, totalTokenCount, maxContextSize) {
+        let cleanedData = info.data.replace("Text Content:", "");
+
+        if (cleanedData.trim()) {
+            let tempString = tempInfoList.join("\n\n") + "\n\n" + cleanedData;
+            let tempTokenCount = getTokenCount([{ content: tempString }]);
+
+            if (tempTokenCount <= remainingTokens && totalTokenCount + tempTokenCount <= maxContextSize) {
+                tempInfoList.push(cleanedData);
+                remainingTokens -= tempTokenCount;
+                totalTokenCount += tempTokenCount;
+                return [remainingTokens, totalTokenCount, false];
+            } else {
+                return [remainingTokens, totalTokenCount, true];
+            }
+        }
+        return [remainingTokens, totalTokenCount, false];
+    }
 }
 
 function createLLMNode(name = '', sx = undefined, sy = undefined, x = undefined, y = undefined) {
@@ -2077,13 +3319,11 @@ class WorkspaceExplorerNode extends WindowedNode {
 
 }
 
-
 function createWorkspaceExplorerNode() {
     return new WorkspaceExplorerNode({ })
 }
 
-
-globalThis.nodeClasses = [TextNode, LinkNode, LLMNode, ImageNode, AudioNode, VideoNode, WolframNode, WorkspaceExplorerNode, WebEditorNode]
+globalThis.nodeClasses = [TextNode, LinkNode, LLMNode, ImageNode, AudioNode, VideoNode, WolframNode, WorkspaceExplorerNode, WebEditorNode, MetaNode, JavascriptNode]
 
 function restoreNode(saveData) {
     let classIndex = globalThis.nodeClasses.map((classObject) => classObject.name).indexOf(saveData.json.type);
