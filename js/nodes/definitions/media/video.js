@@ -120,7 +120,7 @@ class VideoNode extends WindowedNode {
                 this._videoBlob = blob;
             }
         }
-        this.mouseAnchor = background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
+        this.mouseAnchor = this.diagram.background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
         this.afterInit();
     }
 

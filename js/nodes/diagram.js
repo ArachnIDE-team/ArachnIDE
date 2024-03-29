@@ -29,19 +29,28 @@ if (!RegExp.escape) {
 
 class Diagram extends Node {
     static DEFAULT_CONFIGURATION = {
+        diagramContainer: window.body,
         nodeContainer: undefined,
         edgeContainer: undefined,
         panInput: undefined,
         zoomInput: undefined,
         coordsLive: true,
         coordinateContainer: undefined,
-        diagram: null
+        diagram: null,
+        background: {
+            svg_element: undefined,
+            svg_bg_element: undefined,
+            svg_viewmat_element: undefined,
+            svg_mousePath_element: undefined,
+        }
     }
 
     constructor(configuration= Diagram.DEFAULT_CONFIGURATION) {
         configuration = {...Diagram.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.background = {...Diagram.DEFAULT_CONFIGURATION.background, ...configuration.background}
+
         // TO-DO: review
-        super({...configuration, pos: background.pan, content: configuration.nodeContainer, saved: true, saveData: {json: { uuid: "d0"}}});
+        super({...configuration, content: configuration.diagramContainer, saved: true, saveData: {json: { uuid: "d0"}}});
         // htmlnodes_parent.appendChild(this.content);
         // registernode(this);
         // interface_v2.js
@@ -54,7 +63,20 @@ class Diagram extends Node {
         this.prevNodeToConnect = undefined;
         this.selectedNodeUUIDs = new Set();// Global or scoped array for selected UUIDs
         this.edgeDirectionalityMap = new Map();
-        this.gen = background.iter();
+        this.background = new MandelbrotBG({
+            svg_element: configuration.background.svg_element,
+            svg_bg_element: configuration.background.svg_bg_element,
+            svg_viewmat_element: configuration.background.svg_viewmat_element,
+            svg_mousePath_element: configuration.background.svg_mousePath_element,
+            rSlider: document.getElementById("rSlider"),
+            cSlider: document.getElementById("cSlider"),
+            sSlider: document.getElementById("sSlider"),
+            colorPickerR: document.getElementById("rColor"),
+            colorPickerG: document.getElementById("gColor"),
+            colorPickerB: document.getElementById("bColor"),
+            diagram: this
+        })
+        this.gen = this.background.iter();
         this.panInput = configuration.panInput;
         if(this.panInput) {
             this.panInput.addEventListener("input", this.onPanInput.bind(this))
@@ -111,18 +133,32 @@ class Diagram extends Node {
         this.NodeUUID = 0;
         this.nodeMap = {};
 
-        // savenet.js (moved from top-level to function)
-        reloadDiagram(this)
+        this.htmlnodes_parent = configuration.nodeContainer;
+
+
+        if(configuration.diagram === null){ // Root Diagram
+            // savenet.js (moved from top-level to function)
+            reloadDiagram(this)
+            // this.diagram = window;
+
+        } else {
+            this.diagram = configuration.diagram;
+            this.diagram.addNode(this)
+        }
 
         this.nodeStep();
-        // htmlnodes_parent is this.content
     }
+
+
+
+
+
 
     // FROM interface_v2
 
     skipAutopilot() {
-        background.zoom = this.autopilot.zoomTo
-        background.pan = this.autopilot.referenceFrame ? this.autopilot.referenceFrame.pos.plus(this.autopilot.panTo) : this.autopilot.panTo;
+        this.background.zoom = this.autopilot.zoomTo
+        this.background.pan = this.autopilot.referenceFrame ? this.autopilot.referenceFrame.pos.plus(this.autopilot.panTo) : this.autopilot.panTo;
     }
 
     nextUUID() {
@@ -231,7 +267,7 @@ class Diagram extends Node {
 
     getNodeText() {
         const nodes = [];
-        for (const child of this.content.children) {
+        for (const child of this.htmlnodes_parent.children) {
             if (child.firstChild && child.firstChild.win) {
                 const node = child.firstChild.win;
 
@@ -300,7 +336,7 @@ class Diagram extends Node {
         const m = this.panInput.value.match(r);
         this.coordsLive = false;
         if (m === null) return;
-        background.pan = new vec2(parseFloat(m[0]), parseFloat(m[6].replace(/[iI]/, "")));
+        this.background.pan = new vec2(parseFloat(m[0]), parseFloat(m[6].replace(/[iI]/, "")));
     }
 
     onZoomInput(){
@@ -310,7 +346,7 @@ class Diagram extends Node {
         if (m === null) return;
         const z = parseFloat(m);
         if (z !== 0) {
-            background.zoom = background.zoom.scale(z / background.zoom.mag());
+            this.background.zoom = this.background.zoom.scale(z / this.background.zoom.mag());
         }
     }
 
@@ -370,8 +406,8 @@ class Diagram extends Node {
 
 
         if (this.coordsLive) {
-            this.panInput.value = background.pan.ctostring();
-            this.zoomInput.value = background.zoom.mag() + "";
+            this.panInput.value = this.background.pan.ctostring();
+            this.zoomInput.value = this.background.zoom.mag() + "";
         }
 
 
@@ -450,33 +486,33 @@ class Diagram extends Node {
     }
 
     backgroundStep() {
-        background.updateViewbox();
+        this.background.updateViewbox();
 
-        if (background.mousePath == "") {
-            this.mousePathPos = background.toZ(background.mousePos);
-            background.mousePath = "M " + background.toSVG(this.mousePathPos).str() + " L ";
+        if (this.background.mousePath == "") {
+            this.mousePathPos = this.background.toZ(this.background.mousePos);
+            this.background.mousePath = "M " + this.background.toSVG(this.mousePathPos).str() + " L ";
         }
         for (let i = 0; i < settings.orbitStepRate; i++) {
             //let g = mandGrad(settings.iterations,mousePathPos);
             //mousePathPos = mousePathPos.plus(g.unscale((g.mag()+1e-10)*1000));
 
-            this.mousePathPos = MandelbrotBG.mand_step(this.mousePathPos, background.toZ(background.mousePos));
+            this.mousePathPos = MandelbrotBG.mand_step(this.mousePathPos, this.background.toZ(this.background.mousePos));
 
             //let p = findPeriod(mousePathPos);
             //mousePathPos = mand_iter_n(p,mousePathPos,mousePathPos);
-            if (background.toSVG(this.mousePathPos).isFinite() && background.toSVG(this.mousePathPos).mag2() < 1e60)
-                background.mousePath += background.toSVG(this.mousePathPos).str() + " ";
+            if (this.background.toSVG(this.mousePathPos).isFinite() && this.background.toSVG(this.mousePathPos).mag2() < 1e60)
+                this.background.mousePath += this.background.toSVG(this.mousePathPos).str() + " ";
 
 
         }
-        let width = background.zoom.mag() * 0.0005 * background.SVGzoom;
+        let width = this.background.zoom.mag() * 0.0005 * this.background.SVGzoom;
 
         if (this.nodeMode && this.prevNodeToConnect !== undefined) {
             Diagram.clearTextSelection();
-            background.svg_mousePath.setAttribute("d", "M " + background.toSVG(this.prevNodeToConnect.pos).str() + " L " + background.toSVG(background.toZ(background.mousePos)).str());
+            this.background.svg_mousePath.setAttribute("d", "M " + this.background.toSVG(this.prevNodeToConnect.pos).str() + " L " + this.background.toSVG(this.background.toZ(this.background.mousePos)).str());
             width *= 50; // This will increase the width when connecting nodes. Adjust as needed.
         } else {
-            background.svg_mousePath.setAttribute("d", background.mousePath);
+            this.background.svg_mousePath.setAttribute("d", this.background.mousePath);
         }
 
         // Moved the check to clear prevNodeToConnect outside of the if-else block
@@ -484,16 +520,16 @@ class Diagram extends Node {
             this.prevNodeToConnect = undefined;
 
             // Clear the mouse path
-            background.mousePath = "";
-            background.svg_mousePath.setAttribute("d", "");
+            this.background.mousePath = "";
+            this.background.svg_mousePath.setAttribute("d", "");
             Diagram.clearTextSelection();
         }
 
-        background.svg_mousePath.setAttribute("stroke-width", width + "");
+        this.background.svg_mousePath.setAttribute("stroke-width", width + "");
 
         this.regenDebt = Math.min(16, this.regenDebt + lerp(settings.regenDebtAdjustmentFactor, this.regenAmount, Math.min(1, (this.nodeMode_v ** 5) * 1.01)));
         for (; this.regenDebt > 0; this.regenDebt--) {
-            background.render_hair(Math.random() * settings.renderSteps);
+            this.background.render_hair(Math.random() * settings.renderSteps);
         }
         this.regenAmount = 0;
     }
@@ -508,7 +544,7 @@ class Diagram extends Node {
                 this.autopilot.prevNodeScale = this.autopilot.referenceFrame.scale; // Initialize prevNodeScale
             }
             this.autopilot.panToI = this.autopilot.panToI.scale(1 - settings.autopilotRF_Iscale).plus(this.autopilot.referenceFrame.pos.minus(this.autopilot.panToI_prev).scale(settings.autopilotRF_Iscale));
-            newPan = background.pan.scale(1 - this.autopilot.speed).plus(this.autopilot.referenceFrame.pos.scale(this.autopilot.speed).plus(this.autopilot.panToI));
+            newPan = this.background.pan.scale(1 - this.autopilot.speed).plus(this.autopilot.referenceFrame.pos.scale(this.autopilot.speed).plus(this.autopilot.panToI));
             this.autopilot.panToI_prev = this.autopilot.referenceFrame.pos.scale(1);
 
             if (this.autopilot.referenceFrame.scale !== this.autopilot.prevNodeScale) {
@@ -520,22 +556,42 @@ class Diagram extends Node {
                 this.autopilot.prevNodeScale = this.autopilot.referenceFrame.scale; // Update the previous scale
             }
         } else {
-            newPan = background.pan.scale(1 - this.autopilot.speed).plus(this.autopilot.panTo.scale(this.autopilot.speed));
+            newPan = this.background.pan.scale(1 - this.autopilot.speed).plus(this.autopilot.panTo.scale(this.autopilot.speed));
             this.autopilot.panToI_prev = undefined;
         }
-        autopilot_travelDist = background.pan.minus(newPan).mag() / background.zoom.mag();
+        autopilot_travelDist = this.background.pan.minus(newPan).mag() / this.background.zoom.mag();
         if (autopilot_travelDist > settings.autopilotMaxSpeed) {
-            newPan = background.pan.plus(newPan.minus(background.pan).scale(settings.autopilotMaxSpeed / autopilot_travelDist));
+            newPan = this.background.pan.plus(newPan.minus(this.background.pan).scale(settings.autopilotMaxSpeed / autopilot_travelDist));
             const speedCoeff = Math.tanh(Math.log(settings.autopilotMaxSpeed / autopilot_travelDist + 1e-300) / 10) * 2;
-            background.zoom = background.zoom.scale(1 - speedCoeff * this.autopilot.speed);
+            this.background.zoom = this.background.zoom.scale(1 - speedCoeff * this.autopilot.speed);
             //*Math.log(autopilot_travelDist/settings.autopilotMaxSpeed));
         } else {
-            background.zoom = background.zoom.scale(1 - this.autopilot.speed).plus(this.autopilot.zoomTo.scale(this.autopilot.speed));
+            this.background.zoom = this.background.zoom.scale(1 - this.autopilot.speed).plus(this.autopilot.zoomTo.scale(this.autopilot.speed));
         }
-        background.pan = newPan;
+        this.background.pan = newPan;
     }
 
     // END RENDERING STEPS
+
+
+    onclick(event) {
+        if(this.diagram !== null) super.onclick(event)
+    }
+    ondblclick(event) {
+        if(this.diagram !== null) super.ondblclick(event)
+    }
+    onmousedown(event) {
+        if(this.diagram !== null) super.onmousedown(event)
+    }
+    onmouseup(event) {
+        if(this.diagram !== null) super.onmouseup(event)
+    }
+    onmousemove(event) {
+        if(this.diagram !== null) super.onmousemove(event)
+    }
+    onwheel(event) {
+        if(this.diagram !== null) super.onwheel(event)
+    }
 
     onWheel(event){
 
@@ -554,15 +610,15 @@ class Diagram extends Node {
             this.autopilot.speed = 0;
             this.coordsLive = true;
             let amount = event.wheelDelta * settings.rotateModifierSpeed;
-            let p = background.toZ(new vec2(event.pageX, event.pageY));
-            let zc = p.minus(background.pan);
+            let p = this.background.toZ(new vec2(event.pageX, event.pageY));
+            let zc = p.minus(this.background.pan);
             // p = zoom*center+pan = zoom'*center+pan'
             // zoom' = zoom*rot
             // pan' = pan + (zoom*center-zoom*rot*center)
             //      = pan + (1-rot) * zoom*center
             let r = new vec2(Math.cos(amount), Math.sin(amount));
-            background.zoom = background.zoom.cmult(r);
-            background.pan = background.pan.plus(zc.cmult(new vec2(1, 0).minus(r)));
+            this.background.zoom = this.background.zoom.cmult(r);
+            this.background.pan = this.background.pan.plus(zc.cmult(new vec2(1, 0).minus(r)));
             cancel(event);
             return;
         }
@@ -571,29 +627,29 @@ class Diagram extends Node {
             deselectCoordinate();
 
             this.coordsLive = true;
-            let dest = background.toZ(background.mousePos);
+            let dest = this.background.toZ(this.background.mousePos);
             this.regenAmount += Math.abs(event.wheelDelta);
             let amount = Math.exp(event.wheelDelta * settings.zoomSpeed);
-            background.zoom = background.zoom.scale(amount);
-            background.pan = dest.scale(1 - amount).plus(background.pan.scale(amount));
+            this.background.zoom = this.background.zoom.scale(amount);
+            this.background.pan = dest.scale(1 - amount).plus(this.background.pan.scale(amount));
             cancel(event);
         } else if (settings.scroll === "pan") {
             this.autopilot.speed = 0;
             this.coordsLive = true;
-            let dest = background.toZ(background.mousePos);
+            let dest = this.background.toZ(this.background.mousePos);
             let dp;
             let amount;
             if (event.ctrlKey) {
                 dp = new vec2(0, 0);
                 amount = event.deltaY * settings.zoomSpeed;
             } else {
-                dp = background.toDZ(new vec2(event.deltaX, event.deltaY).scale(settings.panSpeed));
+                dp = this.background.toDZ(new vec2(event.deltaX, event.deltaY).scale(settings.panSpeed));
                 amount = event.deltaZ * settings.zoomSpeed;
             }
             this.regenAmount += Math.hypot(event.deltaX, event.deltaY, event.deltaZ);
             amount = Math.exp(amount)
-            background.zoom = background.zoom.scale(amount);
-            background.pan = dest.scale(1 - amount).plus(background.pan.scale(amount)).plus(dp);
+            this.background.zoom = this.background.zoom.scale(amount);
+            this.background.pan = dest.scale(1 - amount).plus(this.background.pan.scale(amount)).plus(dp);
             cancel(event);
             event.preventDefault();
         }
@@ -601,7 +657,7 @@ class Diagram extends Node {
 
     onMouseDown(event){
         this.autopilot.speed = 0;
-        this.mouseDownPos = background.mousePos.scale(1);
+        this.mouseDownPos = this.background.mousePos.scale(1);
         this.mouseDown = true;
         cancel(event);
     }
@@ -618,10 +674,10 @@ class Diagram extends Node {
         if (this.mouseDown) {
             this.autopilot.speed = 0;
             this.coordsLive = true;
-            let delta = background.mousePos.minus(this.mouseDownPos);
-            background.pan = background.pan.minus(background.toDZ(delta));
+            let delta = this.background.mousePos.minus(this.mouseDownPos);
+            this.background.pan = this.background.pan.minus(this.background.toDZ(delta));
             this.regenAmount += delta.mag() * 0.25;
-            this.mouseDownPos = background.mousePos.scale(1);
+            this.mouseDownPos = this.background.mousePos.scale(1);
         }
     }
 
@@ -652,11 +708,11 @@ class Diagram extends Node {
                     if (t && t.prev == t.now) { //hasn't moved
                         const ts = [...this.touches.keys()];
                         const other = this.touches.get(ts[0] === id ? ts[1] : ts[0])
-                        const {scale} = background.windowScaleAndOffset();
+                        const {scale} = this.background.windowScaleAndOffset();
                         const amount = Math.exp(-(other.now.clientY - t.now.clientY) / scale);
-                        const dest = background.toZ(new vec2(other.now.clientX, other.now.clientY));
-                        background.zoom = background.zoom.scale(amount);
-                        background.pan = dest.scale(1 - amount).plus(background.pan.scale(amount));
+                        const dest = this.background.toZ(new vec2(other.now.clientX, other.now.clientY));
+                        this.background.zoom = this.background.zoom.scale(amount);
+                        this.background.pan = dest.scale(1 - amount).plus(this.background.pan.scale(amount));
                     }
                 }
                 break;
@@ -681,7 +737,7 @@ class Diagram extends Node {
                 this.autopilot.speed = 0;
                 this.coordsLive = true;
                 const t = [...this.touches.values()][0];
-                background.pan = background.pan.plus(background.toDZ(new vec2(t.prev.clientX, t.prev.clientY).minus(new vec2(t.now.clientX, t.now.clientY))));
+                this.background.pan = this.background.pan.plus(this.background.toDZ(new vec2(t.prev.clientX, t.prev.clientY).minus(new vec2(t.now.clientX, t.now.clientY))));
                 cancel(ev);
                 break;
             case 2:
@@ -728,8 +784,8 @@ class Diagram extends Node {
         this.gestureStartParams.scale = e.scale;
         this.gestureStartParams.x = e.pageX;
         this.gestureStartParams.y = e.pageY;
-        this.gestureStartParams.zoom = background.zoom;
-        this.gestureStartParams.pan = background.pan;
+        this.gestureStartParams.zoom = this.background.zoom;
+        this.gestureStartParams.pan = this.background.pan;
     }
 
     onGestureChange(e){
@@ -738,21 +794,21 @@ class Diagram extends Node {
         let d_theta = e.rotation - this.gestureStartParams.rotation;
         let d_scale = e.scale;
         let r = -e.rotation * settings.gestureRotateSpeed;
-        background.pan = this.gestureStartParams.pan;
-        background.zoom = this.gestureStartParams.zoom;
-        let r_center = background.toZ(new vec2(e.pageX, e.pageY));
+        this.background.pan = this.gestureStartParams.pan;
+        this.background.zoom = this.gestureStartParams.zoom;
+        let r_center = this.background.toZ(new vec2(e.pageX, e.pageY));
         let scale = 0;
-        background.zoom = this.gestureStartParams.zoom.cmult(new vec2(Math.cos(r), Math.sin(r)));
+        this.background.zoom = this.gestureStartParams.zoom.cmult(new vec2(Math.cos(r), Math.sin(r)));
         if (e.scale !== 0) {
             let scale = 1 / e.scale;
-            background.zoom = background.zoom.scale(scale);
+            this.background.zoom = this.background.zoom.scale(scale);
             this.regenAmount += Math.abs(Math.log(scale)) * settings.maxLines;
         }
         let dest = r_center;
         let amount = scale;
         let dp = r_center.minus(this.gestureStartParams.pan);
-        background.pan = this.gestureStartParams.pan.plus(
-            dp.minus(dp.cmult(background.zoom.cdiv(this.gestureStartParams.zoom))));
+        this.background.pan = this.gestureStartParams.pan.plus(
+            dp.minus(dp.cmult(this.background.zoom.cdiv(this.gestureStartParams.zoom))));
         //pan = dest.scale(1-amount).plus(gestureStartParams.pan.scale(amount));
     }
 
@@ -763,7 +819,7 @@ class Diagram extends Node {
     // From WindowedNode/window/Specific node
 
     addNode(node){
-        this.content.appendChild(node.content);
+        this.htmlnodes_parent.appendChild(node.content);
         this.registerNode(node)
     }
 
@@ -777,13 +833,78 @@ window.rootDiagram = null;
 
 function createMainDiagram(){
     window.rootDiagram = new Diagram({
-       nodeContainer: document.getElementById("nodes"),
-       edgeContainer: document.getElementById("edges"),
-       panInput: document.getElementById("pan"),
-       zoomInput: document.getElementById("zoom"),
-       coordsLive: true,
-       coordinateContainer: document.getElementById("coordinates"),
+        nodeContainer: document.getElementById("nodes"),
+        edgeContainer: document.getElementById("edges"),
+        panInput: document.getElementById("pan"),
+        zoomInput: document.getElementById("zoom"),
+        coordsLive: true,
+        coordinateContainer: document.getElementById("coordinates"),
+        background: {
+            svg_element: svg,
+            svg_bg_element: svg.getElementById("bg"),
+            svg_viewmat_element: svg.getElementById("viewmatrix"),
+            svg_mousePath_element: svg.getElementById("mousePath")
+        }
    })
-    Node.DEFAULT_CONFIGURATION.diagram = rootDiagram;
+   Node.DEFAULT_CONFIGURATION.diagram = rootDiagram;
 }
+
 createMainDiagram();
+
+function createDiagram(id, parent){
+    let diagramContainer = document.createElement("div");
+    let nodeContainer = document.createElement("a");
+    nodeContainer.id = "nodes-" + id;
+    let edgeContainer = document.createElement("g");
+    edgeContainer.id = "edges-" + id;
+    let panInput = document.createElement("input")
+    panInput.id = "pan-" + id;
+    panInput.type = "text";
+    panInput.style.background = "none";
+    panInput.style.border = "none";
+    panInput.size = "28";
+    let zoomInput = document.createElement("input")
+    zoomInput.id = "zoom-" + id;
+    zoomInput.type = "text";
+    zoomInput.style.background = "none";
+    zoomInput.style.border = "none";
+    zoomInput.size = "25";
+    let svg_element = document.createElement("svg");
+    svg_element.id = "svg_bg-" + id;
+    svg_element.viewBox= "0 0 0 0"
+    svg_element.width = "100%";
+    svg_element.height = "100vh";
+    svg_element.top = "0";
+    svg_element.left = "0";
+    svg_element.position = "fixed";
+    let svg_viewmat_element = document.createElement("g");
+    svg_viewmat_element.id = "viewmatrix-" + id;
+    let svg_bg_element = document.createElement("g");
+    svg_bg_element.id = "bg-" + id;
+    let svg_mousePath_element = document.createElement("path");
+    svg_mousePath_element.id = "mousePath-" + id;
+
+    svg_bg_element.append(svg_mousePath_element)
+    svg_viewmat_element.append(svg_bg_element, edgeContainer)
+    svg_element.append(svg_viewmat_element)
+    diagramContainer.append(svg_element, nodeContainer)
+
+    let diagram = new Diagram({
+        diagramContainer,
+        nodeContainer,
+        edgeContainer,
+        panInput,
+        zoomInput,
+        coordsLive: false,
+        coordinateContainer: null,
+        diagram: parent,
+        background: {
+            svg_element,
+            svg_bg_element,
+            svg_viewmat_element,
+            svg_mousePath_element
+        }
+    });
+    // diagram.fo
+    return diagram;
+}

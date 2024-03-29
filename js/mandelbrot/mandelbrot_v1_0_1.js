@@ -926,7 +926,8 @@ class Background {
         svg_mousePath_element: undefined,
         svg_viewbox_size: 65536,
         zoom:  new vec2(1.5, 0),
-        pan:  new vec2(-0.3, 0)
+        pan:  new vec2(-0.3, 0),
+        diagram: null,
     }
     constructor(configuration=Background.DEFAULT_CONFIGURATION) {
         configuration = {...Background.DEFAULT_CONFIGURATION, ...configuration}
@@ -942,6 +943,11 @@ class Background {
 
         this.isPanning = false;
 
+        if(configuration.diagram === null) {
+            this.diagram = rootDiagram;
+        } else {
+            this.diagram = configuration.diagram;
+        }
         this.initEventListeners()
     }
 
@@ -1000,7 +1006,6 @@ class MandelbrotBG extends Background {
         colorPickerR: null,
         colorPickerG: null,
         colorPickerB: null,
-
     }
 
     constructor(configuration=MandelbrotBG.DEFAULT_CONFIGURATION) {
@@ -1209,15 +1214,15 @@ class MandelbrotBG extends Background {
         if (i >= iters) {
             i = MandelbrotBG._findInfimum(iters, z);
             //i = findPeriod(z);
-            return this.scol(i.i * 123 + 2, (1 - rootDiagram.nodeMode_v), 128, 32 + (1 - rootDiagram.nodeMode_v) * 48);
+            return this.scol(i.i * 123 + 2, (1 - this.diagram.nodeMode_v), 128, 32 + (1 - this.diagram.nodeMode_v) * 48);
         } else {
             return this.scol(i);
         }
     }
 
     col(i, r = null, c = null, s = null) {
-        if (rootDiagram.nodeMode) {
-            r = rootDiagram.nodeMode_v;
+        if (this.diagram.nodeMode) {
+            r = this.diagram.nodeMode_v;
         }
         if(r === null) r = this.rSlider.value;
         if(c === null) c = this.cSlider.value;
@@ -1456,16 +1461,16 @@ class MandelbrotBG extends Background {
     }
 }
 
-let background = new MandelbrotBG({
-    svg_element: svg,
-    svg_bg_element: svg.getElementById("bg"),
-    svg_viewmat_element: svg.getElementById("viewmatrix"),
-    svg_mousePath_element: svg.getElementById("mousePath"),
-    rSlider: document.getElementById("rSlider"),
-    cSlider: document.getElementById("cSlider"),
-    sSlider: document.getElementById("sSlider"),
-    colorPickerR: document.getElementById("rColor"),
-    colorPickerG: document.getElementById("gColor"),
-    colorPickerB: document.getElementById("bColor")
-})
+// let background = new MandelbrotBG({
+//     svg_element: svg,
+//     svg_bg_element: svg.getElementById("bg"),
+//     svg_viewmat_element: svg.getElementById("viewmatrix"),
+//     svg_mousePath_element: svg.getElementById("mousePath"),
+//     rSlider: document.getElementById("rSlider"),
+//     cSlider: document.getElementById("cSlider"),
+//     sSlider: document.getElementById("sSlider"),
+//     colorPickerR: document.getElementById("rColor"),
+//     colorPickerG: document.getElementById("gColor"),
+//     colorPickerB: document.getElementById("bColor")
+// })
 

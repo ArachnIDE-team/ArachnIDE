@@ -68,7 +68,7 @@ class WolframNode extends WindowedNode {
         if(!saved){
             this.wolframData = wolframData;
         }
-        this.mouseAnchor = background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
+        this.mouseAnchor = this.diagram.background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
         this.afterInit();
     }
 

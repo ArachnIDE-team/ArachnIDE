@@ -119,7 +119,7 @@ class TextNode extends WindowedNode {
         this.addCodeButton = addCodeButton;
 
         if (sx !== undefined) {
-            x = (new vec2(sx, sy)).cmult(background.zoom).plus(background.pan);
+            x = (new vec2(sx, sy)).cmult(this.diagram.background.zoom).plus(this.diagram.background.pan);
             y = x.y;
             x = x.x;
         }

@@ -131,7 +131,7 @@ class Node {
     }
 
     draw() {
-        put(this.content, this.pos, this.intrinsicScale * this.scale * (background.zoom.mag2() ** -settings.zoomContentExp));
+        put(this.content, this.pos, this.intrinsicScale * this.scale * (this.diagram.background.zoom.mag2() ** -settings.zoomContentExp));
 
         // Before saving, get the current title input value and store it in a data-attribute
         let titleInput = this.content.querySelector('.title-input');
@@ -164,7 +164,7 @@ class Node {
         //let d = toZ(mousePos).minus(this.pos);
         //this.force = this.force.plus(d.scale(this.followingMouse/(d.mag2()+1)));
         if (this.followingMouse) {
-            let p = background.toZ(background.mousePos).minus(this.mouseAnchor);
+            let p = this.diagram.background.toZ(this.diagram.background.mousePos).minus(this.mouseAnchor);
             let velocity = p.minus(this.pos).unscale(rootDiagram.nodeMode ? 1 : dt);
 
             this.vel = velocity;
@@ -228,7 +228,7 @@ class Node {
 
     zoom_to_fit(margin = 1) {
         let bb = this.content.getBoundingClientRect();
-        let svgbb = background.svg.getBoundingClientRect();
+        let svgbb = this.diagram.background.svg.getBoundingClientRect();
         let aspect = svgbb.width / svgbb.height;
         let scale = bb.height * aspect > bb.width ? svgbb.height / (margin * bb.height) : svgbb.width / (margin * bb.width);
         this.zoom_by(1 / scale);
@@ -237,15 +237,15 @@ class Node {
     zoom_by(s = 1) {
         this.diagram.autopilot.panTo = new vec2(0, 0); //this.pos;
         let gz = ((s) ** (-1 / settings.zoomContentExp));
-        this.diagram.autopilot.zoomTo = background.zoom.unscale(gz ** 0.5);
+        this.diagram.autopilot.zoomTo = this.diagram.background.zoom.unscale(gz ** 0.5);
         this.diagram.autopilot.referenceFrame = this;
         this.diagram.autopilot.panToI = new vec2(0, 0);
     }
 
     zoom_to(s = 1) {
         this.diagram.autopilot.panTo = new vec2(0, 0); //this.pos;
-        let gz = background.zoom.mag2() * ((this.scale * s) ** (-1 / settings.zoomContentExp));
-        this.diagram.autopilot.zoomTo = background.zoom.unscale(gz ** 0.5);
+        let gz = this.diagram.background.zoom.mag2() * ((this.scale * s) ** (-1 / settings.zoomContentExp));
+        this.diagram.autopilot.zoomTo = this.diagram.background.zoom.unscale(gz ** 0.5);
         this.diagram.autopilot.referenceFrame = this;
         this.diagram.autopilot.panToI = new vec2(0, 0);
     }
@@ -275,7 +275,7 @@ class Node {
     }
 
     onmousedown(event) {
-        this.mouseAnchor = background.toZ(new vec2(event.clientX, event.clientY)).minus(this.pos);
+        this.mouseAnchor = this.diagram.background.toZ(new vec2(event.clientX, event.clientY)).minus(this.pos);
         this.followingMouse = 1;
         window.draggedNode = this;
         this.diagram.movingNode = this;
@@ -348,7 +348,7 @@ class Node {
 
                         // Only update position if the node is not anchored
                         if (node.anchorForce !== 1) {
-                            node.pos = node.pos.lerpto(background.toZ(background.mousePos), 1 - amount);
+                            node.pos = node.pos.lerpto(this.diagram.background.toZ(this.diagram.background.mousePos), 1 - amount);
                         }
 
                         Diagram.updateNodeEdgesLength(node);
@@ -358,7 +358,7 @@ class Node {
 
                     // Only update position if not anchored
                     if (this.anchorForce !== 1) {
-                        this.pos = this.pos.lerpto(background.toZ(background.mousePos), 1 - amount);
+                        this.pos = this.pos.lerpto(this.diagram.background.toZ(this.diagram.background.mousePos), 1 - amount);
                     }
                 }
             }

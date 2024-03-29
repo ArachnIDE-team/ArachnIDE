@@ -47,10 +47,10 @@ class WindowedNode extends Node {
         }
     }
 
-    static getNaturalScaleParameters(scale = 1, nscale_mult = 1){
+    static getNaturalScaleParameters(scale = 1, nscale_mult = 1, diagram=rootDiagram){
         return {
-            pos: background.toZ(background.mousePos),
-            scale: nscale_mult * (background.zoom.mag2() ** settings.zoomContentExp),
+            pos: diagram.background.toZ(diagram.background.mousePos),
+            scale: nscale_mult * (diagram.background.zoom.mag2() ** settings.zoomContentExp),
             intrinsicScale: scale
         };
     }
@@ -281,8 +281,8 @@ class WindowedNode extends Node {
         const title = this.getTitle();
         if (rootDiagram.prevNodeToConnect === this) {
             rootDiagram.prevNodeToConnect = undefined;
-            background.mousePath = "";
-            background.svg_mousePath.setAttribute("d", "");
+            this.diagram.background.mousePath = "";
+            this.diagram.background.svg_mousePath.setAttribute("d", "");
         }
         this.remove();
         // Delete the this from CodeMirror
@@ -617,8 +617,8 @@ function registernode(node) {
 }
 
 function posToLeftTop(element, pos, scale){
-    let svgbb = background.svg.getBoundingClientRect();
-    pos = background.fromZtoUV(pos);
+    let svgbb = rootDiagram.background.svg.getBoundingClientRect();
+    pos = rootDiagram.background.fromZtoUV(pos);
     let hide = pos.minus(new vec2(0.5, 0.5)).mag2() > 16;
     let w = Math.min(svgbb.width, svgbb.height);
     let off = svgbb.width < svgbb.height ? svgbb.right : svgbb.bottom;

@@ -170,9 +170,9 @@ class Edge {
                 let left = rotated.normed(r);
 
                 if (!isNaN(left.x) && !isNaN(left.y) && !isNaN(n.pos.x) && !isNaN(n.pos.y)) {
-                    path += background.toSVG(n.pos.minus(left)).str();
+                    path += rootDiagram.background.toSVG(n.pos.minus(left)).str();
                     path += " L ";
-                    path += background.toSVG(left.plus(n.pos)).str() + " ";
+                    path += rootDiagram.background.toSVG(left.plus(n.pos)).str() + " ";
                 } else {
                     validPath = false;
                     break;
@@ -183,7 +183,7 @@ class Edge {
         // Closing the main path
         let firstPoint = this.pts[0].pos.minus(this.pts[0].pos.minus(c).rot90().normed(this.pts[0].scale * wscale));
         if (!isNaN(firstPoint.x) && !isNaN(firstPoint.y)) {
-            path += " " + background.toSVG(firstPoint).str() + "z";
+            path += " " + rootDiagram.background.toSVG(firstPoint).str() + "z";
         } else {
             validPath = false;
         }
@@ -252,7 +252,7 @@ class Edge {
                 arrowTip = rotatePoint(arrowTip, arrowCenter);
 
                 // Arrow path
-                let arrowPath = `M ${background.toSVG(arrowBase1).str()} L ${background.toSVG(arrowTip).str()} L ${background.toSVG(arrowBase2).str()} Z`;
+                let arrowPath = `M ${rootDiagram.background.toSVG(arrowBase1).str()} L ${rootDiagram.background.toSVG(arrowTip).str()} L ${rootDiagram.background.toSVG(arrowBase2).str()} Z`;
                 this.arrowSvg.setAttribute("d", arrowPath);
                 this.arrowSvg.style.display = '';
 
@@ -268,7 +268,7 @@ class Edge {
                 let borderTip = arrowMidPoint.plus(arrowTip.minus(arrowMidPoint).scale(offsetScale));
 
                 // Border path
-                let borderPath = `M ${background.toSVG(borderBase1).str()} L ${background.toSVG(borderTip).str()} L ${background.toSVG(borderBase2).str()} Z`;
+                let borderPath = `M ${rootDiagram.background.toSVG(borderBase1).str()} L ${rootDiagram.background.toSVG(borderTip).str()} L ${rootDiagram.background.toSVG(borderBase2).str()} Z`;
                 this.borderSvg.setAttribute("d", borderPath);
                 this.borderSvg.style.display = '';
             } else {

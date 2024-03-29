@@ -89,7 +89,7 @@ class WorkspaceExplorerNode extends WindowedNode {
         footerContainer.appendChild(footerContainerRightContainer);
 
 
-        this.mouseAnchor = background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
+        this.mouseAnchor = this.diagram.background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
         const elementID = `workspaceExplorerContainer-${this.index}`
         let treeContainer = document.getElementById(elementID);
         WindowedNode.makeContentScrollable(treeContainer, true)

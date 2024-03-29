@@ -116,11 +116,11 @@ async function constructSearchQuery(userMessage, recentContext = null, node = nu
         document.getElementById("prompt").value = ''; // Clear the textarea
         let linkNode = createLinkNode(userMessage, userMessage, userMessage); // Set the title to user'scale message (URL)
 
-        htmlnodes_parent.appendChild(linkNode.content);
+        // htmlnodes_parent.appendChild(linkNode.content);
         // Attach the node to the user'scale mouse
         linkNode.followingMouse = 1;
         linkNode.draw();
-        linkNode.mouseAnchor = background.toDZ(new vec2(0, -linkNode.content.offsetHeight / 2 + 6));
+        linkNode.mouseAnchor = linkNode.diagram.background.toDZ(new vec2(0, -linkNode.content.offsetHeight / 2 + 6));
 
         return null; // Return null to indicate that no further processing is necessary
     }
@@ -215,11 +215,11 @@ function displaySearchResults(searchResults) {
 
         let node = createLinkNode(title, description, link);
 
-        htmlnodes_parent.appendChild(node.content);
+        // htmlnodes_parent.appendChild(node.content);
         // Attach the node to the user'scale mouse
         node.followingMouse = 1;
         node.draw();
-        node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
     });
 }
 
@@ -229,7 +229,7 @@ async function processLinkInput(linkUrl) {
         let node = createLinkNode(linkUrl, linkUrl, linkUrl);
         node.followingMouse = 1;
         node.draw();
-        node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
         console.log('Handle drop for the link icon');
     } else {
         let searchResultsData = null;

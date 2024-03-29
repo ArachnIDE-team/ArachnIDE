@@ -6,3 +6,6 @@
 // textNode.files.push({"key":"uuid","path":"D:/Projects/ChrysalIDE/samples/ztext.txt", "name":"ztext.txt","autoLoad":false,"autoSave":false})
 //
 // new NodeFilesUI({node: textNode});
+
+
+// createDiagram(1, rootDiagram)

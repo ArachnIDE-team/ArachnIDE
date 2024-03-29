@@ -10,7 +10,7 @@ class WindowedUI extends WindowedNode {
     // constructor(title, content, scaleProportions) {
     constructor(configuration = WindowedUI.DEFAULT_CONFIGURATION) {
         configuration = {...WindowedUI.DEFAULT_CONFIGURATION, ...configuration};
-        super({title: configuration.title, content: [configuration.content], pos: background.pan, scale: (background.zoom.mag2() ** settings.zoomContentExp), intrinsicScale: 1, addFullScreenButton: false, addCollapseButton: false, addSettingsButton: false, addFileButton: false});
+        super({title: configuration.title, content: [configuration.content], pos: rootDiagram.background.pan, scale: (rootDiagram.background.zoom.mag2() ** settings.zoomContentExp), intrinsicScale: 1, addFullScreenButton: false, addCollapseButton: false, addSettingsButton: false, addFileButton: false});
         this.diagram.addNode(this);
         // WindowedNode.makeContentScrollable(this.innerContent, true)
         this._initializeUI(configuration.scaleProportions)
@@ -38,8 +38,8 @@ class WindowedUI extends WindowedNode {
         super.afterInit();
     }
     recenter() {
-        this.anchor = background.pan;
-        this.pos = background.pan;
+        this.anchor = this.diagram.background.pan;
+        this.pos = this.diagram.background.pan;
     }
     save() {
         return null;
@@ -135,7 +135,7 @@ class FilePicker extends WindowedUI {
         footerContainer.appendChild(footerContainerRightContainer);
 
 
-        this.mouseAnchor = background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
+        this.mouseAnchor = this.diagram.background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
         const elementID = `workspaceExplorerContainer-${this.index}`
         let treeContainer = document.getElementById(elementID);
         WindowedNode.makeContentScrollable(treeContainer, true)
@@ -225,7 +225,7 @@ class NodeFilesUI extends WindowedUI {
         footerContainer.appendChild(footerContainerLeftContainer);
         footerContainer.appendChild(footerContainerRightContainer);
 
-        this.mouseAnchor = background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
+        this.mouseAnchor = this.diagram.background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
 
         let fileMappingContainer = this.windowDiv.querySelector(".file-mapping-container");
         WindowedNode.makeContentScrollable(fileMappingContainer, true)

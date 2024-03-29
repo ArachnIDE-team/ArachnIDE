@@ -68,7 +68,7 @@ edgesIcons.forEach(icon => {
 function handleIconDrop(event, iconName) {
 
     console.log(`Dropped icon: ${iconName}`);
-
+    let node;
     switch (iconName) {
         case 'note-icon':
             node = createNodeFromWindow(``, ``, true); // The last parameter sets followMouse to true
@@ -78,7 +78,7 @@ function handleIconDrop(event, iconName) {
             node = createLLMNode('', undefined, undefined, undefined, undefined);
             node.followingMouse = 1;
             node.draw();
-            node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+            node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
             console.log('Handle drop for the ai icon');
             break;
         case 'link-icon':
@@ -92,7 +92,7 @@ function handleIconDrop(event, iconName) {
             node = createEditorNode();
             node.followingMouse = 1;
             node.draw();
-            node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+            node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
             console.log('Handle drop for the code icon');
             break;
         case 'edges-icon':
@@ -141,7 +141,7 @@ function createPDFNodeFromFile(content, file) {
     htmlnodes_parent.appendChild(node.content);
     node.followingMouse = 1;
     node.draw();
-    node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+    node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
     return node;
 }
 
@@ -181,7 +181,7 @@ function createImageNodeFromFile(base64DataUrl, file, callback) {
         htmlnodes_parent.appendChild(node.content);
         node.followingMouse = 1;
         node.draw();
-        node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
         callback(node)
     };
 }
@@ -336,18 +336,18 @@ addEventListener("paste", (event) => {
         let node = createLinkNode(pastedData, pastedData, pastedData); // Use 'pastedData' instead of 'url'
         node.followingMouse = 1;
         node.draw();
-        node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
     } else if (isIframe(pastedData)) {
         let iframeUrl = getIframeUrl(pastedData);
         let node = createLinkNode(iframeUrl, iframeUrl, iframeUrl);
         node.followingMouse = 1;
         node.draw();
-        node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
     } else {
         let node = createNodeFromWindow('', pastedData, true);
         node.followingMouse = 1;
         node.draw();
-        node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
     }
 });
 

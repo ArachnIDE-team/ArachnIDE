@@ -50,45 +50,45 @@ function easeInOutCubic(t) {
 
 
 function chrysalideZoom(zoomFactor, targetX = window.innerWidth / 2, targetY = window.innerHeight / 2, duration = 1000) {
-    const dest = background.toZ(new vec2(targetX, targetY));
+    const dest = rootDiagram.background.toZ(new vec2(targetX, targetY));
     const adjustedZoomFactor = 1 / zoomFactor;
 
-    const startZoom = background.zoom;
+    const startZoom = rootDiagram.background.zoom;
     const endZoom = startZoom.scale(adjustedZoomFactor);
-    const startPan = background.pan;
+    const startPan = rootDiagram.background.pan;
     const endPan = dest.scale(1 - adjustedZoomFactor).plus(startPan.scale(adjustedZoomFactor));
 
     animateTransition(0, 1, duration, (t) => {
-        background.zoom = linterpolateVec2(startZoom.clog(), endZoom.clog(), t).cexp();
-        background.pan = interpolateVec2(startPan, endPan, t);
-        background.updateViewbox();
+        rootDiagram.background.zoom = linterpolateVec2(startZoom.clog(), endZoom.clog(), t).cexp();
+        rootDiagram.background.pan = interpolateVec2(startPan, endPan, t);
+        rootDiagram.background.updateViewbox();
     }, easeInOutCubic);
 }
 
 function chrysalidePan(deltaX, deltaY, duration = 1000) {
-    const dp = background.toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
-    const startPan = background.pan;
+    const dp = rootDiagram.background.toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
+    const startPan = rootDiagram.background.pan;
     const endPan = startPan.plus(dp);
 
     animateTransition(0, 1, duration, (t) => {
-        background.pan = interpolateVec2(startPan, endPan, t);
-        background.updateViewbox();
+        rootDiagram.background.pan = interpolateVec2(startPan, endPan, t);
+        rootDiagram.background.updateViewbox();
     }, easeInOutCubic);
 }
 
 function chrysalideRotate(rotationAngle, pivotX, pivotY, duration = 1000) {
-    const p = background.toZ(new vec2(pivotX, pivotY));
-    const zc = p.minus(background.pan);
+    const p = rootDiagram.background.toZ(new vec2(pivotX, pivotY));
+    const zc = p.minus(rootDiagram.background.pan);
     const r = new vec2(Math.cos(rotationAngle), Math.sin(rotationAngle));
-    const startZoom = background.zoom;
+    const startZoom = rootDiagram.background.zoom;
     const endZoom = startZoom.cmult(r);
-    const startPan = background.pan;
+    const startPan = rootDiagram.background.pan;
     const endPan = startPan.plus(zc.cmult(new vec2(1, 0).minus(r)));
 
     animateTransition(0, 1, duration, (t) => {
-        background.zoom = linterpolateVec2(startZoom.clog(), endZoom.clog(), t).cexp();
-        background.pan = interpolateVec2(startPan, endPan, t);
-        background.updateViewbox();
+        rootDiagram.background.zoom = linterpolateVec2(startZoom.clog(), endZoom.clog(), t).cexp();
+        rootDiagram.background.pan = interpolateVec2(startPan, endPan, t);
+        rootDiagram.background.updateViewbox();
     }, easeInOutCubic);
 }
 
@@ -145,14 +145,14 @@ function chrysalideMovement(movementTypes = [], customZoomParams = {}, customPan
         const isRotationNeeded = rotationAngle !== null;
 
         // Starting states
-        const startZoom = background.zoom;
-        const startPan = background.pan;
+        const startZoom = rootDiagram.background.zoom;
+        const startPan = rootDiagram.background.pan;
 
         // Calculate final states for zoom and pan
-        const destZoom = background.toZ(new vec2(zoomX, zoomY));
+        const destZoom = rootDiagram.background.toZ(new vec2(zoomX, zoomY));
         const adjustedZoomFactor = 1 + zoomFactor; // Adjusted zoom factor
         const finalZoom = startZoom.scale(adjustedZoomFactor);
-        const dp = background.toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
+        const dp = rootDiagram.background.toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
         const finalPan = startPan.plus(dp);
 
         // Rotation calculations
@@ -163,20 +163,20 @@ function chrysalideMovement(movementTypes = [], customZoomParams = {}, customPan
         try {
             animateTransition(0, 1, duration, (t) => {
                 // Interpolate zoom and pan
-                background.zoom = linterpolateVec2(startZoom.clog(), finalZoom.clog(), t).cexp();
-                background.pan = interpolateVec2(startPan, finalPan, t);
+                rootDiagram.background.zoom = linterpolateVec2(startZoom.clog(), finalZoom.clog(), t).cexp();
+                rootDiagram.background.pan = interpolateVec2(startPan, finalPan, t);
 
                 // Apply rotation only if needed
                 if (isRotationNeeded) {
                     const currentRotation = interpolate(startRotation, endRotation, t);
-                    const pivot = background.toZ(new vec2(pivotX, pivotY));
-                    const zc = pivot.minus(background.pan);
+                    const pivot = rootDiagram.background.toZ(new vec2(pivotX, pivotY));
+                    const zc = pivot.minus(rootDiagram.background.pan);
                     const r = new vec2(Math.cos(currentRotation), Math.sin(currentRotation));
-                    background.zoom = background.zoom.cmult(r);
-                    background.pan = background.pan.plus(zc.cmult(new vec2(1, 0).minus(r)));
+                    rootDiagram.background.zoom = rootDiagram.background.zoom.cmult(r);
+                    rootDiagram.background.pan = rootDiagram.background.pan.plus(zc.cmult(new vec2(1, 0).minus(r)));
                 }
 
-                background.updateViewbox();
+                rootDiagram.background.updateViewbox();
             }, easeInOutCubic, () => {
                 activeAnimationsCount--;
                 console.log("Animation completed, count:", activeAnimationsCount);
@@ -209,7 +209,7 @@ function chrysalideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, spe
         if (animate) {
             activeAnimationsCount++;
             rootDiagram.autopilot.referenceFrame = undefined;
-            const targetZoom = background.zoom.scale(newZoomMagnitude / background.zoom.mag());
+            const targetZoom = rootDiagram.background.zoom.scale(newZoomMagnitude / rootDiagram.background.zoom.mag());
             const targetPan = new vec2(newPanReal, newPanImaginary);
 
             if (speed > 1) {
@@ -239,7 +239,7 @@ function chrysalideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, spe
                         console.log("Animation interrupted by user interaction.");
                         return true; // Indicate that the animation should be terminated
                     }
-                    return background.zoom.closeEnough(targetZoom, autopilotThreshold) && background.pan.closeEnough(targetPan, autopilotThreshold);
+                    return rootDiagram.background.zoom.closeEnough(targetZoom, autopilotThreshold) && rootDiagram.background.pan.closeEnough(targetPan, autopilotThreshold);
                 });
             } catch (error) {
                 console.error("Error in animation:", error);
@@ -250,9 +250,9 @@ function chrysalideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, spe
         } else {
             // Directly set the new zoom and pan values
             if (newZoomMagnitude !== 0) {
-                background.zoom = background.zoom.scale(newZoomMagnitude / background.zoom.mag());
+                rootDiagram.background.zoom = rootDiagram.background.zoom.scale(newZoomMagnitude / rootDiagram.background.zoom.mag());
             }
-            background.pan = new vec2(newPanReal, newPanImaginary);
+            rootDiagram.background.pan = new vec2(newPanReal, newPanImaginary);
             resolve(); // Resolve immediately for non-animated change
         }
     });
@@ -395,15 +395,15 @@ function chrysalideResetView(animate = true, duration = 2000) {
         const defaultPanReal = -0.3;
         const defaultPanImaginary = 0;
 
-        const defaultZoom = background.zoom.scale(defaultZoomMagnitude / background.zoom.mag());
+        const defaultZoom = rootDiagram.background.zoom.scale(defaultZoomMagnitude / rootDiagram.background.zoom.mag());
         const defaultPan = new vec2(defaultPanReal, defaultPanImaginary);
 
         if (animate) {
             activeAnimationsCount++;
             try {
                 animateTransition(0, 1, duration, (t) => {
-                    background.zoom = interpolateVec2(background.zoom, defaultZoom, t);
-                    background.pan = interpolateVec2(background.pan, defaultPan, t);
+                    rootDiagram.background.zoom = interpolateVec2(rootDiagram.background.zoom, defaultZoom, t);
+                    rootDiagram.background.pan = interpolateVec2(rootDiagram.background.pan, defaultPan, t);
                 }, easeInOutCubic, () => {
                     activeAnimationsCount--;
                     console.log("Animation completed, count:", activeAnimationsCount);
@@ -415,8 +415,8 @@ function chrysalideResetView(animate = true, duration = 2000) {
                 reject(error); // Reject the promise in case of an error
             }
         } else {
-            background.zoom = defaultZoom;
-            background.pan = defaultPan;
+            rootDiagram.background.zoom = defaultZoom;
+            rootDiagram.background.pan = defaultPan;
             resolve(); // Resolve immediately for non-animated changes
         }
     });
@@ -424,9 +424,9 @@ function chrysalideResetView(animate = true, duration = 2000) {
 
 function chrysalideGetMandelbrotCoords(forFunctionCall = false) {
     // Extract and format zoom and pan values
-    const zoomValue = background.zoom.x.toString();
-    const panReal = background.pan.x.toString();
-    const panImaginary = background.pan.y.toString();
+    const zoomValue = rootDiagram.background.zoom.x.toString();
+    const panReal = rootDiagram.background.pan.x.toString();
+    const panImaginary = rootDiagram.background.pan.y.toString();
 
     if (forFunctionCall) {
         // Format for setMandelbrotCoords function call

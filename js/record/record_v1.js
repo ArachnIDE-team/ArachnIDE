@@ -45,7 +45,7 @@ async function captureScreenshot() {
             htmlnodes_parent.appendChild(node.content);
             node.followingMouse = 1;
             node.draw();
-            node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+            node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
         };
     } catch (error) {
         console.error('Error:', error);
