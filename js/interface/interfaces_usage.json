@@ -1,0 +1,232 @@
+{
+  "files": {
+    "H:/projects/ChrysalIDE/js/dropdown/dropdown_v2_0_1.js": {
+      "functions": {
+        "cancel": 3
+      }
+    },
+    "H:/projects/ChrysalIDE/js/dropdown/savenet.js": {
+      "functions": {
+        "clearNodeSelection": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/functioncall/functioncallingpanel.js": {
+      "functions": {
+        "cancel": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/handledrop.js": {
+      "functions": {
+        "isJSON": 1,
+        "getIframeUrl": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/search.js": {
+      "variables": {
+        "autopilotSpeed": 2
+      },
+      "functions": {
+        "skipAutopilot": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/window.js": {
+      "variables": {
+        "zoomTo": 2,
+        "autopilotSpeed": 2
+      },
+      "functions": {
+        "cancel": 3,
+        "toggleNodeSelection": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/neuralapi.js": {
+      "variables": {
+        "autopilotReferenceFrame": 6,
+        "autopilotSpeed": 10,
+        "zoomTo": 3,
+        "panTo": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/connect.js": {
+      "functions": {
+        "getTextareaContentForNode": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/createnodes/createnodes_v2.js": {
+      "functions": {
+        "cancel": 1,
+        "getNodeByTitle": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llmagent.js": {
+      "functions": {
+        "cancel": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llm_old.js": {
+      "functions": {
+        "cancel": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/diagram.js": {
+      "variables": {
+        "mousePathPos": 7,
+        "autopilotReferenceFrame": 9,
+        "autopilotSpeed": 8,
+        "zoomTo": 3,
+        "panTo": 1
+      },
+      "functions": {
+        "getTextareaContentForNode": 1,
+        "clearTextSelection": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/edge.js": {
+      "functions": {
+        "cancel": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/node.js": {
+      "variables": {
+        "panTo": 2,
+        "zoomTo": 4,
+        "autopilotReferenceFrame": 3,
+        "autopilotSpeed": 1
+      },
+      "functions": {
+        "edgeFromJSON": 1,
+        "nextUUID": 1,
+        "updateNodeEdgesLength": 3,
+        "getSelectedNodes": 2,
+        "cancel": 3
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/nodemode.js": {
+      "functions": {
+        "cancel": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/togglenodestate.js": {
+      "functions": {
+        "getNodeByTitle": 1,
+        "toggleNodeSelection": 1,
+        "clearNodeSelection": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/searchapi/embeddingsdb.js": {
+      "functions": {
+        "getNodeText": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/searchapi/filternodes.js": {
+      "functions": {
+        "getNodeByTitle": 1,
+        "getTextareaContentForNode": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": {
+      "variables": {
+        "zoomTo": 2,
+        "autopilotSpeed": 1
+      },
+      "functions": {
+        "getNodeByTitle": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": {
+      "functions": {
+        "getNodeByTitle": 2
+      }
+    }
+  },
+  "variables": {
+    "autopilotSpeed": {
+      "H:/projects/ChrysalIDE/js/interface/search.js": 2,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 2,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 10,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 8,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 1,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 1
+    },
+    "zoomTo": {
+      "H:/projects/ChrysalIDE/js/interface/window.js": 2,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 4,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 2
+    },
+    "autopilotReferenceFrame": {
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 6,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 9,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 3
+    },
+    "panTo": {
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 2
+    },
+    "mousePathPos": {
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 7
+    }
+  },
+  "functions": {
+    "cancel": {
+      "H:/projects/ChrysalIDE/js/dropdown/dropdown_v2_0_1.js": 3,
+      "H:/projects/ChrysalIDE/js/functioncall/functioncallingpanel.js": 2,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/createnodes/createnodes_v2.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llmagent.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llm_old.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/edge.js": 2,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/nodemode.js": 1
+    },
+    "clearNodeSelection": {
+      "H:/projects/ChrysalIDE/js/dropdown/savenet.js": 2,
+      "H:/projects/ChrysalIDE/js/nodes/togglenodestate.js": 1
+    },
+    "isJSON": {
+      "H:/projects/ChrysalIDE/js/interface/handledrop.js": 1
+    },
+    "getIframeUrl": {
+      "H:/projects/ChrysalIDE/js/interface/handledrop.js": 1
+    },
+    "skipAutopilot": {
+      "H:/projects/ChrysalIDE/js/interface/search.js": 1
+    },
+    "toggleNodeSelection": {
+      "H:/projects/ChrysalIDE/js/interface/window.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/togglenodestate.js": 1
+    },
+    "getTextareaContentForNode": {
+      "H:/projects/ChrysalIDE/js/nodes/connect.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 1,
+      "H:/projects/ChrysalIDE/js/searchapi/filternodes.js": 1
+    },
+    "getNodeByTitle": {
+      "H:/projects/ChrysalIDE/js/nodes/createnodes/createnodes_v2.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/togglenodestate.js": 1,
+      "H:/projects/ChrysalIDE/js/searchapi/filternodes.js": 1,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 1,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": 2
+    },
+    "clearTextSelection": {
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 2
+    },
+    "edgeFromJSON": {
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 1
+    },
+    "nextUUID": {
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 1
+    },
+    "updateNodeEdgesLength": {
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 3
+    },
+    "getSelectedNodes": {
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 2
+    },
+    "getNodeText": {
+      "H:/projects/ChrysalIDE/js/searchapi/embeddingsdb.js": 1
+    }
+  }
+}

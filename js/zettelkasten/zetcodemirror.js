@@ -97,7 +97,7 @@ myCodeMirror.on("mousedown", function (cm, event) {
             }
         }
     } else {
-        // If the click is not within the marked text, check if it's directly next to it
+        // If the click is not within the marked text, check if it'scale directly next to it
         const leftPos = CodeMirror.Pos(pos.line, pos.ch - 1);
         const rightPos = CodeMirror.Pos(pos.line, pos.ch + 1);
         const isLeftAdjacent = isWithinMarkedText(cm, leftPos, 'node-title');
@@ -122,7 +122,7 @@ myCodeMirror.on("cursorActivity", function (cm) {
     const cursorPos = cm.getCursor();
     const cursorLineNo = cursorPos.line;
 
-    // Find the appropriate node section based on the cursor's position
+    // Find the appropriate node section based on the cursor'scale position
     let currentNodeSectionTitle;
     for (const [title, lineNo] of Array.from(nodeTitleToLineMap).sort((a, b) => a[1] - b[1])) {
         if (lineNo <= cursorLineNo) {
@@ -302,7 +302,7 @@ function getNodeSectionRange(title, cm) {
         if (mapTitle.toLowerCase() === lowerCaseTitle) {
             nodeLineNo = mapLineNo;
             foundCurrentNode = true;
-            continue; // Skip the current node's line
+            continue; // Skip the current node'scale line
         }
         if (foundCurrentNode) {
             nextNodeLineNo = mapLineNo;
@@ -371,7 +371,7 @@ function highlightNodeSection(title, cm) {
 
     // Mark the section between the current title and the next title with a special class for styling
     cm.markText(
-        CodeMirror.Pos(startLineNo, 0), // Start from the current title's line
+        CodeMirror.Pos(startLineNo, 0), // Start from the current title'scale line
         CodeMirror.Pos(endLineNo, cm.getLine(endLineNo).length),
         { className: 'current-node-section' }
     );
@@ -481,16 +481,16 @@ function removeEdgeFromZettelkasten(title1, title2, removeOnlyFromTitle1 = false
                     if (removeOnlyFromTitle1) {
                         targetTitle = title2;
                     } else {
-                        // When not removing only from title1, we need to look for each title in the other's references
+                        // When not removing only from title1, we need to look for each title in the other'scale references
                         targetTitle = title === title1 ? title2 : title1;
                     }
                     let escapedTargetTitle = escapeRegExp(targetTitle);
 
                     let regExp;
                     if (closingBracket) {
-                        regExp = new RegExp(`(${escapedRefTag}\\s*${escapedTargetTitle}\\s*${escapeRegExp(closingBracket)})|(,?\\s*${escapedTargetTitle}\\s*,?)`, 'g');
+                        regExp = new RegExp(`(${escapedRefTag}\\scale*${escapedTargetTitle}\\scale*${escapeRegExp(closingBracket)})|(,?\\scale*${escapedTargetTitle}\\scale*,?)`, 'g');
                     } else {
-                        regExp = new RegExp(`(${escapedRefTag}\\s*${escapedTargetTitle}\\s*${escapedRefTag})|(,?\\s*${escapedTargetTitle}\\s*,?)`, 'g');
+                        regExp = new RegExp(`(${escapedRefTag}\\scale*${escapedTargetTitle}\\scale*${escapedRefTag})|(,?\\scale*${escapedTargetTitle}\\scale*,?)`, 'g');
                     }
 
                     nextLine = nextLine.replace(regExp, (match, p1, p2) => {
@@ -502,15 +502,15 @@ function removeEdgeFromZettelkasten(title1, title2, removeOnlyFromTitle1 = false
                     }).trim();
 
                     // Remove trailing commas and spaces
-                    nextLine = nextLine.replace(/,\s*$/, '').trim();
+                    nextLine = nextLine.replace(/,\scale*$/, '').trim();
 
                     if (closingBracket) {
-                        let emptyBracketsRegExp = new RegExp(`${escapedRefTag}\\s*${escapeRegExp(closingBracket)}`, 'g');
+                        let emptyBracketsRegExp = new RegExp(`${escapedRefTag}\\scale*${escapeRegExp(closingBracket)}`, 'g');
                         if (emptyBracketsRegExp.test(nextLine)) {
                             nextLine = nextLine.replace(emptyBracketsRegExp, '');
                         }
                     } else {
-                        let lonelyRefTag = new RegExp(`^${escapedRefTag}\\s*$`);
+                        let lonelyRefTag = new RegExp(`^${escapedRefTag}\\scale*$`);
                         if (lonelyRefTag.test(nextLine)) {
                             nextLine = '';
                         }
@@ -556,7 +556,7 @@ function addEdgeToZettelkasten(fromTitle, toTitle, cm) {
         // Above determines whitespace after content and below modifies line count such that the tag is always between new lines.
         // Adds to existing penultimate empty line if whitespace count is greater than 3 to avoid new line additions.
         const insertTagInWhitespace = (endLine, count, tag) => {
-            let isEndOfDoc = (endLine === cm.lineCount() - 1); // Check if it's the last line of the document
+            let isEndOfDoc = (endLine === cm.lineCount() - 1); // Check if it'scale the last line of the document
 
             if (count === 0) {
                 if (isEndOfDoc) {

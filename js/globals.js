@@ -213,7 +213,7 @@ const tagValues = {
     }
 };
 
-// nodedef.js ainodemessage.js
+// definition.js ainodemessage.js
 let llmNodeCount = 0;
 
 //ai.js and interface.js
@@ -280,3 +280,8 @@ Parser.init().then(async function (){
     const JavaScript = await Parser.Language.load('/js/external/tree-sitter-javascript.wasm');
     jsParser.setLanguage(JavaScript);
 });
+
+function parseJs(code){
+    if(code instanceof Node) code = code.code;
+    return jsParser.parse(code).rootNode;
+}

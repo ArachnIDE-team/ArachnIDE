@@ -28,7 +28,7 @@ Navigate to the LocalHost servers folder in the command line.
 
 node start_servers.js
 
-This will spawn each server in its own subprocess and they will run concurrently. Output from each server's stdout and stderr will be logged to the console.
+This will spawn each server in its own subprocess and they will run concurrently. Output from each server'scale stdout and stderr will be logged to the console.
 
 
 The Node.js servers will run npm install before starting, ensuring all dependencies are installed. If the dependencies are already installed and up-to-date, npm install will not reinstall them.

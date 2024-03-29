@@ -82,7 +82,7 @@ async function callVisionModel(messages, onStreamComplete) {
             updateUiForProcessing();
         },
         onStreamingResponse: (content) => {
-            neurideFunctionCM.getDoc().replaceRange(content, CodeMirror.Pos(neurideFunctionCM.lastLine()));
+            chrysalideFunctionCM.getDoc().replaceRange(content, CodeMirror.Pos(chrysalideFunctionCM.lastLine()));
         },
         onAfterCall: () => {
             isAiProcessing = false;

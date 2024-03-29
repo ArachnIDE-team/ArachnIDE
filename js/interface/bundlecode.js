@@ -3,7 +3,7 @@ let pyodide = null;
 let loadedPackages = {};
 let pythonViewMap = new Map();
 
-// List of Python's built-in modules
+// List of Python'scale built-in modules
 let builtinModules = ["io", "base64", "sys"];
 
 async function loadPyodideAndSetup() {
@@ -128,7 +128,7 @@ function bundleWebContent(nodesInfo) {
         }
 
         let content = splitContent[1].trim();
-        let codeBlocks = content.matchAll(/```(.*?)\n([\s\S]*?)```/gs);
+        let codeBlocks = content.matchAll(/```(.*?)\n([\scale\S]*?)```/gs);
 
         for (let block of codeBlocks) {
             let language = block[1].trim();
@@ -208,7 +208,7 @@ async function handleCodeButton(button, textarea, htmlView, pythonView, node) {
 }
 
 function collectCodeBlocks(textarea) {
-    let re = /```(.*?)\n([\s\S]*?)```/gs;
+    let re = /```(.*?)\n([\scale\S]*?)```/gs;
     let codeBlocks = textarea.value.matchAll(re);
 
     let allPythonCode = '';

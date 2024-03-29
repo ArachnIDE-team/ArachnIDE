@@ -12,7 +12,7 @@ document.addEventListener('dblclick', function (e) {
         // Assuming that the createLLMNode function takes x, y coordinates
         let node = createLLMNode('', undefined, undefined, e.clientX, e.clientY);
         node.draw();
-    } else if (nodeMode && !prevNode) {
+    } else if (nodeMode && !prevNodeToConnect) {
         // Node mode (Shift) + double click behavior
         createNodeFromWindow();
     }

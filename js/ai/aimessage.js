@@ -201,8 +201,8 @@ async function sendMessage(event, autoModeMessage = null) {
     // Use the helper function to extract titles
     let existingTitles = extractTitlesFromContent(context, nodeTag);
 
-    // Replace the original search and highlight code with neurideSearchNotes
-    const topMatchedNodes = await neurideSearchNotes(keywords);
+    // Replace the original search and highlight code with chrysalideSearchNotes
+    const topMatchedNodes = await chrysalideSearchNotes(keywords);
 
     let titlesToForget = new Set();
 

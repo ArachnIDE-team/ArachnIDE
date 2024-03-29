@@ -1,10 +1,10 @@
 {
-  "name": "neuride-automation",
+  "name": "chrysalide-automation",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node NeurideAutomation.js"
+    "start": "node ChrysalIDEAutomation.js"
   },
   "keywords": [],
   "author": "",

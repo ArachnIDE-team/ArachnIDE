@@ -198,6 +198,7 @@ class ResponseHandler {
         this.processingQueue = Promise.resolve();
         this.previousContentLength = 0;
         this.responseCount = 0;
+        this.systemCount = 0;
         this.currentResponseEnded = false
 
             // Attach the input event listener for new input
@@ -214,24 +215,28 @@ class ResponseHandler {
 
             // Check if the child contains a user-prompt div
             const userPromptDiv = child.querySelector('.user-prompt');
+            const systemPromptDiv = child.querySelector('.system-prompt');
             if (userPromptDiv) {
                 // Initialize the user prompt div found within the child
                 saveObj.push({role: "user", message: userPromptDiv.innerText})
+            } else if(systemPromptDiv){
+                saveObj.push({role: "system", message: systemPromptDiv.innerText})
             } else if (child.classList.contains('response-wrapper')) {
                 // For AI responses, find the .ai-response div within the wrapper
                 const responseDiv = child.querySelector('.ai-response');
                 if (responseDiv) {
-                    saveObj.push({role: "ai", message: responseDiv.innerText})
+                    saveObj.push({role: "assistant", message: responseDiv.innerText})
                 }
             } else if (child.classList.contains('code-block-container')) {
                 // For code blocks, pass the container div
                 let language = child.querySelector('div.language-label').childNodes[0].textContent;
                 let code = child.querySelector('pre.code-block').innerText;
-                saveObj.push({role: "ai", code, language})
+                saveObj.push({role: "assistant", code, language})
             }
         }
         return saveObj;
     }
+
     restoreAiResponseDiv() {
         // Iterate through each child element in the AI response div
         const children = this.node.aiResponseDiv.children;
@@ -240,10 +245,14 @@ class ResponseHandler {
 
             // Check if the child contains a user-prompt div
             const userPromptDiv = child.querySelector('.user-prompt');
+            const systemPromptDiv = child.querySelector('.system-prompt');
+
             if (userPromptDiv) {
                 // Initialize the user prompt div found within the child
                 this.initUserPromptDiv(userPromptDiv);
-            } else if (child.classList.contains('response-wrapper')) {
+            } else if(systemPromptDiv){
+                this.initSystemPromptDiv(systemPromptDiv);
+            }  else if (child.classList.contains('response-wrapper')) {
                 // For AI responses, find the .ai-response div within the wrapper
                 const responseDiv = child.querySelector('.ai-response');
                 if (responseDiv) {
@@ -255,6 +264,11 @@ class ResponseHandler {
             }
         }
     }
+
+    initSystemPromptDiv(promptDiv) {
+        this.setupSystemPrompt(promptDiv);
+    }
+
 
     initUserPromptDiv(promptDiv) {
         this.setupUserPrompt(promptDiv);
@@ -373,6 +387,33 @@ class ResponseHandler {
         this.initUserPromptDiv(promptDiv)
 
         this.responseCount++;  // Increment the response count after each prompt
+    }
+
+    handleSystemPrompt(promptContent) {
+        if (!promptContent) return;
+        // Create a new div for the outer container
+        let outerDiv = document.createElement('div');
+        outerDiv.style.width = '100%';
+        outerDiv.style.textAlign = 'right';
+
+        // Create a new div for the user prompt
+        let promptDiv = document.createElement('div');
+        promptDiv.className = 'system-prompt';
+        promptDiv.id = `system-prompt-${this.systemCount}`;  // Assign a unique ID to each prompt
+        promptDiv.contentEditable = false; // Set contentEditable to false when the promptDiv is created
+
+
+        promptDiv.textContent = promptContent;
+
+        // Append the prompt div to the outer div
+        outerDiv.appendChild(promptDiv);
+
+        // Append the outer div to the response area
+        this.node.aiResponseDiv.appendChild(outerDiv);
+
+        this.initSystemPromptDiv(promptDiv)
+
+        this.systemCount++;  // Increment the response count after each prompt
     }
 
     handleMarkdown(markdown) {
@@ -577,6 +618,116 @@ class ResponseHandler {
                 // Handle leaving edit mode
                 promptDiv.style.backgroundColor = "#b799ce";
                 promptDiv.style.color = "#222226";
+
+                // Set the cursor style to move
+                promptDiv.style.cursor = "move";
+
+                makeDivDraggable(promptDiv, 'Prompt');
+                promptDiv.ondragstart = function () { return isEditing ? false : null; };
+                promptDiv.removeEventListener('keydown', handleKeyDown);
+            }
+
+        }.bind(this));
+    }
+
+    setupSystemPrompt(promptDiv) {
+        // Make the prompt div draggable
+        makeDivDraggable(promptDiv, 'Prompt');
+
+        let isEditing = false; // Flag to check if user is editing the content
+
+        let handleKeyDown = function (event) {
+            if (event.key === 'Enter' && event.shiftKey) {
+                event.preventDefault();
+                this.removeResponsesUntil(promptDiv.id);
+
+                // Get the HTML content of the promptDiv
+                let message = promptDiv.innerHTML;
+
+                console.log(`Sending message: "${message}"`);
+                this.node.sendLLMNodeMessage(message);
+            }
+        }.bind(this);
+
+        // Set an onBlur event handler to handle when the div loses focus
+        promptDiv.addEventListener('blur', function () {
+            // If the div is in editing mode
+            if (isEditing) {
+                // Remove the .editing class
+                promptDiv.classList.remove('editing');
+                // Set contentEditable to false when div loses focus
+                promptDiv.contentEditable = false;
+
+                // Reset isEditing
+                isEditing = false;
+
+                // Reset styles to non-editing state
+                promptDiv.style.backgroundColor = "#444556";
+                promptDiv.style.color = "#ceced5";
+                promptDiv.style.textDecoration = "";
+                promptDiv.style.outline = "";
+                promptDiv.style.border = "";
+
+                // Reset the cursor style to move
+                promptDiv.style.cursor = "move";
+
+                // Make the div draggable
+                makeDivDraggable(promptDiv, 'Prompt');
+                promptDiv.ondragstart = function () { return isEditing ? false : null; };
+
+                // Remove the keydown event listener
+                promptDiv.removeEventListener('keydown', handleKeyDown);
+            }
+        }.bind(this));
+
+        // Add a double click listener to the prompt div
+        promptDiv.addEventListener('dblclick', function (event) {
+            // Prevent the default action of double click
+            event.preventDefault();
+
+            // Toggle isEditing
+            isEditing = !isEditing;
+
+            if (isEditing) {
+                // Add the .editing class
+                promptDiv.classList.add('editing');
+                // Set contentEditable to true when entering edit mode
+                promptDiv.contentEditable = true;
+
+                // Remove draggable attribute
+                promptDiv.removeAttribute('draggable');
+
+                // Set the cursor style to text
+                promptDiv.style.cursor = "text";
+
+                // Set the background and text color to match original, remove inherited text decoration
+                promptDiv.style.backgroundColor = "inherit";
+                promptDiv.style.color = "#bbb";
+                promptDiv.style.textDecoration = "none";
+                promptDiv.style.outline = "none";
+                promptDiv.style.border = "none";
+
+                // Focus the div
+                promptDiv.focus();
+
+                // Add the keydown event listener when the promptDiv enters edit mode
+                promptDiv.addEventListener('keydown', handleKeyDown);
+
+                // Set promptDiv non-draggable
+                promptDiv.ondragstart = function () { return false; };
+            } else {
+                // Remove the .editing class
+                promptDiv.classList.remove('editing');
+                // Set contentEditable to false when leaving edit mode
+                promptDiv.contentEditable = false;
+
+
+                // Handle leaving edit mode
+                promptDiv.style.backgroundColor = "#444556";
+                promptDiv.style.color = "#ceced5";
+                promptDiv.style.textDecoration = "";
+                promptDiv.style.outline = "";
+                promptDiv.style.border = "";
 
                 // Set the cursor style to move
                 promptDiv.style.cursor = "move";

@@ -1,0 +1,386 @@
+{
+  "files": {
+    "H:/projects/ChrysalIDE/js/ai/aihelpers.js": {
+      "variables": {
+        "myCodeMirror": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/ai/aimessage.js": {
+      "variables": {
+        "myCodeMirror": 14,
+        "nodes": 1,
+        "nodeTag": 4
+      }
+    },
+    "H:/projects/ChrysalIDE/js/ai/ai_v2.js": {
+      "variables": {
+        "myCodeMirror": 4
+      }
+    },
+    "H:/projects/ChrysalIDE/js/ai/prompts.js": {
+      "variables": {
+        "refTag": 3,
+        "nodeTag": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/dropdown/dropdown_v2_0_1.js": {
+      "variables": {
+        "myCodeMirror": 12,
+        "textarea": 8,
+        "settings": 16,
+        "flashlight_fraction": 3,
+        "flashlight_stdev": 3
+      },
+      "functions": {
+        "debounce": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/dropdown/savenet.js": {
+      "variables": {
+        "nodes": 6,
+        "nodeMap": 6,
+        "edges": 3
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/bundlecode.js": {
+      "variables": {
+        "textarea": 4
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/interface_v2.js": {
+      "variables": {
+        "nodeMap": 5,
+        "NodeUUID": 3,
+        "nodes": 14,
+        "edges": 3,
+        "settings": 18,
+        "nodeMode": 4,
+        "nodeMode_v": 4,
+        "movingNode": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/search.js": {
+      "variables": {
+        "nodes": 2,
+        "settings": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/uinodes.js": {
+      "variables": {
+        "settings": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/window.js": {
+      "variables": {
+        "settings": 8,
+        "myCodeMirror": 1,
+        "nodes": 2,
+        "nodeMap": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/mandelbrot/mandelbrot_v1_0_1.js": {
+      "variables": {
+        "nodeMode_v": 3,
+        "nodeMode": 1,
+        "settings": 9,
+        "flashlight_fraction": 1,
+        "flashlight_stdev": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/neuralapi.js": {
+      "variables": {
+        "settings": 4,
+        "nodes": 1,
+        "nodeTag": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/connect.js": {
+      "variables": {
+        "edges": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/createnodes/contenteditable.js": {
+      "variables": {
+        "textarea": 12,
+        "myCodeMirror": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/createnodes/createnodes_v2.js": {
+      "variables": {
+        "nodeMode": 2,
+        "nodeTag": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/languages/code.js": {
+      "variables": {
+        "settings": 12
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/languages/editornode.js": {
+      "functions": {
+        "debounce": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/languages/javascript.js": {
+      "variables": {
+        "settings": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/languages/meta.js": {
+      "variables": {
+        "textarea": 14,
+        "settings": 4
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/llm/chat/ainodes_v2.js": {
+      "variables": {
+        "textarea": 5
+      },
+      "functions": {
+        "encodeHTML": 1,
+        "decodeHTML": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llmagent.js": {
+      "variables": {
+        "textarea": 5
+      },
+      "functions": {
+        "debounce": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llm_old.js": {
+      "variables": {
+        "textarea": 5
+      },
+      "functions": {
+        "debounce": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/text.js": {
+      "variables": {
+        "textarea": 17
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/diagram.js": {
+      "variables": {
+        "NodeUUID": 1,
+        "nodes": 3,
+        "nodeMap": 3,
+        "nodeMode_v": 4,
+        "nodeMode": 3,
+        "settings": 8
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/edge.js": {
+      "variables": {
+        "myCodeMirror": 4,
+        "nodeMode": 3,
+        "settings": 1,
+        "edges": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/node.js": {
+      "variables": {
+        "nodeMap": 5,
+        "settings": 5,
+        "nodeMode": 5,
+        "movingNode": 2,
+        "myCodeMirror": 2,
+        "nodes": 4
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/nodemode.js": {
+      "variables": {
+        "nodeMode": 7,
+        "settings": 6,
+        "nodes": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/togglenodestate.js": {
+      "variables": {
+        "nodeMode": 1,
+        "myCodeMirror": 1,
+        "nodeMap": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/searchapi/embeddingsdb.js": {
+      "variables": {
+        "nodes": 8
+      }
+    },
+    "H:/projects/ChrysalIDE/js/searchapi/filternodes.js": {
+      "variables": {
+        "nodeTag": 5,
+        "nodes": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/searchapi/wolframapi.js": {
+      "variables": {
+        "myCodeMirror": 4
+      }
+    },
+    "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": {
+      "variables": {
+        "myCodeMirror": 37,
+        "textarea": 2,
+        "nodeTag": 9,
+        "refTag": 8,
+        "nodeTagInput": 1,
+        "refTagInput": 1,
+        "settings": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": {
+      "variables": {
+        "myCodeMirror": 2,
+        "nodes": 86,
+        "nodeTag": 8,
+        "refTag": 14,
+        "nodeTagInput": 2,
+        "refTagInput": 2,
+        "textarea": 7
+      }
+    }
+  },
+  "variables": {
+    "myCodeMirror": {
+      "H:/projects/ChrysalIDE/js/ai/aihelpers.js": 1,
+      "H:/projects/ChrysalIDE/js/ai/aimessage.js": 14,
+      "H:/projects/ChrysalIDE/js/ai/ai_v2.js": 4,
+      "H:/projects/ChrysalIDE/js/dropdown/dropdown_v2_0_1.js": 12,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/createnodes/contenteditable.js": 2,
+      "H:/projects/ChrysalIDE/js/nodes/edge.js": 4,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 2,
+      "H:/projects/ChrysalIDE/js/nodes/togglenodestate.js": 1,
+      "H:/projects/ChrysalIDE/js/searchapi/wolframapi.js": 4,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 37,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": 2
+    },
+    "nodes": {
+      "H:/projects/ChrysalIDE/js/ai/aimessage.js": 1,
+      "H:/projects/ChrysalIDE/js/dropdown/savenet.js": 6,
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 14,
+      "H:/projects/ChrysalIDE/js/interface/search.js": 2,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 2,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 4,
+      "H:/projects/ChrysalIDE/js/nodes/nodemode.js": 1,
+      "H:/projects/ChrysalIDE/js/searchapi/embeddingsdb.js": 8,
+      "H:/projects/ChrysalIDE/js/searchapi/filternodes.js": 2,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": 86
+    },
+    "nodeTag": {
+      "H:/projects/ChrysalIDE/js/ai/aimessage.js": 4,
+      "H:/projects/ChrysalIDE/js/ai/prompts.js": 1,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/createnodes/createnodes_v2.js": 1,
+      "H:/projects/ChrysalIDE/js/searchapi/filternodes.js": 5,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 9,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": 8
+    },
+    "refTag": {
+      "H:/projects/ChrysalIDE/js/ai/prompts.js": 3,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 8,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": 14
+    },
+    "textarea": {
+      "H:/projects/ChrysalIDE/js/dropdown/dropdown_v2_0_1.js": 8,
+      "H:/projects/ChrysalIDE/js/interface/bundlecode.js": 4,
+      "H:/projects/ChrysalIDE/js/nodes/createnodes/contenteditable.js": 12,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/languages/meta.js": 14,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/llm/chat/ainodes_v2.js": 5,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llmagent.js": 5,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llm_old.js": 5,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/text.js": 17,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 2,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": 7
+    },
+    "settings": {
+      "H:/projects/ChrysalIDE/js/dropdown/dropdown_v2_0_1.js": 16,
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 18,
+      "H:/projects/ChrysalIDE/js/interface/search.js": 2,
+      "H:/projects/ChrysalIDE/js/interface/uinodes.js": 1,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 8,
+      "H:/projects/ChrysalIDE/js/mandelbrot/mandelbrot_v1_0_1.js": 9,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 4,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/languages/code.js": 12,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/languages/javascript.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/languages/meta.js": 4,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 8,
+      "H:/projects/ChrysalIDE/js/nodes/edge.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 5,
+      "H:/projects/ChrysalIDE/js/nodes/nodemode.js": 6,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 1
+    },
+    "flashlight_fraction": {
+      "H:/projects/ChrysalIDE/js/dropdown/dropdown_v2_0_1.js": 3,
+      "H:/projects/ChrysalIDE/js/mandelbrot/mandelbrot_v1_0_1.js": 1
+    },
+    "flashlight_stdev": {
+      "H:/projects/ChrysalIDE/js/dropdown/dropdown_v2_0_1.js": 3,
+      "H:/projects/ChrysalIDE/js/mandelbrot/mandelbrot_v1_0_1.js": 1
+    },
+    "nodeMap": {
+      "H:/projects/ChrysalIDE/js/dropdown/savenet.js": 6,
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 5,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 5,
+      "H:/projects/ChrysalIDE/js/nodes/togglenodestate.js": 1
+    },
+    "edges": {
+      "H:/projects/ChrysalIDE/js/dropdown/savenet.js": 3,
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/connect.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/edge.js": 2
+    },
+    "NodeUUID": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 1
+    },
+    "nodeMode": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 4,
+      "H:/projects/ChrysalIDE/js/mandelbrot/mandelbrot_v1_0_1.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/createnodes/createnodes_v2.js": 2,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/edge.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 5,
+      "H:/projects/ChrysalIDE/js/nodes/nodemode.js": 7,
+      "H:/projects/ChrysalIDE/js/nodes/togglenodestate.js": 1
+    },
+    "nodeMode_v": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 4,
+      "H:/projects/ChrysalIDE/js/mandelbrot/mandelbrot_v1_0_1.js": 3,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 4
+    },
+    "movingNode": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 2,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 2
+    },
+    "nodeTagInput": {
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 1,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": 2
+    },
+    "refTagInput": {
+      "H:/projects/ChrysalIDE/js/zettelkasten/zetcodemirror.js": 1,
+      "H:/projects/ChrysalIDE/js/zettelkasten/zettelkasten_v2.js": 2
+    }
+  },
+  "functions": {
+    "debounce": {
+      "H:/projects/ChrysalIDE/js/dropdown/dropdown_v2_0_1.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/languages/editornode.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llmagent.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/llm/llm_old.js": 1
+    },
+    "encodeHTML": {
+      "H:/projects/ChrysalIDE/js/nodes/definitions/llm/chat/ainodes_v2.js": 1
+    },
+    "decodeHTML": {
+      "H:/projects/ChrysalIDE/js/nodes/definitions/llm/chat/ainodes_v2.js": 1
+    }
+  }
+}

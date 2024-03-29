@@ -1,7 +1,7 @@
 {
-  "name": "neuride-servers",
+  "name": "chrysalide-servers",
   "version": "1.0.0",
-  "description": "Starts all Localhost Servers for Neuride",
+  "description": "Starts all Localhost Servers for ChrysalIDE",
   "main": "start_servers.js",
   "type": "module",
   "scripts": {

@@ -2,7 +2,7 @@
 
 This is an early (not yet working) implementation of MLC through python. When running, it will replace the in browser webLLM.
 
-Before installing the required packages, make sure to install `mlc-ai-nightly` and `mlc-chat-nightly` based on your system's specific hardware and configurations. Follow the instructions provided by MLC AI to do so.
+Before installing the required packages, make sure to install `mlc-ai-nightly` and `mlc-chat-nightly` based on your system'scale specific hardware and configurations. Follow the instructions provided by MLC AI to do so.
 
 [MLC AI Package Instructions](https://mlc.ai/package/)
 

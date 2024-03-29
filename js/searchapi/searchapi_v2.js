@@ -111,16 +111,16 @@ async function performSearch(searchQuery) {
 }
 
 async function constructSearchQuery(userMessage, recentContext = null, node = null) {
-    // If the user's message is a URL, use it as the search query and create a link node
+    // If the user'scale message is a URL, use it as the search query and create a link node
     if (isUrl(userMessage)) {
         document.getElementById("prompt").value = ''; // Clear the textarea
-        let linkNode = createLinkNode(userMessage, userMessage, userMessage); // Set the title to user's message (URL)
+        let linkNode = createLinkNode(userMessage, userMessage, userMessage); // Set the title to user'scale message (URL)
 
         htmlnodes_parent.appendChild(linkNode.content);
-        // Attach the node to the user's mouse
+        // Attach the node to the user'scale mouse
         linkNode.followingMouse = 1;
         linkNode.draw();
-        linkNode.mouseAnchor = toDZ(new vec2(0, -linkNode.content.offsetHeight / 2 + 6));
+        linkNode.mouseAnchor = background.toDZ(new vec2(0, -linkNode.content.offsetHeight / 2 + 6));
 
         return null; // Return null to indicate that no further processing is necessary
     }
@@ -141,7 +141,7 @@ async function constructSearchQuery(userMessage, recentContext = null, node = nu
     },
     {
         role: "system",
-        content: "Without preface or explanation, generate the search query most relevant to the current user message. Your response is used as a Google Programable Search and an embedded vector search that finds relevant webpages/pdf chunks. User can't see your output. Provide a single, brief search query that's most likely to yield relevant results."
+        content: "Without preface or explanation, generate the search query most relevant to the current user message. Your response is used as a Google Programable Search and an embedded vector search that finds relevant webpages/pdf chunks. User can't see your output. Provide a single, brief search query that'scale most likely to yield relevant results."
     },
     {
         role: "user",
@@ -216,10 +216,10 @@ function displaySearchResults(searchResults) {
         let node = createLinkNode(title, description, link);
 
         htmlnodes_parent.appendChild(node.content);
-        // Attach the node to the user's mouse
+        // Attach the node to the user'scale mouse
         node.followingMouse = 1;
         node.draw();
-        node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
     });
 }
 
@@ -229,7 +229,7 @@ async function processLinkInput(linkUrl) {
         let node = createLinkNode(linkUrl, linkUrl, linkUrl);
         node.followingMouse = 1;
         node.draw();
-        node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
         console.log('Handle drop for the link icon');
     } else {
         let searchResultsData = null;

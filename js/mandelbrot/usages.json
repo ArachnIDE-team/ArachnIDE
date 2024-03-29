@@ -1,0 +1,218 @@
+{
+  "files": {
+    "H:/projects/ChrysalIDE/js/aicursor/aicursor.js": {
+      "variables": {
+        "svg": 1
+      },
+      "functions": {
+        "toDZ": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/handledrop.js": {
+      "functions": {
+        "toDZ": 7
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/interface_v2.js": {
+      "variables": {
+        "zoom": 25,
+        "pan": 26,
+        "mousePath": 5,
+        "mousePos": 9,
+        "SVGzoom": 1
+      },
+      "functions": {
+        "updateViewbox": 1,
+        "toZ": 9,
+        "toSVG": 6,
+        "mand_step": 1,
+        "lerp": 2,
+        "render_hair": 1,
+        "toDZ": 3,
+        "windowScaleAndOffset": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/uinodes.js": {
+      "variables": {
+        "pan": 3,
+        "zoom": 1
+      },
+      "functions": {
+        "toDZ": 2
+      }
+    },
+    "H:/projects/ChrysalIDE/js/interface/window.js": {
+      "variables": {
+        "mousePos": 1,
+        "zoom": 1,
+        "mousePath": 1,
+        "svg": 1
+      },
+      "functions": {
+        "toZ": 1,
+        "fromZtoUV": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/neuralapi.js": {
+      "variables": {
+        "zoom": 20,
+        "pan": 19
+      },
+      "functions": {
+        "toZ": 4,
+        "updateViewbox": 4,
+        "toDZ": 2,
+        "generateBoundaryPoints": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/media/audio.js": {
+      "functions": {
+        "toDZ": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/media/video.js": {
+      "functions": {
+        "toDZ": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/text.js": {
+      "variables": {
+        "zoom": 1,
+        "pan": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/wolfram.js": {
+      "functions": {
+        "toDZ": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/definitions/workspace/explorer.js": {
+      "functions": {
+        "toDZ": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/diagram.js": {
+      "variables": {
+        "pan": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/edge.js": {
+      "functions": {
+        "toSVG": 9
+      }
+    },
+    "H:/projects/ChrysalIDE/js/nodes/node.js": {
+      "variables": {
+        "zoom": 4,
+        "mousePos": 3,
+        "svg": 1
+      },
+      "functions": {
+        "mandGrad": 1,
+        "toZ": 4,
+        "windowScaleAndOffset": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/record/record_v1.js": {
+      "functions": {
+        "toDZ": 1
+      }
+    },
+    "H:/projects/ChrysalIDE/js/searchapi/searchapi_v2.js": {
+      "functions": {
+        "toDZ": 3
+      }
+    },
+    "H:/projects/ChrysalIDE/js/searchapi/wikipedia.js": {
+      "functions": {
+        "toDZ": 1
+      }
+    }
+  },
+  "variables": {
+    "svg": {
+      "H:/projects/ChrysalIDE/js/aicursor/aicursor.js": 1,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 1
+    },
+    "zoom": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 25,
+      "H:/projects/ChrysalIDE/js/interface/uinodes.js": 1,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 1,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 20,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/text.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 4
+    },
+    "pan": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 26,
+      "H:/projects/ChrysalIDE/js/interface/uinodes.js": 3,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 19,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/text.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/diagram.js": 1
+    },
+    "mousePath": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 5,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 1
+    },
+    "mousePos": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 9,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 3
+    },
+    "SVGzoom": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 1
+    }
+  },
+  "functions": {
+    "toDZ": {
+      "H:/projects/ChrysalIDE/js/aicursor/aicursor.js": 1,
+      "H:/projects/ChrysalIDE/js/interface/handledrop.js": 7,
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 3,
+      "H:/projects/ChrysalIDE/js/interface/uinodes.js": 2,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 2,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/media/audio.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/media/video.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/wolfram.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/definitions/workspace/explorer.js": 1,
+      "H:/projects/ChrysalIDE/js/record/record_v1.js": 1,
+      "H:/projects/ChrysalIDE/js/searchapi/searchapi_v2.js": 3,
+      "H:/projects/ChrysalIDE/js/searchapi/wikipedia.js": 1
+    },
+    "updateViewbox": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 1,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 4
+    },
+    "toZ": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 9,
+      "H:/projects/ChrysalIDE/js/interface/window.js": 1,
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 4,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 4
+    },
+    "toSVG": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 6,
+      "H:/projects/ChrysalIDE/js/nodes/edge.js": 9
+    },
+    "mand_step": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 1
+    },
+    "lerp": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 2
+    },
+    "render_hair": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 1
+    },
+    "windowScaleAndOffset": {
+      "H:/projects/ChrysalIDE/js/interface/interface_v2.js": 1,
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 1
+    },
+    "fromZtoUV": {
+      "H:/projects/ChrysalIDE/js/interface/window.js": 1
+    },
+    "generateBoundaryPoints": {
+      "H:/projects/ChrysalIDE/js/neuralapi.js": 1
+    },
+    "mandGrad": {
+      "H:/projects/ChrysalIDE/js/nodes/node.js": 1
+    }
+  }
+}

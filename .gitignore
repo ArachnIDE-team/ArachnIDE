@@ -7,5 +7,6 @@ package-lock.json
 TO-DO.md
 DEV-PROMPTS.md
 workspaces.json
+.chrysalIDE*/
 .neurIDE*/
 samples

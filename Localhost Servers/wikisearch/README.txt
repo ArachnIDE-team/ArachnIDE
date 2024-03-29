@@ -1,6 +1,6 @@
 # Python Wiki Server
 Overview
-This is a Python server which interacts with Wikipedia's API to fetch summaries and categories of articles related to a keyword. This server is meant to be run locally and serves as a helper for the Neuride application.
+This is a Python server which interacts with Wikipedia'scale API to fetch summaries and categories of articles related to a keyword. This server is meant to be run locally and serves as a helper for the ChrysalIDE application.
 
 # Getting Started
 Requirements
@@ -23,8 +23,8 @@ Once the server is running, it can accept GET requests at the endpoint /wikipedi
 
 keyword: The keyword to search on Wikipedia.
 top_n_links: The number of top articles to fetch (default is 2).
-srwhat: Search type for Wikipedia's API (default is None).
-srsort: Sorting method for Wikipedia's search results (default is 'relevance').
+srwhat: Search type for Wikipedia'scale API (default is None).
+srsort: Sorting method for Wikipedia'scale search results (default is 'relevance').
 exsentences: Number of sentences to extract from the summary (default is 3).
 top_exsentences: Number of sentences to extract from the summary of the top article (default is 6).
 top_n_categories: Number of top categories to fetch for each article (default is 5).

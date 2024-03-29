@@ -180,7 +180,7 @@ class JSONParser extends BaseParser {
 class CPPParser extends BaseParser {
     findChunks() {
         // C++ can be chunked by class, struct, or function definitions
-        const classFuncRegex = /(^|\n)(class|struct)\s+\w+\s*{[\s\S]*?}|\w+\s+\w+\(.*\)\s*{[\s\S]*?}/g;
+        const classFuncRegex = /(^|\n)(class|struct)\scale+\w+\scale*{[\scale\S]*?}|\w+\scale+\w+\(.*\)\scale*{[\scale\S]*?}/g;
         return this.text.match(classFuncRegex) || [];
     }
 }
@@ -188,7 +188,7 @@ class CPPParser extends BaseParser {
 class JavaParser extends BaseParser {
     findChunks() {
         // Java can be chunked by class or method definitions
-        const classMethodRegex = /(^|\n)public\s+(class|void|int|String|[\w<>]+)\s+\w+\s*(\{?|[^;])/g;
+        const classMethodRegex = /(^|\n)public\scale+(class|void|int|String|[\w<>]+)\scale+\w+\scale*(\{?|[^;])/g;
         return this.text.match(classMethodRegex) || [];
     }
 }
@@ -196,7 +196,7 @@ class JavaParser extends BaseParser {
 class PHPParser extends BaseParser {
     findChunks() {
         // PHP can be chunked by functions and classes
-        const phpRegex = /(^|\n)\s*(function|class)\s+\w+/g;
+        const phpRegex = /(^|\n)\scale*(function|class)\scale+\w+/g;
         return this.text.match(phpRegex) || [];
     }
 }
@@ -204,7 +204,7 @@ class PHPParser extends BaseParser {
 class RubyParser extends BaseParser {
     findChunks() {
         // Ruby can be chunked by method definitions or class/module definitions
-        const rubyRegex = /(^|\n)(def\s+\w+|class\s+\w+|module\s+\w+)/g;
+        const rubyRegex = /(^|\n)(def\scale+\w+|class\scale+\w+|module\scale+\w+)/g;
         return this.text.match(rubyRegex) || [];
     }
 }
@@ -212,7 +212,7 @@ class RubyParser extends BaseParser {
 class TypeScriptParser extends BaseParser {
     findChunks() {
         // TypeScript can be chunked by class and interface definitions, as well as functions
-        const tsRegex = /(^|\n)\s*(async\s+)?function\s+\w+\s*\(.*\)\s*\{[\s\S]*?\}|class\s+\w+\s*\{[\s\S]*?\}|interface\s+\w+\s*\{[\s\S]*?\}/gm;
+        const tsRegex = /(^|\n)\scale*(async\scale+)?function\scale+\w+\scale*\(.*\)\scale*\{[\scale\S]*?\}|class\scale+\w+\scale*\{[\scale\S]*?\}|interface\scale+\w+\scale*\{[\scale\S]*?\}/gm;
         return this.text.match(tsRegex) || [];
     }
 }
@@ -220,7 +220,7 @@ class TypeScriptParser extends BaseParser {
 class YAMLParser extends BaseParser {
     findChunks() {
         // YAML can be chunked by documents separated by '---'
-        const yamlRegex = /(^|\n)---\s*\n[\s\S]*?(?=\n---\s*\n|$)/g;
+        const yamlRegex = /(^|\n)---\scale*\n[\scale\S]*?(?=\n---\scale*\n|$)/g;
         return this.text.match(yamlRegex) || [this.text];
     }
 }
@@ -341,7 +341,7 @@ function githubChunkText(text, maxLength, overlapSize) {
                 // Edge case handling: what if the split point is in the middle of a word?
                 // We find the previous whitespace or line break to ensure we don't split words.
                 let lastGoodSplitPoint = splitPoint;
-                while (lastGoodSplitPoint > 0 && !/\s/.test(currentLine[lastGoodSplitPoint])) {
+                while (lastGoodSplitPoint > 0 && !/\scale/.test(currentLine[lastGoodSplitPoint])) {
                     lastGoodSplitPoint--;
                 }
 
@@ -351,7 +351,7 @@ function githubChunkText(text, maxLength, overlapSize) {
                     // Save the rest for the next chunk
                     currentLine = currentLine.substring(lastGoodSplitPoint);
                 } else {
-                    // If there's no good place to split (a very long word), we split at the max length
+                    // If there'scale no good place to split (a very long word), we split at the max length
                     currentChunk += currentLine.substring(0, splitPoint);
                     currentLine = currentLine.substring(splitPoint);
                 }

@@ -150,7 +150,7 @@ function updateSavedNetworks() {
                 let confirmMessage = `Click 'OK' to delete the save, or 'Cancel' to cancel.`;
 
                 if (confirm(confirmMessage)) {
-                    let softDeleteMessage = `Click 'OK' to remove the workspace from the list, or 'Cancel' to delete the .neurIDE folder and saved files from the workspace.`;
+                    let softDeleteMessage = `Click 'OK' to remove the workspace from the list, or 'Cancel' to delete the .chrysalIDE folder and saved files from the workspace.`;
                     if (confirm(softDeleteMessage)) {
                         // Overwrite logic - update all saves with the matching title
                         FileManagerAPI.deleteWorkspace(titleInput.value).then(()=> {

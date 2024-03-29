@@ -12,7 +12,7 @@ class AiCursor {
     }
 
     calculateViewboxCenter() {
-        let svgbb = svg.getBoundingClientRect();
+        let svgbb = background.svg.getBoundingClientRect();
         return new vec2(svgbb.width / 2, svgbb.height / 2);
     }
 
@@ -22,7 +22,7 @@ class AiCursor {
         this.aiNode.pos = this.initialPosition;
         this.aiNode.aiCursor = this;
         this.followingAiCursor = true;
-        this.aiNode.aiCursorAnchor = toDZ(new vec2(0, -this.aiNode.content.offsetHeight / 2 + 6));
+        this.aiNode.aiCursorAnchor = background.toDZ(new vec2(0, -this.aiNode.content.offsetHeight / 2 + 6));
         this.aiNode.aiCursorAnchor = this.aiCursorAnchor;
     }
 

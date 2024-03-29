@@ -1,6 +1,6 @@
 Wolfram Alpha API Server
 Overview
-This is a Node.js server that uses Wolfram Alpha's API to fetch results based on a user query. This server is meant to be run locally and acts as an intermediary between the user's application and the Wolfram Alpha API.
+This is a Node.js server that uses Wolfram Alpha'scale API to fetch results based on a user query. This server is meant to be run locally and acts as an intermediary between the user'scale application and the Wolfram Alpha API.
 
 Getting Started
 Requirements

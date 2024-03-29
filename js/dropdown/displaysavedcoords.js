@@ -25,7 +25,7 @@ function appendViewsToContainer(views, containerId, startIndex) {
         coordElement.classList.add('saved-coordinate-item');
 
         coordElement.addEventListener('click', () => {
-            neurideReturnToSavedView(view);
+            chrysalideReturnToSavedView(view);
 
             // Update selected state
             document.querySelectorAll('.saved-coordinate-item').forEach(div => {

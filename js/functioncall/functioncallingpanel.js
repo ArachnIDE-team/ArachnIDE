@@ -50,7 +50,7 @@ CodeMirror.defineMode("ignoreCodeBlocks", function (config) {
             if (stream.match(/^\w+/)) {
                 var currentToken = stream.current();
                 if (functionNameList.includes(currentToken)) {
-                    return "neuride-function-name"; // Custom style for function names
+                    return "chrysalide-function-name"; // Custom style for function names
                 }
                 stream.backUp(currentToken.length); // Back up to reprocess this token in jsMode
             }
@@ -72,7 +72,7 @@ CodeMirror.defineMode("ignoreCodeBlocks", function (config) {
     };
 });
 
-const neurideFunctionCM = CodeMirror.fromTextArea(document.getElementById('neuride-function-cm'), {
+const chrysalideFunctionCM = CodeMirror.fromTextArea(document.getElementById('chrysalide-function-cm'), {
     mode: "ignoreCodeBlocks", // Use the custom mode
     lineNumbers: false,
     lineWrapping: true,
@@ -82,28 +82,28 @@ const neurideFunctionCM = CodeMirror.fromTextArea(document.getElementById('neuri
 });
 
 // Add class to the CodeMirror wrapper
-neurideFunctionCM.display.wrapper.classList.add('neuride-function-cm-style');
+chrysalideFunctionCM.display.wrapper.classList.add('chrysalide-function-cm-style');
 // Function to update the content of the CodeMirror instance
-function updateNeurideFunctionCMContent(content) {
-    neurideFunctionCM.setValue(content);
-    neurideFunctionCM.refresh();
+function updateChrysalIDEFunctionCMContent(content) {
+    chrysalideFunctionCM.setValue(content);
+    chrysalideFunctionCM.refresh();
 }
 
 let userScrolledUpFunctionPanel = false;
 
 // Scroll event listener
-neurideFunctionCM.on("scroll", function () {
-    var scrollInfo = neurideFunctionCM.getScrollInfo();
+chrysalideFunctionCM.on("scroll", function () {
+    var scrollInfo = chrysalideFunctionCM.getScrollInfo();
     var atBottom = scrollInfo.height - scrollInfo.top - scrollInfo.clientHeight < 1;
     userScrolledUpFunctionPanel = !atBottom;
 });
 
 // Change event listener
-neurideFunctionCM.on("change", function () {
+chrysalideFunctionCM.on("change", function () {
     if (!userScrolledUpFunctionPanel) {
         // Scroll to the bottom
-        var scrollInfo = neurideFunctionCM.getScrollInfo();
-        neurideFunctionCM.scrollTo(null, scrollInfo.height);
+        var scrollInfo = chrysalideFunctionCM.getScrollInfo();
+        chrysalideFunctionCM.scrollTo(null, scrollInfo.height);
     }
 });
 
@@ -145,8 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // Global log collector
 let logCollector = [];
 
-function runNeurideCode() {
-    const code = neurideFunctionCM.getValue();
+function runChrysalIDECode() {
+    const code = chrysalideFunctionCM.getValue();
     const codeBlocks = extractCodeBlocks(code);
     const codeToRun = codeBlocks.length > 0 ? codeBlocks.join('\n') : code;
 
@@ -220,7 +220,7 @@ function runNeurideCode() {
     // Cleanup
     window.onerror = originalOnError;
     updateTitleWithLogs();
-    neurideFunctionCM.setValue('');
+    chrysalideFunctionCM.setValue('');
 }
 
 // Function to update the UI with the current title
@@ -236,7 +236,7 @@ function updateFunctionCallItem(title, itemId, error = null) {
         callData.functionName = title.replace(/<br>/g, '\n'); // Convert <br> back to \n for the data structure
         item.setAttribute('data-call-data', JSON.stringify(callData));
 
-        // Style error logs if there's an error
+        // Style error logs if there'scale an error
         if (error) {
             const errorLogs = item.getElementsByClassName('error-log');
             for (const errorLog of errorLogs) {
@@ -274,7 +274,7 @@ function formatResultAsTitle(result) {
         titleString = result.toString();
     }
 
-    // Truncate the title if it's too long
+    // Truncate the title if it'scale too long
     if (titleString.length > 200) {
         titleString = titleString.substring(0, 197) + '...';
     }
@@ -290,7 +290,7 @@ function generateUUID() {
 }
 
 function addFunctionCallItem(functionName, code, isError = false) {
-    const currentCoords = neurideGetMandelbrotCoords(); // Get current coordinates
+    const currentCoords = chrysalideGetMandelbrotCoords(); // Get current coordinates
 
     const item = document.createElement('div');
     item.classList.add('function-call-item');
@@ -313,7 +313,7 @@ function addFunctionCallItem(functionName, code, isError = false) {
     };
     item.setAttribute('data-call-data', JSON.stringify(callData));
 
-    // Add a specific class if it's an error
+    // Add a specific class if it'scale an error
     if (isError) {
         item.classList.add('error-item');
 
@@ -369,7 +369,7 @@ function clearActiveStates() {
 
 function generateTitleForCode(code) {
     // Regular expressions for block and line comments
-    const blockCommentRegex = /\/\*([\s\S]*?)\*\//;
+    const blockCommentRegex = /\/\*([\scale\S]*?)\*\//;
     const lineCommentRegex = /\/\/(.*)/;
 
     // Find matches for both comment types
@@ -393,7 +393,7 @@ function generateTitleForCode(code) {
 }
 
 const functionRunButton = document.getElementById('function-run-button');
-functionRunButton.addEventListener('click', runNeurideCode);
+functionRunButton.addEventListener('click', runChrysalIDECode);
 
 const functionCallList = document.querySelector('.function-call-list');
 
@@ -401,15 +401,15 @@ functionCallList.addEventListener('click', function (event) {
     // Check if the clicked target is a div
     if (event.target.tagName === 'DIV') {
         if (event.target.classList.contains('active-state')) {
-            neurideFunctionCM.setValue('');
+            chrysalideFunctionCM.setValue('');
             // If the div becomes active, repopulate the CodeMirror
             const originalText = event.target.originalText;
             if (originalText) {
-                updateNeurideFunctionCMContent(originalText);
+                updateChrysalIDEFunctionCMContent(originalText);
             }
         } else {
             // Clear the CodeMirror content if the div is not active
-            neurideFunctionCM.setValue('');
+            chrysalideFunctionCM.setValue('');
         }
     }
 });
@@ -418,11 +418,11 @@ functionCallList.addEventListener('click', function (event) {
 
 function extractCodeBlocks(code) {
     // Regular expression to match code blocks enclosed in triple backticks, ignoring any language label
-    const blockDelimiter = /```.*?\n([\s\S]*?)```/g;
+    const blockDelimiter = /```.*?\n([\scale\S]*?)```/g;
     const matches = code.match(blockDelimiter) || [];
     return matches.map(block => {
         // Extract the content within the backticks, excluding the language label
-        const contentMatch = block.match(/```.*?\n([\s\S]*?)```/);
+        const contentMatch = block.match(/```.*?\n([\scale\S]*?)```/);
         return contentMatch ? contentMatch[1].trim() : '';
     });
 }

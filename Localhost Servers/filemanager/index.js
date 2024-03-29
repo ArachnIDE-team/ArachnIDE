@@ -14,9 +14,9 @@ console.log("Startup filemanager: ", JSON.parse(workspacesJSONFile.content));
 
 function initializeWorkspaceFolder(folder, diagram) {
     let workspaceID = uuidv4();
-    let workspaceExternalFolder = new fs.Node(path.join(folder, ".neurIDE." + workspaceID));
+    let workspaceExternalFolder = new fs.Node(path.join(folder, ".chrysalIDE." + workspaceID));
     workspaceExternalFolder.mkdir();
-    let workspaceJSONFile = new fs.Node(path.join(workspaceExternalFolder.path,  "neurIDE.workspace.json"));
+    let workspaceJSONFile = new fs.Node(path.join(workspaceExternalFolder.path,  "chrysalIDE.workspace.json"));
     let folderNode = new fs.Node(folder);
     workspaceJSONFile.content = JSON.stringify({rootFolder: folderNode.path, id: workspaceID, diagram}, null, 2)
     return workspaceJSONFile.path;

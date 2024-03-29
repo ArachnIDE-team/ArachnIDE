@@ -7,8 +7,8 @@ class NeuralTelemetry {
 
     // Method to directly fetch current Mandelbrot coordinates
     getCurrentMandelbrotCoords() {
-        // Assuming neurideGetMandelbrotCoords is a globally available function
-        const coords = neurideGetMandelbrotCoords();
+        // Assuming chrysalideGetMandelbrotCoords is a globally available function
+        const coords = chrysalideGetMandelbrotCoords();
         return {
             zoom: coords.zoom,
             pan: coords.pan
@@ -145,7 +145,7 @@ async function performSequence(animations) {
     });
 
     // Execute the queue of animations
-    await neurideAnimationQueue(transformedAnimations);
+    await chrysalideAnimationQueue(transformedAnimations);
 }`,
         examples: [
             `// Expected Input Format for animations:
@@ -155,7 +155,7 @@ async function performSequence(animations) {
 //     ...
 // ]`,
             `// An Example of how to use performSequence(animations)
-async function neurideExploreSequence() {
+async function chrysalideExploreSequence() {
     try {
         const animations = [
             // Edge of Scepter Valley (Disc 3)
@@ -177,11 +177,11 @@ async function neurideExploreSequence() {
         await performSequence(animations);  // Utilize performSequence to await each call in const animations.
         console.log("Sequence completed!");
     } catch (error) {
-        console.error("An error occurred during the Neuride exploration sequence:", error);
+        console.error("An error occurred during the ChrysalIDE exploration sequence:", error);
     }
 }
 
-neurideExploreSequence()`
+chrysalideExploreSequence()`
         ],
         options: { neuralApi: true, vision: true }
     },
@@ -323,14 +323,14 @@ async function furtherMovementSequence() {
 }
 
 // Combine the sequences with the Zettelkasten call in between
-async function completeNeurideInteraction() {
+async function completeChrysalIDEInteraction() {
     await initialSequence();
     callZettelkasten();
     await furtherMovementSequence();
 }
 
 // Execute the complete interaction
-completeNeurideInteraction();`
+completeChrysalIDEInteraction();`
         ],
         options: { neuralApi: true, vision: false }
     },
@@ -354,8 +354,8 @@ function constructPromptWithFunctions(functions, forVision = false) {
 }
 
 function functionBasePrompt() {
-    return `/* Neuride API Documentation
-You write code that is executed within the fractal mind mapping interface, Neuride.
+    return `/* ChrysalIDE API Documentation
+You write code that is executed within the fractal mind mapping interface, ChrysalIDE.
 
 REMEMBER, creativity, format, substance, etc... As you are a transformer architecture, each token generation is a chance to grow computational context. UTILIZE available JAVASCRIPT FUNCTIONALITY*/`;
 }
@@ -363,7 +363,7 @@ REMEMBER, creativity, format, substance, etc... As you are a transformer archite
 function neuralApiPrompt() {
     let prompt = functionBasePrompt();
     prompt += constructPromptWithFunctions(functionObjects, false);
-    prompt += `\n/* The creation of text notes and prompts to the zettelkasten can be called BOTH inside and/or outside of Neuride's async function performSequence(animations)
+    prompt += `\n/* The creation of text notes and prompts to the zettelkasten can be called BOTH inside and/or outside of ChrysalIDE's async function performSequence(animations)
 For example, you can either use promptZettelkasten within a performSequence such that there are no animations during the response, or call promptZettelkasten outside of a performSequence such that the Ai response and movements coordinate.
 The setting of coords, movement, zoomToTitle, etc. are ALWAYS CALLED within performSequence */`;
     return prompt;
@@ -373,14 +373,14 @@ function visionPrompt() {
     let prompt = functionBasePrompt();
     prompt += constructPromptWithFunctions(functionObjects, true);
     prompt += `\n/* Vision Specific Guidelines */\n
-You TAKE ACTION based off the provided SCREENSHOTS of Neuride's interface.`;
+You TAKE ACTION based off the provided SCREENSHOTS of ChrysalIDE's interface.`;
     return prompt;
 }
 
 // Usage
-const neurideNeuralApiPrompt = neuralApiPrompt();
-const neurideNeuralVisionPrompt = visionPrompt();
+const chrysalideNeuralApiPrompt = neuralApiPrompt();
+const chrysalideNeuralVisionPrompt = visionPrompt();
 
 // Example console log
-//console.log(neurideNeuralApiPrompt);
-//console.log(neurideNeuralVisionPrompt);
+//console.log(chrysalideNeuralApiPrompt);
+//console.log(chrysalideNeuralVisionPrompt);

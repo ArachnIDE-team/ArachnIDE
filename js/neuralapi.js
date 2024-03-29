@@ -49,46 +49,46 @@ function easeInOutCubic(t) {
 
 
 
-function neurideZoom(zoomFactor, targetX = window.innerWidth / 2, targetY = window.innerHeight / 2, duration = 1000) {
-    const dest = toZ(new vec2(targetX, targetY));
+function chrysalideZoom(zoomFactor, targetX = window.innerWidth / 2, targetY = window.innerHeight / 2, duration = 1000) {
+    const dest = background.toZ(new vec2(targetX, targetY));
     const adjustedZoomFactor = 1 / zoomFactor;
 
-    const startZoom = zoom;
+    const startZoom = background.zoom;
     const endZoom = startZoom.scale(adjustedZoomFactor);
-    const startPan = pan;
+    const startPan = background.pan;
     const endPan = dest.scale(1 - adjustedZoomFactor).plus(startPan.scale(adjustedZoomFactor));
 
     animateTransition(0, 1, duration, (t) => {
-        zoom = linterpolateVec2(startZoom.clog(), endZoom.clog(), t).cexp();
-        pan = interpolateVec2(startPan, endPan, t);
-        updateViewbox();
+        background.zoom = linterpolateVec2(startZoom.clog(), endZoom.clog(), t).cexp();
+        background.pan = interpolateVec2(startPan, endPan, t);
+        background.updateViewbox();
     }, easeInOutCubic);
 }
 
-function neuridePan(deltaX, deltaY, duration = 1000) {
-    const dp = toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
-    const startPan = pan;
+function chrysalidePan(deltaX, deltaY, duration = 1000) {
+    const dp = background.toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
+    const startPan = background.pan;
     const endPan = startPan.plus(dp);
 
     animateTransition(0, 1, duration, (t) => {
-        pan = interpolateVec2(startPan, endPan, t);
-        updateViewbox();
+        background.pan = interpolateVec2(startPan, endPan, t);
+        background.updateViewbox();
     }, easeInOutCubic);
 }
 
-function neurideRotate(rotationAngle, pivotX, pivotY, duration = 1000) {
-    const p = toZ(new vec2(pivotX, pivotY));
-    const zc = p.minus(pan);
+function chrysalideRotate(rotationAngle, pivotX, pivotY, duration = 1000) {
+    const p = background.toZ(new vec2(pivotX, pivotY));
+    const zc = p.minus(background.pan);
     const r = new vec2(Math.cos(rotationAngle), Math.sin(rotationAngle));
-    const startZoom = zoom;
+    const startZoom = background.zoom;
     const endZoom = startZoom.cmult(r);
-    const startPan = pan;
+    const startPan = background.pan;
     const endPan = startPan.plus(zc.cmult(new vec2(1, 0).minus(r)));
 
     animateTransition(0, 1, duration, (t) => {
-        zoom = linterpolateVec2(startZoom.clog(), endZoom.clog(), t).cexp();
-        pan = interpolateVec2(startPan, endPan, t);
-        updateViewbox();
+        background.zoom = linterpolateVec2(startZoom.clog(), endZoom.clog(), t).cexp();
+        background.pan = interpolateVec2(startPan, endPan, t);
+        background.updateViewbox();
     }, easeInOutCubic);
 }
 
@@ -107,7 +107,7 @@ const defaultMovements = {
     // Add more default movements as needed
 };
 
-function neurideMovement(movementTypes = [], customZoomParams = {}, customPanParams = {}, customRotateParams = {}, customDuration = 1000) {
+function chrysalideMovement(movementTypes = [], customZoomParams = {}, customPanParams = {}, customRotateParams = {}, customDuration = 1000) {
     return new Promise((resolve, reject) => {
         activeAnimationsCount++;
 
@@ -145,14 +145,14 @@ function neurideMovement(movementTypes = [], customZoomParams = {}, customPanPar
         const isRotationNeeded = rotationAngle !== null;
 
         // Starting states
-        const startZoom = zoom;
-        const startPan = pan;
+        const startZoom = background.zoom;
+        const startPan = background.pan;
 
         // Calculate final states for zoom and pan
-        const destZoom = toZ(new vec2(zoomX, zoomY));
+        const destZoom = background.toZ(new vec2(zoomX, zoomY));
         const adjustedZoomFactor = 1 + zoomFactor; // Adjusted zoom factor
         const finalZoom = startZoom.scale(adjustedZoomFactor);
-        const dp = toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
+        const dp = background.toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
         const finalPan = startPan.plus(dp);
 
         // Rotation calculations
@@ -163,20 +163,20 @@ function neurideMovement(movementTypes = [], customZoomParams = {}, customPanPar
         try {
             animateTransition(0, 1, duration, (t) => {
                 // Interpolate zoom and pan
-                zoom = linterpolateVec2(startZoom.clog(), finalZoom.clog(), t).cexp();
-                pan = interpolateVec2(startPan, finalPan, t);
+                background.zoom = linterpolateVec2(startZoom.clog(), finalZoom.clog(), t).cexp();
+                background.pan = interpolateVec2(startPan, finalPan, t);
 
                 // Apply rotation only if needed
                 if (isRotationNeeded) {
                     const currentRotation = interpolate(startRotation, endRotation, t);
-                    const pivot = toZ(new vec2(pivotX, pivotY));
-                    const zc = pivot.minus(pan);
+                    const pivot = background.toZ(new vec2(pivotX, pivotY));
+                    const zc = pivot.minus(background.pan);
                     const r = new vec2(Math.cos(currentRotation), Math.sin(currentRotation));
-                    zoom = zoom.cmult(r);
-                    pan = pan.plus(zc.cmult(new vec2(1, 0).minus(r)));
+                    background.zoom = background.zoom.cmult(r);
+                    background.pan = background.pan.plus(zc.cmult(new vec2(1, 0).minus(r)));
                 }
 
-                updateViewbox();
+                background.updateViewbox();
             }, easeInOutCubic, () => {
                 activeAnimationsCount--;
                 console.log("Animation completed, count:", activeAnimationsCount);
@@ -198,7 +198,7 @@ autopilotReferenceFrame = this;
 panToI = new vec2(0, 0); */
 
 
-function neurideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, speed = 0.1) {
+function chrysalideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, speed = 0.1) {
     return new Promise((resolve) => {
         let animate = true
 
@@ -209,7 +209,7 @@ function neurideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, speed 
         if (animate) {
             activeAnimationsCount++;
             autopilotReferenceFrame = undefined;
-            const targetZoom = zoom.scale(newZoomMagnitude / zoom.mag());
+            const targetZoom = background.zoom.scale(newZoomMagnitude / background.zoom.mag());
             const targetPan = new vec2(newPanReal, newPanImaginary);
 
             if (speed > 1) {
@@ -239,7 +239,7 @@ function neurideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, speed 
                         console.log("Animation interrupted by user interaction.");
                         return true; // Indicate that the animation should be terminated
                     }
-                    return zoom.closeEnough(targetZoom, autopilotThreshold) && pan.closeEnough(targetPan, autopilotThreshold);
+                    return background.zoom.closeEnough(targetZoom, autopilotThreshold) && background.pan.closeEnough(targetPan, autopilotThreshold);
                 });
             } catch (error) {
                 console.error("Error in animation:", error);
@@ -250,9 +250,9 @@ function neurideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, speed 
         } else {
             // Directly set the new zoom and pan values
             if (newZoomMagnitude !== 0) {
-                zoom = zoom.scale(newZoomMagnitude / zoom.mag());
+                background.zoom = background.zoom.scale(newZoomMagnitude / background.zoom.mag());
             }
-            pan = new vec2(newPanReal, newPanImaginary);
+            background.pan = new vec2(newPanReal, newPanImaginary);
             resolve(); // Resolve immediately for non-animated change
         }
     });
@@ -266,7 +266,7 @@ vec2.prototype.closeEnough = function (target, autopilotThreshold) {
 };
 
 
-function neurideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
+function chrysalideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
     return new Promise((resolve) => {
         activeAnimationsCount++;
         autopilotReferenceFrame = undefined;
@@ -323,7 +323,7 @@ function neurideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
     });
 }
 
-async function neurideSearchNotes(searchTerm, maxNodesOverride = null) {
+async function chrysalideSearchNotes(searchTerm, maxNodesOverride = null) {
     const nodesArray = Object.values(nodes); // Assuming this contains full node objects
 
     // Clear previous search highlights
@@ -358,17 +358,17 @@ async function neurideSearchNotes(searchTerm, maxNodesOverride = null) {
 }
 
 
-async function neurideSearchAndZoom(searchTerm, maxNodesOverride = null, zoomLevel = 1.0, delayBetweenNodes = 2000) {
+async function chrysalideSearchAndZoom(searchTerm, maxNodesOverride = null, zoomLevel = 1.0, delayBetweenNodes = 2000) {
     return new Promise(async (resolve, reject) => {
         try {
             activeAnimationsCount++;
 
             // Search for nodes based on the searchTerm
-            const matchedNodes = await neurideSearchNotes(searchTerm, maxNodesOverride);
+            const matchedNodes = await chrysalideSearchNotes(searchTerm, maxNodesOverride);
 
             // Loop through each matched node and zoom to it
             for (const node of matchedNodes) {
-                await neurideZoomToNodeTitle(node, zoomLevel);
+                await chrysalideZoomToNodeTitle(node, zoomLevel);
 
                 // Wait for the specified delay before moving to the next node
                 await new Promise(r => setTimeout(r, delayBetweenNodes));
@@ -387,23 +387,23 @@ async function neurideSearchAndZoom(searchTerm, maxNodesOverride = null, zoomLev
 
 
 // Example usage
-// neurideSearchAndZoom("desired search term", null, 1.0, 3000);
+// chrysalideSearchAndZoom("desired search term", null, 1.0, 3000);
 
-function neurideResetView(animate = true, duration = 2000) {
+function chrysalideResetView(animate = true, duration = 2000) {
     return new Promise((resolve, reject) => {
         const defaultZoomMagnitude = 1.3;
         const defaultPanReal = -0.3;
         const defaultPanImaginary = 0;
 
-        const defaultZoom = zoom.scale(defaultZoomMagnitude / zoom.mag());
+        const defaultZoom = background.zoom.scale(defaultZoomMagnitude / background.zoom.mag());
         const defaultPan = new vec2(defaultPanReal, defaultPanImaginary);
 
         if (animate) {
             activeAnimationsCount++;
             try {
                 animateTransition(0, 1, duration, (t) => {
-                    zoom = interpolateVec2(zoom, defaultZoom, t);
-                    pan = interpolateVec2(pan, defaultPan, t);
+                    background.zoom = interpolateVec2(background.zoom, defaultZoom, t);
+                    background.pan = interpolateVec2(background.pan, defaultPan, t);
                 }, easeInOutCubic, () => {
                     activeAnimationsCount--;
                     console.log("Animation completed, count:", activeAnimationsCount);
@@ -415,18 +415,18 @@ function neurideResetView(animate = true, duration = 2000) {
                 reject(error); // Reject the promise in case of an error
             }
         } else {
-            zoom = defaultZoom;
-            pan = defaultPan;
+            background.zoom = defaultZoom;
+            background.pan = defaultPan;
             resolve(); // Resolve immediately for non-animated changes
         }
     });
 }
 
-function neurideGetMandelbrotCoords(forFunctionCall = false) {
+function chrysalideGetMandelbrotCoords(forFunctionCall = false) {
     // Extract and format zoom and pan values
-    const zoomValue = zoom.x.toString();
-    const panReal = pan.x.toString();
-    const panImaginary = pan.y.toString();
+    const zoomValue = background.zoom.x.toString();
+    const panReal = background.pan.x.toString();
+    const panImaginary = background.pan.y.toString();
 
     if (forFunctionCall) {
         // Format for setMandelbrotCoords function call
@@ -441,12 +441,12 @@ function neurideGetMandelbrotCoords(forFunctionCall = false) {
     }
 }
 
-function neurideReceiveCurrentView() {
+function chrysalideReceiveCurrentView() {
     // Get current coordinates in standard format
-    const standardCoords = neurideGetMandelbrotCoords();
+    const standardCoords = chrysalideGetMandelbrotCoords();
 
     // Get current coordinates in function call format
-    const functionCallFormat = neurideGetMandelbrotCoords(true);
+    const functionCallFormat = chrysalideGetMandelbrotCoords(true);
 
     // Prompt user for a title for the saved view
     const title = prompt("Enter a title for the saved view:");
@@ -578,8 +578,8 @@ function initializeSavedViews() {
 
 initializeSavedViews();
 
-function neurideSaveCurrentView() {
-    const view = neurideReceiveCurrentView();
+function chrysalideSaveCurrentView() {
+    const view = chrysalideReceiveCurrentView();
 
     if (view === null) {
         console.log("View save cancelled by user.");
@@ -602,18 +602,18 @@ function neurideSaveCurrentView() {
 }
 
 document.getElementById('saveCoordinatesBtn').addEventListener('click', function () {
-    neurideSaveCurrentView();
+    chrysalideSaveCurrentView();
 });
 
 document.getElementById('deleteCoordinatesBtn').addEventListener('click', function () {
     if (selectedCoordinateIndex !== null) {
-        neurideDeleteSavedView(selectedCoordinateIndex);
+        chrysalideDeleteSavedView(selectedCoordinateIndex);
     } else {
         alert('No coordinate selected for deletion.');
     }
 });
 
-function neurideDeleteSavedView(index) {
+function chrysalideDeleteSavedView(index) {
     // Check if the index is within bounds
     if (index !== null && savedViews[index]) {
         // Remove the selected view from the array
@@ -637,15 +637,15 @@ function neurideDeleteSavedView(index) {
 }
 
 
-function neurideReturnToSavedView(savedView, animate = true, speed = 0.0001) {
+function chrysalideReturnToSavedView(savedView, animate = true, speed = 0.0001) {
     if (savedView && savedView.standardCoords) {
         // Extract real and imaginary parts from pan
         const panParts = savedView.standardCoords.pan.split('+i');
         const panReal = parseFloat(panParts[0]);
         const panImaginary = panParts.length > 1 ? parseFloat(panParts[1]) : 0;
 
-        // Call neurideSetMandelbrotCoords with the parsed coordinates
-        neurideSetMandelbrotCoords(
+        // Call chrysalideSetMandelbrotCoords with the parsed coordinates
+        chrysalideSetMandelbrotCoords(
             parseFloat(savedView.standardCoords.zoom),
             panReal,
             panImaginary,
@@ -677,7 +677,7 @@ function selectAndReturnToSavedView(animate = true, speed = 0.1) {
 
     // Return to the selected view with specified animation settings
     if (selectedView) {
-        neurideReturnToSavedView(selectedView, animate, speed);
+        chrysalideReturnToSavedView(selectedView, animate, speed);
     } else {
         console.log("View not found with title:", selectedTitle);
     }
@@ -692,7 +692,7 @@ async function exploreBoundaryPoints({
     methods = ["cardioid", "disk", "spike"],
     promptForSave = false
 }) {
-    const points = generateBoundaryPoints(numPoints, methods);
+    const points = MandelbrotBG._generateBoundaryPoints(numPoints, methods);
     const shuffledPoints = sequential ? points : shuffleArray(points);
 
     for (const point of shuffledPoints) {
@@ -711,7 +711,7 @@ async function exploreBoundaryPoints({
 async function promptToSaveView() {
     const save = confirm("Save this view?");
     if (save) {
-        neurideSaveCurrentView();
+        chrysalideSaveCurrentView();
     }
 }
 
@@ -724,7 +724,7 @@ function shuffleArray(array) {
 }
 
 
-function neurideCaptureScreenshot() {
+function chrysalideCaptureScreenshot() {
     if (window.startedViaPlaywright) {
         // Playwright controlled session, use fetch to request screenshot
         fetch('http://localhost:8081/screenshot')
@@ -744,12 +744,12 @@ function neurideCaptureScreenshot() {
     }
 }
 
-function neurideDelay(delay) {
+function chrysalideDelay(delay) {
     return new Promise(resolve => setTimeout(resolve, delay));
 }
 
 // Verbose Schema
-async function neurideAnimationQueue(animations) {
+async function chrysalideAnimationQueue(animations) {
     for (const animation of animations) {
         const { action, params, delayBefore = 0, delayAfter = 0 } = animation;
 
@@ -770,7 +770,7 @@ async function neurideAnimationQueue(animations) {
 }
 
 // Enchanced to reduce size of request format.
-async function neurideQueueAnimations(animations) {
+async function chrysalideQueueAnimations(animations) {
     // Artificially increment the animation count
     activeAnimationsCount++;
 
@@ -787,7 +787,7 @@ async function neurideQueueAnimations(animations) {
         };
     });
 
-    await neurideAnimationQueue(transformedAnimations);
+    await chrysalideAnimationQueue(transformedAnimations);
 
     // Artificially decrement the animation count
     activeAnimationsCount--;
@@ -809,10 +809,10 @@ async function waitForAllAnimations(additionalDelay = 0) {
     });
 }
 
-document.getElementById('screenshotButton').addEventListener('click', neurideCaptureScreenshot);
+document.getElementById('screenshotButton').addEventListener('click', chrysalideCaptureScreenshot);
 
 
-async function neurideReturnScreenshot() {
+async function chrysalideReturnScreenshot() {
     return new Promise(async (resolve, reject) => {
         if (window.startedViaPlaywright) {
             // Playwright controlled session, use fetch to request screenshot
@@ -839,9 +839,9 @@ async function neurideReturnScreenshot() {
 }
 
 
-async function neurideCallMovementAi(movementIntention, totalIterations = 1, currentIteration = 0) {
+async function chrysalideCallMovementAi(movementIntention, totalIterations = 1, currentIteration = 0) {
     if (currentIteration < totalIterations) {
-        const screenshotBase64 = await neurideReturnScreenshot();
+        const screenshotBase64 = await chrysalideReturnScreenshot();
 
         if (screenshotBase64) {
 
@@ -850,7 +850,7 @@ async function neurideCallMovementAi(movementIntention, totalIterations = 1, cur
             let messages = [
                 {
                     role: 'system',
-                    content: neurideNeuralVisionPrompt
+                    content: chrysalideNeuralVisionPrompt
                 },
                 {
                     role: 'system',
@@ -873,13 +873,13 @@ async function neurideCallMovementAi(movementIntention, totalIterations = 1, cur
 
             try {
                 await callVisionModel(messages, async () => {
-                    runNeurideCode(true); // Run code with increment and decrement of activeAnimations.
+                    runChrysalIDECode(true); // Run code with increment and decrement of activeAnimations.
 
                     // Wait for all animations to complete
                     await waitForAllAnimations();
                     console.log(`awaited`);
                     // Recursive call for the next iteration
-                    await neurideCallMovementAi(movementIntention, totalIterations, currentIteration + 1);
+                    await chrysalideCallMovementAi(movementIntention, totalIterations, currentIteration + 1);
                 });
             } catch (error) {
                 console.error("Error in API call:", error);
@@ -895,7 +895,7 @@ async function neurideCallMovementAi(movementIntention, totalIterations = 1, cur
 /* 
 
 const autopilotThreshold2 = 0.1;
-function neurideZoomToNodeTitle(nodeTitle, zoomLevel = 1.5) {
+function chrysalideZoomToNodeTitle(nodeTitle, zoomLevel = 1.5) {
     return new Promise((resolve, reject) => {
         const cm = window.myCodemirror;
         const node = scrollToTitle(nodeTitle, cm);
@@ -958,7 +958,7 @@ function resolveAiMessageIfAppropriate(response, isError = false) {
     }
 }
 
-async function neuridePromptZettelkasten(message) {
+async function chrysalidePromptZettelkasten(message) {
     activeAnimationsCount++;
     isPromiseResolved = false;
 
@@ -994,7 +994,7 @@ async function neuridePromptZettelkasten(message) {
     return streamedResponse;
 }
 
-function neurideGetUserResponse(message) {
+function chrysalideGetUserResponse(message) {
     // Display a prompt dialog with the specified message
     let userResponse = prompt(message);
 
@@ -1003,11 +1003,11 @@ function neurideGetUserResponse(message) {
 }
 
 
-function neurideAddNote(nodeTitle, nodeText) {
+function chrysalideAddNote(nodeTitle, nodeText) {
     return new Promise((resolve) => {
         activeAnimationsCount++;
         let formattedNodeTitle = nodeTitle.replace(/\n/g, ' ');
-        formattedNodeTitle = neurideGetUniqueNodeTitle(formattedNodeTitle);
+        formattedNodeTitle = chrysalideGetUniqueNodeTitle(formattedNodeTitle);
 
         if (nodeText === undefined || nodeText === null) {
             nodeText = '';
@@ -1042,7 +1042,7 @@ function neurideAddNote(nodeTitle, nodeText) {
     });
 }
 
-function neurideGetUniqueNodeTitle(baseTitle) {
+function chrysalideGetUniqueNodeTitle(baseTitle) {
     let counter = 2;
     let uniqueTitle = baseTitle;
     while (nodeTitleToLineMap.has(uniqueTitle)) {
@@ -1075,63 +1075,63 @@ function initializeFunctionMappings() {
 // Register the base function with its alternate names
 registerFunctions([
     {
-        baseFunctionName: 'neurideAddNote',
-        baseFunction: neurideAddNote,
+        baseFunctionName: 'chrysalideAddNote',
+        baseFunction: chrysalideAddNote,
         alternateNames: ['addNote', 'createNote', 'zettelkastenAddNote', `promptNote`]
     },
     {
-        baseFunctionName: 'neuridePromptZettelkasten',
-        baseFunction: neuridePromptZettelkasten,
+        baseFunctionName: 'chrysalidePromptZettelkasten',
+        baseFunction: chrysalidePromptZettelkasten,
         alternateNames: ['promptZettelkasten', 'zettelkastenPrompt', 'promptZettelkastenAi', 'callZettelkastenAi', `zettelkastenAi`]
     },
     {
-        baseFunctionName: 'neurideGetUserResponse',
-        baseFunction: neurideGetUserResponse,
+        baseFunctionName: 'chrysalideGetUserResponse',
+        baseFunction: chrysalideGetUserResponse,
         alternateNames: ['getUserResponse', 'promptUser', 'requestUserResponse']
     },
     {
-        baseFunctionName: 'neurideZoomToNodeTitle',
-        baseFunction: neurideZoomToNodeTitle,
+        baseFunctionName: 'chrysalideZoomToNodeTitle',
+        baseFunction: chrysalideZoomToNodeTitle,
         alternateNames: ['zoomToNodeTitle', 'focusNode', 'zoomToNote', 'zoomToNoteByTitle', `zoomToNode`]
     },
     {
-        baseFunctionName: 'neurideCallMovementAi',
-        baseFunction: neurideCallMovementAi,
+        baseFunctionName: 'chrysalideCallMovementAi',
+        baseFunction: chrysalideCallMovementAi,
         alternateNames: ['callMovementAi', 'promptMovementAi', 'initiateMovementAi']
     },
     {
-        baseFunctionName: 'neurideQueueAnimations',
-        baseFunction: neurideQueueAnimations,
-        alternateNames: ['queueAnimations', 'performSequence', 'neuridePerformSequence']
+        baseFunctionName: 'chrysalideQueueAnimations',
+        baseFunction: chrysalideQueueAnimations,
+        alternateNames: ['queueAnimations', 'performSequence', 'chrysalidePerformSequence']
     },
     {
-        baseFunctionName: 'neurideResetView',
-        baseFunction: neurideResetView,
+        baseFunctionName: 'chrysalideResetView',
+        baseFunction: chrysalideResetView,
         alternateNames: ['resetView', 'returnToStart', 'reinitializeView']
     },
     {
-        baseFunctionName: 'neurideSetMandelbrotCoords',
-        baseFunction: neurideSetMandelbrotCoords,
+        baseFunctionName: 'chrysalideSetMandelbrotCoords',
+        baseFunction: chrysalideSetMandelbrotCoords,
         alternateNames: ['setMandelbrotCoords', 'updateMandelbrotPosition', 'mandelbrotCoords']
     },
     {
-        baseFunctionName: 'neurideMovement',
-        baseFunction: neurideMovement,
+        baseFunctionName: 'chrysalideMovement',
+        baseFunction: chrysalideMovement,
         alternateNames: ['movement', 'startMovement', 'performMovement']
     },
     {
-        baseFunctionName: 'neurideDelay',
-        baseFunction: neurideDelay,
+        baseFunctionName: 'chrysalideDelay',
+        baseFunction: chrysalideDelay,
         alternateNames: ['delay', 'setDelay']
     },
     {
-        baseFunctionName: 'neurideSearchNotes',
-        baseFunction: neurideSearchNotes,
+        baseFunctionName: 'chrysalideSearchNotes',
+        baseFunction: chrysalideSearchNotes,
         alternateNames: ['searchNotes', 'returnSearchedNodes', `searchNodes`]
     },
     {
-        baseFunctionName: 'neurideSearchAndZoom',
-        baseFunction: neurideSearchAndZoom,
+        baseFunctionName: 'chrysalideSearchAndZoom',
+        baseFunction: chrysalideSearchAndZoom,
         alternateNames: ['searchAndZoom', 'searchZoom', `zoomToRelevantNodes`]
     },
 

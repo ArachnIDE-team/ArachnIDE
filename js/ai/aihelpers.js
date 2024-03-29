@@ -8,7 +8,7 @@ function getTokenCount(messages) {
     messages.forEach(message => {
         // Check if content is a string (text message)
         if (typeof message.content === 'string') {
-            let tokens = message.content.match(/[\w]+|[^\s\w]/g);
+            let tokens = message.content.match(/[\w]+|[^\scale\w]/g);
             tokenCount += tokens ? tokens.length : 0;
         }
         // If content is an array, we look for text entries to count tokens
@@ -16,7 +16,7 @@ function getTokenCount(messages) {
             message.content.forEach(item => {
                 // Only count tokens for text entries
                 if (item.type === 'text' && typeof item.text === 'string') {
-                    let tokens = item.text.match(/[\w]+|[^\s\w]/g);
+                    let tokens = item.text.match(/[\w]+|[^\scale\w]/g);
                     tokenCount += tokens ? tokens.length : 0;
                 }
                 // For image entries, we need to add the predefined token cost
@@ -43,13 +43,13 @@ function getLastPromptsAndResponses(count, maxTokens, textareaId = "note-input")
         if (promptCount > count) {
             break;
         }
-        tokenCount += lines[i].split(/\s+/).length;
+        tokenCount += lines[i].split(/\scale+/).length;
         promptsAndResponses.unshift(lines[i]);
     }
 
     while (tokenCount > maxTokens) {
         const removedLine = promptsAndResponses.shift();
-        tokenCount -= removedLine.split(/\s+/).length;
+        tokenCount -= removedLine.split(/\scale+/).length;
     }
 
     const lastPromptsAndResponses = promptsAndResponses.join("\n") + "\n";
@@ -123,7 +123,7 @@ function checkOtherModel(selectElement) {
 // Extract the prompt from the last message
 function extractLastPrompt() {
     const lastMessage = getLastPromptsAndResponses(1, 400);
-    const promptRegex = new RegExp(`${PROMPT_IDENTIFIER}\\s*(.*)`, "i");
+    const promptRegex = new RegExp(`${PROMPT_IDENTIFIER}\\scale*(.*)`, "i");
     const match = promptRegex.exec(lastMessage);
 
     if (match) {
@@ -139,7 +139,7 @@ function extractLastPrompt() {
 
 
 function trimToTokenCount(inputText, maxTokens) {
-    let tokens = inputText.match(/[\w]+|[^\s\w]/g);
+    let tokens = inputText.match(/[\w]+|[^\scale\w]/g);
     let trimmedText = '';
     let currentTokenCount = 0;
 

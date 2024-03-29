@@ -69,7 +69,6 @@ function connectDistance(na, nb, linkStrength = 0.1, linkStyle = {
     return edge;
 }
 
-
 function getConnectedNodes(node) {
     // Get the connected nodes
     let connectedNodes = node.edges ? node.edges

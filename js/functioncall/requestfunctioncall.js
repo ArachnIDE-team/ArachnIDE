@@ -63,7 +63,7 @@ async function requestFunctionCall() {
 
     const neuralTelemetryPrompt = createTelemetryPrompt(neuralTelemetry, false);
     let systemMessages = [
-        { role: "system", content: neurideNeuralApiPrompt },
+        { role: "system", content: chrysalideNeuralApiPrompt },
         { role: "system", content: neuralTelemetryPrompt }
     ];
 
@@ -112,7 +112,7 @@ async function getFunctionResponse(requestMessages) {
             updateUiForIdleState();
         },
         onStreamingResponse: (content) => {
-            neurideFunctionCM.getDoc().replaceRange(content, CodeMirror.Pos(neurideFunctionCM.lastLine()));
+            chrysalideFunctionCM.getDoc().replaceRange(content, CodeMirror.Pos(chrysalideFunctionCM.lastLine()));
         },
         onError: (error) => {
             functionErrorIcon.style.display = 'block';
@@ -127,7 +127,7 @@ function updateUiForProcessing() {
     functionLoadingIcon.style.display = 'block';
     functionErrorIcon.style.display = 'none';
 
-    neurideFunctionCM.setValue('');
+    chrysalideFunctionCM.setValue('');
 }
 
 function updateUiForIdleState() {

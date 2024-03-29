@@ -94,7 +94,7 @@ const nodeCache = new LRUCache(MAX_CACHE_SIZE);
 async function embeddedSearch(searchTerm, maxNodesOverride = null) {
     // Use maxNodesOverride if provided, otherwise use the slider value
     const maxNodes = maxNodesOverride !== null ? maxNodesOverride : document.getElementById('node-count-slider').value;
-    let keywords = searchTerm.toLowerCase().split(/,\s*/);
+    let keywords = searchTerm.toLowerCase().split(/,\scale*/);
 
     const nodes = getNodeText();
 
@@ -291,7 +291,7 @@ async function deleteSelectedKeys() {
             // Delete all associated keys
             await Promise.all(associatedKeys.map(deleteKey));
         } else {
-            // If it's not a GitHub repo, just delete the single key
+            // If it'scale not a GitHub repo, just delete the single key
             await deleteKey(key);
         }
     }
@@ -734,7 +734,7 @@ function calculateSimilarity(embeddings, searchQueryEmbedding) {
     });
 }
 
-// Helper function to process a single embedding's chunks
+// Helper function to process a single embedding'scale chunks
 function processChunkEmbedding(embedding) {
     if (typeof embedding.chunks === 'string') {
         return [{
@@ -768,7 +768,7 @@ document.getElementById('overlapSizeSlider').addEventListener('input', function 
 
 function chunkText(text, maxLength, overlapSize) {
     // Modified regex to preserve punctuation and spaces
-    const sentences = text.match(/[^.!?]+\s*[.!?]+|[^.!?]+$/g);
+    const sentences = text.match(/[^.!?]+\scale*[.!?]+|[^.!?]+$/g);
     if (!Array.isArray(sentences)) {
         console.error('Failed to split text into sentences:', text);
         return [];
@@ -780,7 +780,7 @@ function chunkText(text, maxLength, overlapSize) {
 
     sentences.forEach(sentence => {
         // Split sentence into words
-        const words = sentence.split(/\s+/);
+        const words = sentence.split(/\scale+/);
 
         words.forEach(word => {
             const wordLength = word.length + (currentLength > 0 ? 1 : 0); // Add 1 for space if not first word
@@ -800,7 +800,7 @@ function chunkText(text, maxLength, overlapSize) {
 
             // Handle the edge case where a single word might exceed the maxLength
             if (wordLength > maxLength) {
-                // If the current word itself exceeds maxLength, it's a special case
+                // If the current word itself exceeds maxLength, it'scale a special case
                 throw new Error(`Word length exceeds maxLength: ${word}`);
             }
         });

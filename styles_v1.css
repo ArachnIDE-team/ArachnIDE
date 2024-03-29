@@ -1876,6 +1876,32 @@ textarea[id^='custom-instructions-textarea-'] {
         transform: none; /* reset size */
     }
 
+
+
+        .system-prompt {
+            background-color: #444556;
+            color: #ceced5;
+            padding: 4px 10px 4px 12px;
+            margin: 15px;
+            display: inline-block;
+            width: auto;
+            -webkit-box-shadow: 0px 0px 20px 6.5px rgba(255, 255, 255, 0.05);
+            -moz-box-shadow: 0px 0px 20px 6.5px rgba(255, 255, 255, 0.05);
+            box-shadow: 0px 0px 20px 6.5px rgba(255, 255, 255, 0.05);
+            cursor: grab;
+            font-family: monospace;
+            white-space: pre;
+            text-align: left;
+            text-wrap: wrap;
+        }
+        .system-prompt.editing {
+            transform: none; /* reset size */
+        }
+        .system-prompt:hover {
+            transform: scale(1.02); /* increase size to 105% on hover */
+            transition: transform 0.3s ease; /* animate the size increase smoothly */
+        }
+
 .response-wrapper {
     display: flex;
     position: relative;
@@ -2063,7 +2089,7 @@ textarea[id^='custom-instructions-textarea-'] {
 
 
 
-.node-panel .neuride-function-cm-style {
+.node-panel .chrysalide-function-cm-style {
     background-color: transparent;
     max-height: 300px; /* Maximum height */
     height: 300px;
@@ -2256,7 +2282,7 @@ textarea[id^='custom-instructions-textarea-'] {
 
 
 
-.cm-neuride-function-name {
+.cm-chrysalide-function-name {
     color: #8e8eff !important;
 }
 

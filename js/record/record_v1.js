@@ -45,7 +45,7 @@ async function captureScreenshot() {
             htmlnodes_parent.appendChild(node.content);
             node.followingMouse = 1;
             node.draw();
-            node.mouseAnchor = toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+            node.mouseAnchor = background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
         };
     } catch (error) {
         console.error('Error:', error);
@@ -116,7 +116,7 @@ async function startRecording() {
 //     // Create a download link for the video
 //     const videoDownloadLink = document.createElement('a');
 //     videoDownloadLink.href = url;
-//     videoDownloadLink.download = "neuriderecord.webm";
+//     videoDownloadLink.download = "chrysaliderecord.webm";
 //
 //     // Set fixed width and height for the button to create a square around the SVG
 //     videoDownloadLink.style.width = "40px";  // Width of the SVG + some padding

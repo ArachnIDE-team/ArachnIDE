@@ -805,7 +805,7 @@ setRenderQuality(getQuality());
 
 document.getElementById("exponent").addEventListener("input", (e) => {
     let v = e.target.value * 1; // Convert to number
-    mand_step = (z, c) => {
+    MandelbrotBG.mand_step = (z, c) => {
         return z.ipow(v).cadd(c);
     };
     document.getElementById("exponent_value").textContent = v;

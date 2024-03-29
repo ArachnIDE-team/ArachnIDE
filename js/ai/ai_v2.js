@@ -58,7 +58,7 @@ async function handleStreamingResponse(response) {
         }
     }
 
-    // Resolve the neuridePromptZettelkasten promise.
+    // Resolve the chrysalidePromptZettelkasten promise.
     resolveAiMessageIfAppropriate(streamedResponse);
 
     // Return the complete streamed response
@@ -146,7 +146,7 @@ async function callchatAPI(messages, stream = false, customTemperature = null) {
             return currentResponse;
         } else {
             const data = await response.json();
-             // Do not resolve the neuridePromptZettelkasten promise here as these are hidden responses.
+             // Do not resolve the chrysalidePromptZettelkasten promise here as these are hidden responses.
             console.log("Token usage:", data.usage);
             return data.choices[0].message.content.trim();
         }

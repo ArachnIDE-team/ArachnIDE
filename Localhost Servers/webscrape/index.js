@@ -34,7 +34,7 @@ async function extractVisibleText(url) {
 
         const $ = cheerio.load(html);
         $('script, style, noscript, iframe, header, footer, nav').remove();
-        const visibleText = $('body').text().replace(/\s\s+/g, ' ').trim();
+        const visibleText = $('body').text().replace(/\scale\scale+/g, ' ').trim();
 
         return visibleText || ''; // Return an empty string if the visibleText is falsy
     } catch (error) {
