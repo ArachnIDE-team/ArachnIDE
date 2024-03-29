@@ -8,12 +8,12 @@ function makeIconDraggable(iconDiv) {
     iconDiv.addEventListener('mousedown', function (event) {
         if (!iconDiv.classList.contains('edges-icon')) {
             iconDiv.dataset.draggable = 'true';  // Set to draggable immediately on mousedown
-            mouseDown = true;
+            rootDiagram.mouseDown = true;
         }
     });
 
     iconDiv.addEventListener('mousemove', function (event) {
-        if (mouseDown && !isDraggingIcon && !iconDiv.classList.contains('edges-icon')) {
+        if (rootDiagram.mouseDown && !isDraggingIcon && !iconDiv.classList.contains('edges-icon')) {
             iconDiv.setAttribute('draggable', 'true');
             isDraggingIcon = true;
         }
@@ -22,7 +22,7 @@ function makeIconDraggable(iconDiv) {
     iconDiv.addEventListener('mouseup', function () {
         iconDiv.setAttribute('draggable', 'false');
         isDraggingIcon = false;
-        mouseDown = false;
+        rootDiagram.mouseDown = false;
         initialMousePosition = null;
     });
 
@@ -44,7 +44,7 @@ function makeIconDraggable(iconDiv) {
     iconDiv.addEventListener('dragend', function () {
         iconDiv.setAttribute('draggable', 'false');
         isDraggingIcon = false;
-        mouseDown = false;
+        rootDiagram.mouseDown = false;
     });
 }
 

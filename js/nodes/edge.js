@@ -41,8 +41,8 @@ class Edge {
         this.attachEventListenersToArrow();
 
         this.edgeKey = this.createEdgeKey(pts);
-        if (edgeDirectionalityMap.has(this.edgeKey)) {
-            this.directionality = edgeDirectionalityMap.get(this.edgeKey);
+        if (rootDiagram.edgeDirectionalityMap.has(this.edgeKey)) {
+            this.directionality = rootDiagram.edgeDirectionalityMap.get(this.edgeKey);
         }
         //console.log("Creating edge with pts:", pts);
         //console.log("Directionality after assignment:", this.directionality);
@@ -127,7 +127,7 @@ class Edge {
         }
 
 
-        edgeDirectionalityMap.set(this.edgeKey, this.directionality);
+        rootDiagram.edgeDirectionalityMap.set(this.edgeKey, this.directionality);
 
         //console.log(`Directionality relative to ${startTitle}: ${this.getDirectionRelativeTo(this.pts[0])}`);
         //console.log(`Directionality relative to ${endTitle}: ${this.getDirectionRelativeTo(this.pts[1])}`);
@@ -311,7 +311,7 @@ class Edge {
         this.length *= amount;
     }
     onwheel = (event) => {
-        if (nodeMode) {
+        if (rootDiagram.nodeMode) {
             let amount = Math.exp(event.wheelDelta * -settings.zoomSpeed);
             this.length *= amount;
             let avg = this.center();
@@ -325,13 +325,13 @@ class Edge {
         }
     }
     onclick = (event) => {
-        if (!nodeMode) {
+        if (!rootDiagram.nodeMode) {
             this.toggleDirection();
             this.draw();
         }
     }
     ondblclick = (event) => {
-        if (nodeMode) {
+        if (rootDiagram.nodeMode) {
             // Capture the titles and textNode flags of the connected nodes for later use
             const connectedNodes = this.pts.map(node => ({ title: node.getTitle(), isTextNode: node.isTextNode }));
 
@@ -359,12 +359,12 @@ class Edge {
     }
 
     remove() {
-        edgeDirectionalityMap.set(this.edgeKey, this.directionality);
+        rootDiagram.edgeDirectionalityMap.set(this.edgeKey, this.directionality);
 
         // Remove the edge from the global edge array
-        let index = edges.indexOf(this);
+        let index = rootDiagram.edges.indexOf(this);
         if (index !== -1) {
-            edges.splice(index, 1);
+            rootDiagram.edges.splice(index, 1);
         }
 
         // Remove this edge from both connected nodes' edges arrays

@@ -117,7 +117,7 @@ let shouldAddCodeButton = false;
 
                 const match = lines[i].match(nodeTitleRegex);
                 if (match) {
-                    return getNodeByTitle(match[1].trim());  // Return the node object
+                    return rootDiagram.getNodeByTitle(match[1].trim());  // Return the node object
                 }
             }
             return null;  // If no matching node is found, return null or another default value
@@ -220,7 +220,7 @@ let shouldAddCodeButton = false;
             currentNodeTitle = line.substr(nodeTag.length).trim();
 
             if (restoreZettelkastenEvent) {
-                let savedNode = getNodeByTitle(currentNodeTitle);
+                let savedNode = rootDiagram.getNodeByTitle(currentNodeTitle);
 
                 if (savedNode) {
                     const node = this._establishZettelkastenNode(savedNode, currentNodeTitle, nodeLines, nodes, noteInput);

@@ -272,15 +272,15 @@ class WindowedNode extends Node {
 
     onFullScreen() {
             this.zoom_to_fit();
-            zoomTo = zoomTo.scale(1.0625);
-            autopilotSpeed = settings.autopilotSpeed;
+        rootDiagram.autopilot.zoomTo = rootDiagram.autopilot.zoomTo.scale(1.0625);
+        rootDiagram.autopilot.speed = settings.autopilotSpeed;
             scrollToTitle(this.getTitle(), noteInput); // Use the getTitle method
     }
 
     onDelete() {
         const title = this.getTitle();
-        if (prevNodeToConnect === this) {
-            prevNodeToConnect = undefined;
+        if (rootDiagram.prevNodeToConnect === this) {
+            rootDiagram.prevNodeToConnect = undefined;
             background.mousePath = "";
             background.svg_mousePath.setAttribute("d", "");
         }
@@ -486,12 +486,12 @@ class WindowedNode extends Node {
         windowDiv.addEventListener('click', (event) => {
             event.stopPropagation();
             if (event.ctrlKey) {
-                toggleNodeSelection(this);
+                rootDiagram.toggleNodeSelection(this);
             }
         });
 
         windowDiv.addEventListener('mousedown', () => {
-            autopilotSpeed = 0;
+            rootDiagram.autopilot.speed = 0;
             dropdown.classList.add('no-select');
             Array.from(wrapperDivs).forEach(div => div.classList.add('no-select'));
         });
@@ -606,14 +606,14 @@ class WindowedNode extends Node {
 
 // DONE (Used by WindowedNode)
 function registernode(node) {
-    let id = nodes.length;
+    let id = rootDiagram.nodes.length;
     let div = node.content;
     /*div.setAttribute("onclick","(e)=>nodes["+id+"].onclick(e)");
     div.setAttribute("onmousedown","(e)=>nodes["+id+"].onmousedown(e)");
     div.setAttribute("onmouseup","(e)=>nodes["+id+"].onmouseup(e)");
     div.setAttribute("onmousemove","(e)=>nodes["+id+"].onmousemove(e)");*/
-    nodes.push(node);
-    nodeMap[node.uuid] = node;
+    rootDiagram.nodes.push(node);
+    rootDiagram.nodeMap[node.uuid] = node;
 }
 
 function posToLeftTop(element, pos, scale){

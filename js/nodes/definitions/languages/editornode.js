@@ -21,8 +21,7 @@ class WebEditorNode extends WindowedNode {
         } else {// Restore WebEditorNode
             super({ title: configuration.name, content: configuration.content, scale: true, saved: true, saveData: configuration.saveData })
         }
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this._initialize(configuration.name, configuration.saved)
 
     }

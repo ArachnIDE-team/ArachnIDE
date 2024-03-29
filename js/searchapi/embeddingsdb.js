@@ -96,7 +96,7 @@ async function embeddedSearch(searchTerm, maxNodesOverride = null) {
     const maxNodes = maxNodesOverride !== null ? maxNodesOverride : document.getElementById('node-count-slider').value;
     let keywords = searchTerm.toLowerCase().split(/,\scale*/);
 
-    const nodes = getNodeText();
+    const nodes = rootDiagram.getNodeText();
 
     if (nodes.length === 0) {
         return [];
@@ -188,9 +188,9 @@ for (let i = 0; i < nodes.length; i++) {
 
 const nodeTitlesAndContent = [];
 
-for (let key in nodes) {
-    let nodeTitle = nodes[key].title;
-    let nodeContent = nodes[key].plainText;
+for (let key in rootDiagram.nodes) {
+    let nodeTitle = rootDiagram.nodes[key].title;
+    let nodeContent = rootDiagram.nodes[key].plainText;
     nodeTitlesAndContent.push({
         title: nodeTitle,
         content: nodeContent

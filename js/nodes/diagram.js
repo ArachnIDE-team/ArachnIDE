@@ -35,13 +35,15 @@ class Diagram extends Node {
         zoomInput: undefined,
         coordsLive: true,
         coordinateContainer: undefined,
+        diagram: null
     }
 
     constructor(configuration= Diagram.DEFAULT_CONFIGURATION) {
         configuration = {...Diagram.DEFAULT_CONFIGURATION, ...configuration}
-        super({pos: background.pan, content:document.getElementById("nodes"), saved: true, saveData: {json: { uuid: 0}}});
+        // TO-DO: review
+        super({...configuration, pos: background.pan, content: configuration.nodeContainer, saved: true, saveData: {json: { uuid: "d0"}}});
         // htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        // registernode(this);
         // interface_v2.js
         this.disableForces = true; // previously DISABLE_FORCE
         this.autopilot = {} // previously globalThis
@@ -109,7 +111,10 @@ class Diagram extends Node {
         this.NodeUUID = 0;
         this.nodeMap = {};
 
+        // savenet.js (moved from top-level to function)
+        reloadDiagram(this)
 
+        this.nodeStep();
         // htmlnodes_parent is this.content
     }
 
@@ -767,3 +772,18 @@ class Diagram extends Node {
         this.nodeMap[node.uuid] = node;
     }
 }
+
+window.rootDiagram = null;
+
+function createMainDiagram(){
+    window.rootDiagram = new Diagram({
+       nodeContainer: document.getElementById("nodes"),
+       edgeContainer: document.getElementById("edges"),
+       panInput: document.getElementById("pan"),
+       zoomInput: document.getElementById("zoom"),
+       coordsLive: true,
+       coordinateContainer: document.getElementById("coordinates"),
+   })
+    Node.DEFAULT_CONFIGURATION.diagram = rootDiagram;
+}
+createMainDiagram();

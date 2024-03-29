@@ -26,9 +26,7 @@ class AudioNode extends WindowedNode {
             super({ title: configuration.name, content: AudioNode._getContentElement(configuration.audioUrl, configuration.blob), scale: true, saved: true, saveData: configuration.saveData })
         }
 
-
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this._initialize(configuration.audioUrl, configuration.blob, configuration.saved);
     }
 

@@ -3,7 +3,7 @@ const edgesIcon = document.querySelector('.edges-icon');
 let lockedNodeMode = false;
 
 function toggleNodeModeState() {
-    if (nodeMode) {
+    if (rootDiagram.nodeMode) {
         edgesIcon.classList.add('edges-active');
     } else {
         edgesIcon.classList.remove('edges-active');
@@ -11,8 +11,8 @@ function toggleNodeModeState() {
 }
 
 function toggleNodeMode() {
-    nodeMode = 1 - nodeMode;
-    lockedNodeMode = !!nodeMode;  // Lock it only if activated by button
+    rootDiagram.nodeMode = 1 - rootDiagram.nodeMode;
+    lockedNodeMode = !!rootDiagram.nodeMode;  // Lock it only if activated by button
     toggleNodeModeState();
 }
 
@@ -22,20 +22,20 @@ addEventListener("keydown", (event) => {
     if (event.key === settings.nodeModeKey) {
         const isCapsLockMode = settings.nodeModeKey === "CapsLock" && event.getModifierState("CapsLock");
 
-        if (lockedNodeMode && !nodeMode) {
+        if (lockedNodeMode && !rootDiagram.nodeMode) {
             // If nodeMode was deactivated by the key while it was locked, unlock it
             lockedNodeMode = false;
         }
 
         if (settings.nodeModeTrigger === "down" && !isCapsLockMode) {
-            nodeMode = 1;
+            rootDiagram.nodeMode = 1;
             toggleNodeModeState();
             autoToggleAllOverlays();
         } else if (settings.nodeModeTrigger === "toggle" || isCapsLockMode) {
             toggleNodeMode();
         }
     } else if (event.key === "Escape") {
-        for (let n of nodes) {
+        for (let n of rootDiagram.nodes) {
             n.followingMouse = 0;
         }
     }
@@ -47,7 +47,7 @@ addEventListener("keyup", (event) => {
             return;  // Don't allow the keyup event to deactivate nodeMode if it's locked
         }
 
-        nodeMode = 0;
+        rootDiagram.nodeMode = 0;
         toggleNodeModeState();
         autoToggleAllOverlays();
         cancel(event);

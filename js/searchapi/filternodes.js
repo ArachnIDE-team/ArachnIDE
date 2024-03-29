@@ -70,9 +70,9 @@ function filterAndProcessNodesByExistingTitles(nodes, existingTitles, titlesToFo
                 return null;
             }
 
-            fullNodeObject = getNodeByTitle(title.toLowerCase());
+            fullNodeObject = rootDiagram.getNodeByTitle(title.toLowerCase());
 
-            const contents = getTextareaContentForNode(fullNodeObject);
+            const contents = Diagram.getTextareaContentForNode(fullNodeObject);
             //console.log(contents);
             /* 
                  const connectedNodesInfo = node.edges

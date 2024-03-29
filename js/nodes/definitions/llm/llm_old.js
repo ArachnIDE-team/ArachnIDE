@@ -30,8 +30,7 @@ class LLMOldNode extends WindowedNode {
                 saveData: configuration.saveData
             })
         }
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this._initialize(ainodewrapperDiv, aiResponseTextArea, configuration.saved)
     }
 

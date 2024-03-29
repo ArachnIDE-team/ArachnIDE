@@ -65,7 +65,7 @@ function connectDistance(na, nb, linkStrength = 0.1, linkStyle = {
     na.edges.push(edge);
     nb.edges.push(edge);
 
-    edges.push(edge);
+    rootDiagram.edges.push(edge);
     return edge;
 }
 
@@ -123,7 +123,7 @@ function getNodeData(node) {
         return nodeInfo;
     } else {
         // Handle regular text content
-        let contentText = getTextareaContentForNode(node);
+        let contentText = Diagram.getTextareaContentForNode(node);
         if (!contentText) {
             console.warn('No content found for node');
             return null;

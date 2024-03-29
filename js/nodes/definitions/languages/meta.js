@@ -25,8 +25,7 @@ class MetaNode extends WindowedNode {
         } else {// Restore MetaNode
             super({title: configuration.name, content:  [textarea], scale: true, saved: true, saveData:  configuration.saveData});
         }
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this._initialize(textarea, configuration.settings, configuration.saved)
         if(configuration.code) this.code = configuration.code;
     }

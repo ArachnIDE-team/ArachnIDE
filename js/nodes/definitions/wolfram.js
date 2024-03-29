@@ -24,8 +24,7 @@ class WolframNode extends WindowedNode {
             configuration.wolframData = configuration.saveData.json.wolframData;
             super({ title: configuration.name, content: WolframNode._getContentElement(configuration.wolframData), scale: true, saved: true, saveData: configuration.saveData })
         }
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this._initialize(configuration.wolframData, configuration.saved);
     }
 

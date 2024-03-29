@@ -4,7 +4,7 @@ function toggleNodeState(nodeOrTitle, cm, event) {
 
     if (typeof nodeOrTitle === 'string') {
         title = nodeOrTitle;
-        node = getNodeByTitle(title);
+        node = rootDiagram.getNodeByTitle(title);
     } else {
         node = nodeOrTitle;
         title = node.getTitle();
@@ -109,7 +109,7 @@ function collapseNode(node) {
             }
 
             function handleCircleDoubleClick(event) {
-                if (nodeMode !== 1) {
+                if (rootDiagram.nodeMode !== 1) {
                     if (circle.classList.contains('collapsed-anchor')) {
                         circle.classList.remove('collapsed-anchor');
                     } else {
@@ -264,20 +264,20 @@ document.addEventListener('mouseup', function (event) {
         };
 
         // Check for intersection with node windows and select them
-        Object.values(nodeMap).forEach(node => {
+        Object.values(rootDiagram.nodeMap).forEach(node => {
             const nodeDiv = node.windowDiv; // Assuming this is how you access the windowDiv of a node
             const rect = nodeDiv.getBoundingClientRect();
 
             if (rect.left < dragBoxBounds.right && rect.right > dragBoxBounds.left &&
                 rect.top < dragBoxBounds.bottom && rect.bottom > dragBoxBounds.top) {
-                toggleNodeSelection(node); // Assuming this function handles the selection logic
+                rootDiagram.toggleNodeSelection(node); // Assuming this function handles the selection logic
                 isAnyNodeSelected = true; // Update flag as a node is selected
             }
         });
 
         // If no nodes were selected, clear the current selection
         if (!isAnyNodeSelected) {
-            clearNodeSelection(); // Assuming this function clears the selection
+            rootDiagram.clearNodeSelection(); // Assuming this function clears the selection
         }
 
         // Clean up

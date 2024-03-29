@@ -24,8 +24,7 @@ class LinkNode extends WindowedNode {
             super({title: configuration.name, content: [], scale: true, saved: true, saveData: configuration.saveData});
         }
         let [contentWrapper, linkWrapper] = LinkNode._getContentElement(configuration.name, configuration.text, configuration.link);
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this.text = configuration.text;
         this.link = configuration.link;
         this._initialize(contentWrapper, linkWrapper, configuration.sx, configuration.sy, configuration.x, configuration.y)

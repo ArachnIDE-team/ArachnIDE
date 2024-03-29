@@ -30,8 +30,7 @@ class TextNode extends WindowedNode {
             configuration.addCodeButton = configuration.saveData.json.addCodeButton;
             super({title: configuration.name, content:  [textarea], scale: true, saved: true, saveData:  configuration.saveData});
         }
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this._initialize(textarea, configuration.sx, configuration.sy, configuration.x, configuration.y, configuration.addCodeButton)
         if(configuration.text) this.text = configuration.text;
     }

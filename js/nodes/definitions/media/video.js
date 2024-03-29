@@ -24,9 +24,7 @@ class VideoNode extends WindowedNode {
             // configuration.videoUrl = configuration.saveData.json.videoUrl;
             super({ title: configuration.name, content: VideoNode._getContentElement(configuration.videoUrl, configuration.blob), scale: true, saved: true, saveData: configuration.saveData })
         }
-
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this._initialize(configuration.videoUrl, configuration.blob, configuration.saved);
     }
 

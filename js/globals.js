@@ -65,7 +65,7 @@ const overlays = [];
 
 const autoToggleAllOverlays = () => {
     for (const overlay of overlays) {
-        if (altHeld || nodeMode === 1) {
+        if (altHeld || rootDiagram.nodeMode === 1) {
             overlay.style.display = 'block';
         } else {
             overlay.style.display = 'none';
@@ -97,23 +97,23 @@ window.addEventListener('message', function (event) {
         autoToggleAllOverlays();
     }
     if (typeof event.data.nodeMode !== 'undefined') {
-        nodeMode = event.data.nodeMode;
+        rootDiagram.nodeMode = event.data.nodeMode;
     } else {
         // TO-DO: Understand why next instruction abruptly interrupt edge dragging
         // nodeMode = 0;
     }
 });
 
-var nodes = [];
-var edges = [];
-var nodeMode_v = 0;
-var nodeMode = 0;
+// var nodes = [];
+// var edges = [];
+// var nodeMode_v = 0;
+// var nodeMode = 0;
 
-var movingNode = undefined;
-var NodeUUID = 0;
-var nodeMap = {};
-var draggedNode = null;
-var mousedownNode = undefined;
+// var movingNode = undefined;
+// var NodeUUID = 0;
+// var nodeMap = {};
+// var draggedNode = null;
+// var mousedownNode = undefined;
 
 let htmlnodes_parent = document.getElementById("nodes");
 let htmlnodes = htmlnodes_parent.children;

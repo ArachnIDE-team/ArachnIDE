@@ -409,7 +409,7 @@ function scrollToTitle(title, cm, lineOffset = 0, chPosition = 0) {
     highlightNodeSection(title, cm);
 
     // Get the node by the title
-    const node = getNodeByTitle(title);
+    const node = rootDiagram.getNodeByTitle(title);
     if (!node) {
         return; // The node could not be found
     }
@@ -623,12 +623,12 @@ function handleTitleClick(title, cm) {
         if (bb && bb.width > 0 && bb.height > 0) {
             // Zoom to fit the node if the bounding rectangle exists
             node.zoom_to_fit();
-            zoomTo = zoomTo.scale(1.5);
+            rootDiagram.autopilot.zoomTo = rootDiagram.autopilot.zoomTo.scale(1.5);
         } else {
             // Use alternative zoom method if the bounding rectangle does not exist (allows best of both options, i.e. zoomto with exact height calculations when available, and when not currently in the viewport, a set value.)
             node.zoom_to(.5);
         }
-        autopilotSpeed = settings.autopilotSpeed;
+        rootDiagram.autopilot.speed = settings.autopilotSpeed;
     }
 }
 

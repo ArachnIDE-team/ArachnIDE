@@ -1209,15 +1209,15 @@ class MandelbrotBG extends Background {
         if (i >= iters) {
             i = MandelbrotBG._findInfimum(iters, z);
             //i = findPeriod(z);
-            return this.scol(i.i * 123 + 2, (1 - nodeMode_v), 128, 32 + (1 - nodeMode_v) * 48);
+            return this.scol(i.i * 123 + 2, (1 - rootDiagram.nodeMode_v), 128, 32 + (1 - rootDiagram.nodeMode_v) * 48);
         } else {
             return this.scol(i);
         }
     }
 
     col(i, r = null, c = null, s = null) {
-        if (nodeMode) {
-            r = nodeMode_v;
+        if (rootDiagram.nodeMode) {
+            r = rootDiagram.nodeMode_v;
         }
         if(r === null) r = this.rSlider.value;
         if(c === null) c = this.cSlider.value;

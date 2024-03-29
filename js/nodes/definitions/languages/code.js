@@ -31,8 +31,7 @@ class CodeNode extends WindowedNode {
             super({ title: configuration.name, content: configuration.content, scale: true, saved: true, saveData: configuration.saveData })
         }
         this._codeListeners = [];
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this._initialize(configuration.name, configuration.code, configuration.settings, configuration.saved)
     }
 

@@ -4,6 +4,7 @@ class Node {
     static DEFAULT_CONFIGURATION = {
         pos: undefined,
         content: undefined,
+        diagram: window.rootDiagram,
         scale: 1,
         intrinsicScale: 1,
         createEdges: true,
@@ -58,12 +59,12 @@ class Node {
                 let es = configuration.saveData.edges;
                 this.init = ((nodeMap) => {
                     for (let e of es) {
-                        edgeFromJSON(e, nodeMap);
+                        configuration.diagram.edgeFromJSON(e, nodeMap);
                     }
                 }).bind(this);
             }
         } else { // new node
-            this.uuid = nextUUID();
+            this.uuid = configuration.diagram ? configuration.diagram.nextUUID() : "d0";
             this.uuid = "" + this.uuid;
 
             this.pos = configuration.pos;
@@ -83,6 +84,7 @@ class Node {
             this.content.setAttribute("data-uuid", this.uuid);
             this.attach();
         }
+        this.diagram = configuration.diagram;
     }
 
     startInitialization() {
@@ -146,7 +148,7 @@ class Node {
                 dt = 1;
             }
         }
-        if (!this.followingMouse && !DISABLE_FORCE) {
+        if (!this.followingMouse && (!this.diagram || !this.diagram.disableForces)) {
             this.pos = this.pos.plus(this.vel.scale(dt / 2));
             this.vel = this.vel.plus(this.force.scale(dt));
             this.pos = this.pos.plus(this.vel.scale(dt / 2));
@@ -163,27 +165,27 @@ class Node {
         //this.force = this.force.plus(d.scale(this.followingMouse/(d.mag2()+1)));
         if (this.followingMouse) {
             let p = background.toZ(background.mousePos).minus(this.mouseAnchor);
-            let velocity = p.minus(this.pos).unscale(nodeMode ? 1 : dt);
+            let velocity = p.minus(this.pos).unscale(rootDiagram.nodeMode ? 1 : dt);
 
             this.vel = velocity;
             this.pos = p;
             this.anchor = this.pos;
 
             // Update the edges of the current node being dragged
-            if (nodeMode === 1) {
-                updateNodeEdgesLength(this);
+            if (this.diagram.nodeMode === 1) {
+                Diagram.updateNodeEdgesLength(this);
             }
 
             // Check if the current node's UUID is in the selected nodes
-            if (selectedNodeUUIDs.has(this.uuid)) {
-                const selectedNodes = getSelectedNodes();
+            if (this.diagram.selectedNodeUUIDs.has(this.uuid)) {
+                const selectedNodes = this.diagram.getSelectedNodes();
                 selectedNodes.forEach(node => {
                     if (node.uuid !== this.uuid && node.anchorForce !== 1) { // Skip the current node and any anchored node
                         node.vel = velocity;
 
                         // Update the edges for each selected node
-                        if (nodeMode === 1) {
-                            updateNodeEdgesLength(node);
+                        if (this.diagram.nodeMode === 1) {
+                            Diagram.updateNodeEdgesLength(node);
                         }
                     }
                 });
@@ -233,19 +235,19 @@ class Node {
     }
 
     zoom_by(s = 1) {
-        panTo = new vec2(0, 0); //this.pos;
+        this.diagram.autopilot.panTo = new vec2(0, 0); //this.pos;
         let gz = ((s) ** (-1 / settings.zoomContentExp));
-        zoomTo = background.zoom.unscale(gz ** 0.5);
-        autopilotReferenceFrame = this;
-        panToI = new vec2(0, 0);
+        this.diagram.autopilot.zoomTo = background.zoom.unscale(gz ** 0.5);
+        this.diagram.autopilot.referenceFrame = this;
+        this.diagram.autopilot.panToI = new vec2(0, 0);
     }
 
     zoom_to(s = 1) {
-        panTo = new vec2(0, 0); //this.pos;
+        this.diagram.autopilot.panTo = new vec2(0, 0); //this.pos;
         let gz = background.zoom.mag2() * ((this.scale * s) ** (-1 / settings.zoomContentExp));
-        zoomTo = background.zoom.unscale(gz ** 0.5);
-        autopilotReferenceFrame = this;
-        panToI = new vec2(0, 0);
+        this.diagram.autopilot.zoomTo = background.zoom.unscale(gz ** 0.5);
+        this.diagram.autopilot.referenceFrame = this;
+        this.diagram.autopilot.panToI = new vec2(0, 0);
     }
 
     searchStrings() {
@@ -276,28 +278,28 @@ class Node {
         this.mouseAnchor = background.toZ(new vec2(event.clientX, event.clientY)).minus(this.pos);
         this.followingMouse = 1;
         window.draggedNode = this;
-        movingNode = this;
-        if (nodeMode) {
-            if (prevNodeToConnect === undefined) {
-                prevNodeToConnect = this;
+        this.diagram.movingNode = this;
+        if (this.diagram.nodeMode) {
+            if (this.diagram.prevNodeToConnect === undefined) {
+                this.diagram.prevNodeToConnect = this;
             } else {
                 // Get titles once and store them in variables
                 const thisTitle = this.getTitle();
-                const prevNodeTitle = prevNodeToConnect.getTitle();
+                const prevNodeTitle = this.diagram.prevNodeToConnect.getTitle();
 
                 // Check conditions before calling addEdgeToZettelkasten
-                if (thisTitle !== prevNodeTitle && this.isTextNode && prevNodeToConnect.isTextNode) {
+                if (thisTitle !== prevNodeTitle && this.isTextNode && this.diagram.prevNodeToConnect.isTextNode) {
                     // Add edge from prevNodeToConnect to this node
                     addEdgeToZettelkasten(prevNodeTitle, thisTitle, myCodeMirror);
                     // Add edge from this node to prevNodeToConnect
                     addEdgeToZettelkasten(thisTitle, prevNodeTitle, myCodeMirror);
                 } else {
                     // If conditions are not met, call the original connectDistance
-                    connectDistance(this, prevNodeToConnect, this.pos.minus(prevNodeToConnect.pos).mag() / 2, undefined, true);
+                    connectDistance(this, this.diagram.prevNodeToConnect, this.pos.minus(this.diagram.prevNodeToConnect.pos).mag() / 2, undefined, true);
                 }
 
                 // Reset prevNodeToConnect
-                prevNodeToConnect = undefined;
+                this.diagram.prevNodeToConnect = undefined;
             }
         }
         // Add an event listener to window.mouseup that stops the node from following the mouse
@@ -307,7 +309,7 @@ class Node {
 
     stopFollowingMouse() {
         this.followingMouse = 0;
-        movingNode = undefined;
+        this.diagram.movingNode = undefined;
         // Remove the event listener to clean up
         window.removeEventListener('mouseup', this.stopFollowingMouse);
     }
@@ -321,7 +323,7 @@ class Node {
 
     onmousemove(event) {
         if (this === window.draggedNode) {
-            prevNodeToConnect = undefined;
+            this.diagram.prevNodeToConnect = undefined;
         }
         /*if (this.followingMouse){
         this.pos = this.pos.plus(toDZ(new vec2(event.movementX,event.movementY)));
@@ -331,16 +333,16 @@ class Node {
     }
 
     onwheel(event) {
-        if (nodeMode) {
+        if (this.diagram.nodeMode) {
             let amount = Math.exp(event.wheelDelta * -settings.zoomSpeed);
 
-            if (autopilotSpeed !== 0 && this.uuid === autopilotReferenceFrame.uuid) {
-                zoomTo = zoomTo.scale(1 / amount);
+            if (this.diagram.autopilot.speed !== 0 && this.uuid === this.diagram.autopilot.referenceFrame.uuid) {
+                this.diagram.autopilot.zoomTo = this.diagram.autopilot.zoomTo.scale(1 / amount);
             } else {
                 // Scale selected nodes or individual node
                 let targetWindow = event.target.closest('.window');
                 if (targetWindow && targetWindow.classList.contains('selected')) {
-                    const selectedNodes = getSelectedNodes();
+                    const selectedNodes = this.diagram.getSelectedNodes();
                     selectedNodes.forEach((node) => {
                         node.scale *= amount;
 
@@ -349,7 +351,7 @@ class Node {
                             node.pos = node.pos.lerpto(background.toZ(background.mousePos), 1 - amount);
                         }
 
-                        updateNodeEdgesLength(node);
+                        Diagram.updateNodeEdgesLength(node);
                     });
                 } else {
                     this.scale *= amount;
@@ -396,7 +398,7 @@ class Node {
 
     remove() {
         let dels = [];
-        for (let n of nodes) {
+        for (let n of this.diagram.nodes) {
             for (let e of n.edges) {
                 if (e.pts.includes(this)) {
                     dels.push(e);
@@ -408,24 +410,24 @@ class Node {
         }
 
         // Remove this node from the edges array of any nodes it was connected to
-        for (let n of nodes) {
+        for (let n of this.diagram.nodes) {
             n.edges = n.edges.filter(edge => !edge.pts.includes(this));
         }
 
         // Remove the node from the global nodes array
-        let index = nodes.indexOf(this);
+        let index = this.diagram.nodes.indexOf(this);
         if (index !== -1) {
-            nodes.splice(index, 1);
+            this.diagram.nodes.splice(index, 1);
         }
 
         // Remove the node from the nodeMap if it exists
-        if (nodeMap[this.uuid] === this) {
-            delete nodeMap[this.uuid];
+        if (this.diagram.nodeMap[this.uuid] === this) {
+            delete this.diagram.nodeMap[this.uuid];
         }
 
         // Remove the node UUID from the selectedNodeUUIDs set
-        if (selectedNodeUUIDs.has(this.uuid)) {
-            selectedNodeUUIDs.delete(this.uuid);
+        if (this.diagram.selectedNodeUUIDs.has(this.uuid)) {
+            this.diagram.selectedNodeUUIDs.delete(this.uuid);
         }
 
         // Mark the node as removed and remove its content

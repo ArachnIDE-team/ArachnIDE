@@ -2,7 +2,7 @@
 function searchNodesBy(searchTerm) {
     let keywords = searchTerm.toLowerCase().split(' ');
     let matched = [];
-    for (let n of nodes) {
+    for (let n of rootDiagram.nodes) {
         let numMatches = 0;
         for (let keyword of keywords) {
             if ([...n.searchStrings()].join().toLowerCase().includes(keyword)) {
@@ -26,7 +26,7 @@ function searchNodesBy(searchTerm) {
 }
 
 function clearSearch() {
-    for (let n of nodes) {
+    for (let n of rootDiagram.nodes) {
         n.content.classList.remove("search_matched");
         n.content.classList.remove("search_nomatch");
     }
@@ -48,12 +48,12 @@ inp.addEventListener("input", function () {
 
             c.addEventListener("click", (function (event) {
                 this.zoom_to();
-                autopilotSpeed = settings.autopilotSpeed;
+                rootDiagram.autopilot.speed = settings.autopilotSpeed;
             }).bind(n));
             c.addEventListener("dblclick", (function (event) {
                 this.zoom_to();
-                skipAutopilot();
-                autopilotSpeed = settings.autopilotSpeed;
+                rootDiagram.skipAutopilot();
+                rootDiagram.autopilot.speed = settings.autopilotSpeed;
             }).bind(n));
             resdiv.appendChild(c);
         }

@@ -27,8 +27,7 @@ class WorkspaceExplorerNode extends WindowedNode {
             super({ title: configuration.name, content: WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index), addFileButton:false, scale: true, saved: true, saveData: configuration.saveData })
         }
 
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         this._initialize(configuration.index, configuration.saved);
     }
 

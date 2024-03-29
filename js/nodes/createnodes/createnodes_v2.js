@@ -2,7 +2,7 @@ document.addEventListener('dblclick', function (e) {
     // Cancel the default behavior of the event
     cancel(e);
 
-    if (nodeMode && e.altKey) {
+    if (rootDiagram.nodeMode && e.altKey) {
         // Node mode (Shift) + Alt + double click behavior
         let node = createEditorNode();
         node.draw();
@@ -12,7 +12,7 @@ document.addEventListener('dblclick', function (e) {
         // Assuming that the createLLMNode function takes x, y coordinates
         let node = createLLMNode('', undefined, undefined, e.clientX, e.clientY);
         node.draw();
-    } else if (nodeMode && !prevNodeToConnect) {
+    } else if (rootDiagram.nodeMode && !rootDiagram.prevNodeToConnect) {
         // Node mode (Shift) + double click behavior
         createNodeFromWindow();
     }
@@ -43,7 +43,7 @@ function createNodeFromWindow(title = null, content = null, followMouse = false)
         followMouseFromWindow = true;
     }
     addNodeTagToZettelkasten(defaultTitle, content);
-    return getNodeByTitle(defaultTitle);
+    return rootDiagram.getNodeByTitle(defaultTitle);
 }
 
 function addNodeTagToZettelkasten(title, content = null) {

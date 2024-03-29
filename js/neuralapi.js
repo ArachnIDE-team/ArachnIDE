@@ -208,14 +208,14 @@ function chrysalideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, spe
 
         if (animate) {
             activeAnimationsCount++;
-            autopilotReferenceFrame = undefined;
+            rootDiagram.autopilot.referenceFrame = undefined;
             const targetZoom = background.zoom.scale(newZoomMagnitude / background.zoom.mag());
             const targetPan = new vec2(newPanReal, newPanImaginary);
 
             if (speed > 1) {
-                autopilotSpeed = settings.autopilotSpeed;
+                rootDiagram.autopilot.speed = settings.autopilotSpeed;
             } else {
-                autopilotSpeed = speed; // Use provided speed if within acceptable range
+                rootDiagram.autopilot.speed = speed; // Use provided speed if within acceptable range
             }
 
             // duration does not matter here
@@ -224,18 +224,18 @@ function chrysalideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, spe
             try {
                 animateTransition(0, 1, duration, (t) => {
                     // Regular animation steps
-                    zoomTo = targetZoom;
-                    panTo = targetPan;
+                    rootDiagram.autopilot.zoomTo = targetZoom;
+                    rootDiagram.autopilot.panTo = targetPan;
                 }, easeInOutCubic, () => {
                     // Completion callback
                     activeAnimationsCount--;
-                    autopilotSpeed = 0;
-                    autopilotReferenceFrame = undefined;
+                    rootDiagram.autopilot.speed = 0;
+                    rootDiagram.autopilot.referenceFrame = undefined;
                     console.log("Animation completed, count:", activeAnimationsCount);
                     resolve();
                 }, () => {
                     // Bailout condition
-                    if (autopilotSpeed === 0) {
+                    if (rootDiagram.autopilot.speed === 0) {
                         console.log("Animation interrupted by user interaction.");
                         return true; // Indicate that the animation should be terminated
                     }
@@ -244,8 +244,8 @@ function chrysalideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, spe
             } catch (error) {
                 console.error("Error in animation:", error);
                 activeAnimationsCount--;
-                autopilotSpeed = 0;
-                autopilotReferenceFrame = undefined;
+                rootDiagram.autopilot.speed = 0;
+                rootDiagram.autopilot.referenceFrame = undefined;
             }
         } else {
             // Directly set the new zoom and pan values
@@ -269,7 +269,7 @@ vec2.prototype.closeEnough = function (target, autopilotThreshold) {
 function chrysalideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
     return new Promise((resolve) => {
         activeAnimationsCount++;
-        autopilotReferenceFrame = undefined;
+        rootDiagram.autopilot.referenceFrame = undefined;
         let node;
 
         // First check if the argument is a node object
@@ -288,20 +288,20 @@ function chrysalideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
             let bb = node.content.getBoundingClientRect();
             if (bb && bb.width > 0 && bb.height > 0) {
                 node.zoom_to_fit();
-                zoomTo = zoomTo.scale(1.5);
+                rootDiagram.autopilot.zoomTo = rootDiagram.autopilot.zoomTo.scale(1.5);
             } else {
                 node.zoom_to(0.5);
             }
-            autopilotSpeed = settings.autopilotSpeed;
+            rootDiagram.autopilot.speed = settings.autopilotSpeed;
         }
 
         let intervalCheck;
         const checkForInterruption = () => {
-            if (autopilotSpeed === 0) {
+            if (rootDiagram.autopilot.speed === 0) {
                 console.log("Animation interrupted by user interaction.");
                 clearInterval(intervalCheck);
-                autopilotSpeed = 0;
-                autopilotReferenceFrame = undefined;
+                rootDiagram.autopilot.speed = 0;
+                rootDiagram.autopilot.referenceFrame = undefined;
                 activeAnimationsCount--;
                 resolve();
             }
@@ -312,19 +312,19 @@ function chrysalideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
         // Use a 3-second timeout to end animation
         setTimeout(() => {
             clearInterval(intervalCheck); // Clear interval check regardless of the state
-            if (autopilotSpeed !== 0) {
+            if (rootDiagram.autopilot.speed !== 0) {
                 //console.log("Animation completed normally.");
             }
             activeAnimationsCount--;
-            autopilotSpeed = 0;
-            autopilotReferenceFrame = undefined;
+            rootDiagram.autopilot.speed = 0;
+            rootDiagram.autopilot.referenceFrame = undefined;
             resolve();
         }, 3000); // 3 seconds
     });
 }
 
 async function chrysalideSearchNotes(searchTerm, maxNodesOverride = null) {
-    const nodesArray = Object.values(nodes); // Assuming this contains full node objects
+    const nodesArray = Object.values(rootDiagram.nodes); // Assuming this contains full node objects
 
     // Clear previous search highlights
     clearSearchHighlights(nodesArray); // Clears "search_matched" class from all nodes

@@ -48,11 +48,11 @@ function restoreNewLinesInPreElements(nodeElement) {
 }
 
 function savenet(existingTitle = null) {
-    nodes.map((n) => n.updateEdgeData());
-    clearNodeSelection();
+    rootDiagram.nodes.map((n) => n.updateEdgeData());
+    rootDiagram.clearNodeSelection();
 
     // get the save object from Node class, WindowedUI return null
-    let nodeList = nodes.map((node) => node.save()).filter((node) => node !== null);
+    let nodeList = rootDiagram.nodes.map((node) => node.save()).filter((node) => node !== null);
 
     // Remove properties already saved to file
     for (let node of nodeList) {
@@ -290,27 +290,29 @@ document.getElementById("clearLocalStorage").onclick = function () {
 for (let n of htmlnodes) {
     // let node = new Node(undefined, n, true);  // Indicate edge creation with `true`
     let node = new WindowedNode({title: n.dataset.title, content: n, scale: true});
-    registernode(node);
+    node.diagram.registerNode(node);
 }
-for (let n of nodes) {
-    n.init(nodeMap);
+function reloadDiagram(diagram){
+    for (let n of diagram.nodes) {
+        n.init(diagram.nodeMap);
+    }
 }
 
 function clearnet() {
-    clearNodeSelection()
+    rootDiagram.clearNodeSelection()
 
     // Remove automatic load/save from/to files
     FileManagerAPI.clearAutoFiles();
 
     // Remove all edges
-    while (edges.length > 0) {
-        edges[edges.length - 1].remove();
+    while (rootDiagram.edges.length > 0) {
+        rootDiagram.edges[rootDiagram.edges.length - 1].remove();
     }
-    edgeDirectionalityMap.clear();
+    rootDiagram.edgeDirectionalityMap.clear();
 
     // Remove all nodes
-    while (nodes.length > 0) {
-        nodes[nodes.length - 1].remove();
+    while (rootDiagram.nodes.length > 0) {
+        rootDiagram.nodes[rootDiagram.nodes.length - 1].remove();
     }
 
     // Reset LLM node count
@@ -366,10 +368,10 @@ function loadnet(text, clobber, createEdges = true) {
         newNodes.push(node);
     }
 
-    populateDirectionalityMap(newNodes.map((node) => node.content), nodeMap);
+    populateDirectionalityMap(newNodes.map((node) => node.content), rootDiagram.nodeMap);
 
     for (let n of newNodes) {
-        n.init(nodeMap); // Initialize the node
+        n.init(rootDiagram.nodeMap); // Initialize the node
 
         reconstructSavedNode(n); // Reconstruct the saved node
     }
@@ -395,8 +397,8 @@ function populateDirectionalityMap(nodeElements, nodeMap) {
             const edgesData = JSON.parse(nodeElement.getAttribute('data-edges'));
             edgesData.forEach(edgeData => {
                 const edgeKey = edgeData.edgeKey;
-                if (!edgeDirectionalityMap.has(edgeKey)) {
-                    edgeDirectionalityMap.set(edgeKey, {
+                if (!rootDiagram.edgeDirectionalityMap.has(edgeKey)) {
+                    rootDiagram.edgeDirectionalityMap.set(edgeKey, {
                         start: nodeMap[edgeData.directionality.start],
                         end: nodeMap[edgeData.directionality.end]
                     });

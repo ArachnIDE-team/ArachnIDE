@@ -52,7 +52,7 @@ async function sendMessage(event, autoModeMessage = null) {
     }
 
     // Convert nodes object to an array of nodes
-    const nodesArray = Object.values(nodes);
+    const nodesArray = Object.values(rootDiagram.nodes);
 
     let keywordsArray = [];
     let keywords = '';

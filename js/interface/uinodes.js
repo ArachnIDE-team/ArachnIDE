@@ -11,8 +11,7 @@ class WindowedUI extends WindowedNode {
     constructor(configuration = WindowedUI.DEFAULT_CONFIGURATION) {
         configuration = {...WindowedUI.DEFAULT_CONFIGURATION, ...configuration};
         super({title: configuration.title, content: [configuration.content], pos: background.pan, scale: (background.zoom.mag2() ** settings.zoomContentExp), intrinsicScale: 1, addFullScreenButton: false, addCollapseButton: false, addSettingsButton: false, addFileButton: false});
-        htmlnodes_parent.appendChild(this.content);
-        registernode(this);
+        this.diagram.addNode(this);
         // WindowedNode.makeContentScrollable(this.innerContent, true)
         this._initializeUI(configuration.scaleProportions)
     }
