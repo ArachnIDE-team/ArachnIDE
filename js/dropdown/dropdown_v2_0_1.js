@@ -872,16 +872,17 @@ document.getElementById('node-count-slider').addEventListener('input', function 
     document.getElementById('node-slider-label').innerText = 'Top ' + this.value + '\nnodes';
 });
 
-let colorPicker = document.getElementById("colorPicker");
+// let colorPicker = document.getElementById("colorPicker");
 
-colorPicker.addEventListener("input", function () {
-    document.body.style.backgroundColor = this.value;
-}, false);
+// Moved to background.js Background Class
+// colorPicker.addEventListener("input", function () {
+//     document.body.style.backgroundColor = this.value;
+// }, false);
+//
+// // Manually dispatch the input event
+// colorPicker.dispatchEvent(new Event("input"));
 
-// Manually dispatch the input event
-colorPicker.dispatchEvent(new Event("input"));
-
-        //ai.js dropdown interaction
+//ai.js dropdown interaction
 let MAX_CHUNK_SIZE = 400;
 
 const maxChunkSizeSlider = document.getElementById('maxChunkSizeSlider');

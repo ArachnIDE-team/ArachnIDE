@@ -48,9 +48,14 @@ class Diagram extends Node {
     constructor(configuration= Diagram.DEFAULT_CONFIGURATION) {
         configuration = {...Diagram.DEFAULT_CONFIGURATION, ...configuration}
         configuration.background = {...Diagram.DEFAULT_CONFIGURATION.background, ...configuration.background}
-
+        // if(configuration.diagram === null) {
+        //     configuration.diagramContainer.dataset.init = "window";
+        //     configuration.diagramContainer.classList.add("window");
+        //     configuration.diagramContainer.classList.add("content");
+        // }
         // TO-DO: review
-        super({...configuration, content: configuration.diagramContainer, saved: true, saveData: {json: { uuid: "d0"}}});
+        super({...configuration, content: configuration.diagramContainer, saved: true, saveData: {json: { uuid: "d" + configuration.id}}});
+        this.diagramContainer = configuration.diagramContainer;
         // htmlnodes_parent.appendChild(this.content);
         // registernode(this);
         // interface_v2.js
@@ -63,6 +68,7 @@ class Diagram extends Node {
         this.prevNodeToConnect = undefined;
         this.selectedNodeUUIDs = new Set();// Global or scoped array for selected UUIDs
         this.edgeDirectionalityMap = new Map();
+        // this.background = new GridBG({
         this.background = new MandelbrotBG({
             svg_element: configuration.background.svg_element,
             svg_bg_element: configuration.background.svg_bg_element,
@@ -74,7 +80,8 @@ class Diagram extends Node {
             colorPickerR: document.getElementById("rColor"),
             colorPickerG: document.getElementById("gColor"),
             colorPickerB: document.getElementById("bColor"),
-            diagram: this
+            diagram: this,
+            container: this.diagramContainer
         })
         this.gen = this.background.iter();
         this.panInput = configuration.panInput;
@@ -93,25 +100,25 @@ class Diagram extends Node {
         }
         this.coordsLive = configuration.coordsLive;
         this.coordinateContainer = configuration.coordinateContainer; // previously coords (probably unused tho)
-        this.mousePathPos = undefined;
+        // this.mousePathPos = undefined; // Moved to Mandelbrot
         this.currentTime = undefined;// previously current_time
-        this.regenAmount = 0;
-        this.regenDebt = 0
+        // this.regenAmount = 0; // Moved to Mandelbrot
+        // this.regenDebt = 0; // Moved to Mandelbrot
         this.avgFPS = 0; // previously avgfps
         this.autopilot.panToI = new vec2(0, 0); // previously panToI
         this.autopilot.panToI_prev = undefined; // previously panToI_prev
         this.autopilot.prevNodeScale = 1; // previously prevNodeScale
-        document.addEventListener('wheel', this.onWheel.bind(this));
+        this.diagramContainer.addEventListener('wheel', this.onWheel.bind(this));
         this.mouseDown = false;
         this.mouseDownPos = new vec2(0, 0);
-        addEventListener("mousedown", this.onMouseDown.bind(this));
-        addEventListener("mouseup", this.onMouseUp.bind(this));
-        addEventListener("mousemove", this.onMouseMove.bind(this));
+        this.diagramContainer.addEventListener("mousedown", this.onMouseDown.bind(this));
+        this.diagramContainer.addEventListener("mouseup", this.onMouseUp.bind(this));
+        this.diagramContainer.addEventListener("mousemove", this.onMouseMove.bind(this));
         this.touches = new Map();
-        addEventListener("touchstart", this.onTouchStart.bind(this), false);
-        addEventListener("touchcancel", this.onTouchCancel.bind(this), false);
-        addEventListener("touchend", this.onTouchEnd.bind(this), false);
-        addEventListener("touchmove", this.onTouchMove.bind(this), false);
+        this.diagramContainer.addEventListener("touchstart", this.onTouchStart.bind(this), false);
+        this.diagramContainer.addEventListener("touchcancel", this.onTouchCancel.bind(this), false);
+        this.diagramContainer.addEventListener("touchend", this.onTouchEnd.bind(this), false);
+        this.diagramContainer.addEventListener("touchmove", this.onTouchMove.bind(this), false);
         this.gestureStartParams = {
             rotation: 0,
             x: 0,
@@ -120,9 +127,9 @@ class Diagram extends Node {
             zoom: new vec2(),
             pan: new vec2()
         };
-        addEventListener("gesturestart", this.onGestureStart.bind(this));
-        addEventListener("gesturechange", this.onGestureChange.bind(this));
-        addEventListener("gestureend", this.onGestureEnd.bind(this));
+        this.diagramContainer.addEventListener("gesturestart", this.onGestureStart.bind(this));
+        this.diagramContainer.addEventListener("gesturechange", this.onGestureChange.bind(this));
+        this.diagramContainer.addEventListener("gestureend", this.onGestureEnd.bind(this));
         // globals.js
         this.nodes = [];
         this.edges = [];
@@ -143,9 +150,10 @@ class Diagram extends Node {
 
         } else {
             this.diagram = configuration.diagram;
-            this.diagram.addNode(this)
+            this.parentNode = null;// host parentNode set by WindowedDiagram
+            // this.diagram.addNode(this)
         }
-
+        // this.diagramContainer = configuration.diagramContainer;
         this.nodeStep();
     }
 
@@ -486,53 +494,56 @@ class Diagram extends Node {
     }
 
     backgroundStep() {
-        this.background.updateViewbox();
-
-        if (this.background.mousePath == "") {
-            this.mousePathPos = this.background.toZ(this.background.mousePos);
-            this.background.mousePath = "M " + this.background.toSVG(this.mousePathPos).str() + " L ";
-        }
-        for (let i = 0; i < settings.orbitStepRate; i++) {
-            //let g = mandGrad(settings.iterations,mousePathPos);
-            //mousePathPos = mousePathPos.plus(g.unscale((g.mag()+1e-10)*1000));
-
-            this.mousePathPos = MandelbrotBG.mand_step(this.mousePathPos, this.background.toZ(this.background.mousePos));
-
-            //let p = findPeriod(mousePathPos);
-            //mousePathPos = mand_iter_n(p,mousePathPos,mousePathPos);
-            if (this.background.toSVG(this.mousePathPos).isFinite() && this.background.toSVG(this.mousePathPos).mag2() < 1e60)
-                this.background.mousePath += this.background.toSVG(this.mousePathPos).str() + " ";
-
-
-        }
-        let width = this.background.zoom.mag() * 0.0005 * this.background.SVGzoom;
-
-        if (this.nodeMode && this.prevNodeToConnect !== undefined) {
-            Diagram.clearTextSelection();
-            this.background.svg_mousePath.setAttribute("d", "M " + this.background.toSVG(this.prevNodeToConnect.pos).str() + " L " + this.background.toSVG(this.background.toZ(this.background.mousePos)).str());
-            width *= 50; // This will increase the width when connecting nodes. Adjust as needed.
-        } else {
-            this.background.svg_mousePath.setAttribute("d", this.background.mousePath);
-        }
-
-        // Moved the check to clear prevNodeToConnect outside of the if-else block
-        if (!this.nodeMode && this.prevNodeToConnect !== undefined) {
-            this.prevNodeToConnect = undefined;
-
-            // Clear the mouse path
-            this.background.mousePath = "";
-            this.background.svg_mousePath.setAttribute("d", "");
-            Diagram.clearTextSelection();
-        }
-
-        this.background.svg_mousePath.setAttribute("stroke-width", width + "");
-
-        this.regenDebt = Math.min(16, this.regenDebt + lerp(settings.regenDebtAdjustmentFactor, this.regenAmount, Math.min(1, (this.nodeMode_v ** 5) * 1.01)));
-        for (; this.regenDebt > 0; this.regenDebt--) {
-            this.background.render_hair(Math.random() * settings.renderSteps);
-        }
-        this.regenAmount = 0;
+        this.prevNodeToConnect = this.background.step(this.nodeMode, this.nodeMode_v, this.prevNodeToConnect)
     }
+    // backgroundStep() {
+    //     this.background.updateViewbox();
+    //
+    //     if (this.background.mousePath == "") {
+    //         this.background.mousePathPos = this.background.toZ(this.background.mousePos);
+    //         this.background.mousePath = "M " + this.background.toSVG(this.background.mousePathPos).str() + " L ";
+    //     }
+    //     for (let i = 0; i < settings.orbitStepRate; i++) {
+    //         //let g = mandGrad(settings.iterations,mousePathPos);
+    //         //mousePathPos = mousePathPos.plus(g.unscale((g.mag()+1e-10)*1000));
+    //
+    //         this.background.mousePathPos = MandelbrotBG.mand_step(this.background.mousePathPos, this.background.toZ(this.background.mousePos));
+    //
+    //         //let p = findPeriod(mousePathPos);
+    //         //mousePathPos = mand_iter_n(p,mousePathPos,mousePathPos);
+    //         if (this.background.toSVG(this.background.mousePathPos).isFinite() && this.background.toSVG(this.background.mousePathPos).mag2() < 1e60)
+    //             this.background.mousePath += this.background.toSVG(this.background.mousePathPos).str() + " ";
+    //
+    //
+    //     }
+    //     let width = this.background.zoom.mag() * 0.0005 * this.background.SVGzoom;
+    //
+    //     if (this.nodeMode && this.prevNodeToConnect !== undefined) {
+    //         Diagram.clearTextSelection();
+    //         this.background.svg_mousePath.setAttribute("d", "M " + this.background.toSVG(this.prevNodeToConnect.pos).str() + " L " + this.background.toSVG(this.background.toZ(this.background.mousePos)).str());
+    //         width *= 50; // This will increase the width when connecting nodes. Adjust as needed.
+    //     } else {
+    //         this.background.svg_mousePath.setAttribute("d", this.background.mousePath);
+    //     }
+    //
+    //     // Moved the check to clear prevNodeToConnect outside of the if-else block
+    //     if (!this.nodeMode && this.prevNodeToConnect !== undefined) {
+    //         this.prevNodeToConnect = undefined;
+    //
+    //         // Clear the mouse path
+    //         this.background.mousePath = "";
+    //         this.background.svg_mousePath.setAttribute("d", "");
+    //         Diagram.clearTextSelection();
+    //     }
+    //
+    //     this.background.svg_mousePath.setAttribute("stroke-width", width + "");
+    //
+    //     this.background.regenDebt = Math.min(16, this.background.regenDebt + lerp(settings.regenDebtAdjustmentFactor, this.background.regenAmount, Math.min(1, (this.nodeMode_v ** 5) * 1.01)));
+    //     for (; this.background.regenDebt > 0; this.background.regenDebt--) {
+    //         this.background.render_hair(Math.random() * settings.renderSteps);
+    //     }
+    //     this.background.regenAmount = 0;
+    // }
 
     autoPilotStep() {
         let autopilot_travelDist = 0;
@@ -601,7 +612,9 @@ class Diagram extends Node {
         while (targetElement) {
             // Check if the target is a textarea or contenteditable
             if (targetElement.tagName.toLowerCase() === 'textarea' ||
-                targetElement.contentEditable === 'true' || targetElement.classList.contains("scrollable-content")) {
+                targetElement.contentEditable === 'true' ||
+                (targetElement.classList.contains("scrollable-content") &&
+                this.diagramContainer.parentNode.parentNode.parentNode !== targetElement)) {
                 return;
             }
             targetElement = targetElement.parentElement;
@@ -627,8 +640,15 @@ class Diagram extends Node {
             deselectCoordinate();
 
             this.coordsLive = true;
-            let dest = this.background.toZ(this.background.mousePos);
-            this.regenAmount += Math.abs(event.wheelDelta);
+            let containerBounds = this.diagramContainer.getBoundingClientRect()
+            let topLeft = new vec2(containerBounds.x, containerBounds.y);
+            // if(this.diagram !== null) {
+            //     topLeft = this.diagram.background.toS(topLeft)
+            // }
+            let destPoint = this.background.mousePos.minus(topLeft);
+            let dest = this.background.toZ(destPoint);
+            // console.log("Zoom destination: ", dest, " mouse position: ", destPoint)
+            this.background.regenAmount += Math.abs(event.wheelDelta);
             let amount = Math.exp(event.wheelDelta * settings.zoomSpeed);
             this.background.zoom = this.background.zoom.scale(amount);
             this.background.pan = dest.scale(1 - amount).plus(this.background.pan.scale(amount));
@@ -646,7 +666,7 @@ class Diagram extends Node {
                 dp = this.background.toDZ(new vec2(event.deltaX, event.deltaY).scale(settings.panSpeed));
                 amount = event.deltaZ * settings.zoomSpeed;
             }
-            this.regenAmount += Math.hypot(event.deltaX, event.deltaY, event.deltaZ);
+            this.background.regenAmount += Math.hypot(event.deltaX, event.deltaY, event.deltaZ);
             amount = Math.exp(amount)
             this.background.zoom = this.background.zoom.scale(amount);
             this.background.pan = dest.scale(1 - amount).plus(this.background.pan.scale(amount)).plus(dp);
@@ -676,7 +696,7 @@ class Diagram extends Node {
             this.coordsLive = true;
             let delta = this.background.mousePos.minus(this.mouseDownPos);
             this.background.pan = this.background.pan.minus(this.background.toDZ(delta));
-            this.regenAmount += delta.mag() * 0.25;
+            this.background.regenAmount += delta.mag() * 0.25;
             this.mouseDownPos = this.background.mousePos.scale(1);
         }
     }
@@ -802,7 +822,7 @@ class Diagram extends Node {
         if (e.scale !== 0) {
             let scale = 1 / e.scale;
             this.background.zoom = this.background.zoom.scale(scale);
-            this.regenAmount += Math.abs(Math.log(scale)) * settings.maxLines;
+            this.background.regenAmount += Math.abs(Math.log(scale)) * settings.maxLines;
         }
         let dest = r_center;
         let amount = scale;
@@ -843,68 +863,176 @@ function createMainDiagram(){
             svg_element: svg,
             svg_bg_element: svg.getElementById("bg"),
             svg_viewmat_element: svg.getElementById("viewmatrix"),
-            svg_mousePath_element: svg.getElementById("mousePath")
+            svg_mousePath_element: svg.getElementById("mousePath"),
         }
    })
    Node.DEFAULT_CONFIGURATION.diagram = rootDiagram;
 }
 
+
+class WindowedDiagram extends WindowedNode {
+    static DEFAULT_CONFIGURATION = { // just for eg, we cant pass default values
+        id: undefined,
+        parent: undefined,
+    }
+    static SAVE_PROPERTIES = [];
+    // constructor(title, content, pos, scale, iscale, link) {
+    constructor(configuration= WindowedDiagram.DEFAULT_CONFIGURATION) {
+        let {diagramContainer, diagram} = WindowedDiagram._getContentElement(configuration.id, configuration.parent);
+        super({content: [diagramContainer], title: "diagram: " + configuration.id, ...WindowedNode.getNaturalScaleParameters() });
+        configuration.parent.addNode(this)
+        this.diagramContainer = diagramContainer;
+        this.innerDiagram = diagram;
+        diagram.parentNode = this;
+        super.setMinSize(808, 500);
+        this.onResize(808,500)
+        WindowedNode.makeContentScrollable(this.content)
+        this.proxyEventListeners();
+
+    }
+
+    static _getContentElement(id, parent) {
+        let diagramContainer = document.createElement("div");
+        let nodeContainer = document.createElement("a");
+        nodeContainer.id = "nodes-" + id;
+        let edgeContainer = document.createElementNS("http://www.w3.org/2000/svg","g");
+        edgeContainer.id = "edges-" + id;
+        let panInput = document.createElement("input")
+        panInput.id = "pan-" + id;
+        panInput.type = "text";
+        panInput.style.background = "none";
+        panInput.style.border = "none";
+        panInput.size = "28";
+        let zoomInput = document.createElement("input")
+        zoomInput.id = "zoom-" + id;
+        zoomInput.type = "text";
+        zoomInput.style.background = "none";
+        zoomInput.style.border = "none";
+        zoomInput.size = "25";
+        let svg_element = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg_element.id = "svg_bg-" + id;
+        svg_element.setAttribute("viewBox", "0 0 0 0");
+        svg_element.setAttribute("width","100%");
+        svg_element.setAttribute("height","100vh");
+        svg_element.setAttribute("top","0");
+        svg_element.setAttribute("left", "0");
+        svg_element.setAttribute("position", "fixed");
+        svg_element.style.width = "100%"
+        svg_element.style.height = "100%"
+        svg_element.style.display = "block"
+        let svg_viewmat_element = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        svg_viewmat_element.id = "viewmatrix-" + id;
+        let svg_bg_element = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        svg_bg_element.id = "bg-" + id;
+        svg_bg_element.style.width = "100%"
+        svg_bg_element.style.height = "100%"
+        svg_bg_element.style.display = "block"
+        let svg_mousePath_element = document.createElementNS("http://www.w3.org/2000/svg","path");
+        svg_mousePath_element.id = "mousePath-" + id;
+        svg_mousePath_element.setAttribute("fill", "none");
+        svg_mousePath_element.setAttribute("stroke", "rgb(50 51 62 / 80%)");
+        svg_mousePath_element.setAttribute("stroke-width","6.144");
+
+        svg_viewmat_element.append(svg_bg_element, svg_mousePath_element, edgeContainer)
+        svg_element.append(svg_viewmat_element)
+        diagramContainer.append(svg_element, nodeContainer)
+
+        let diagram = new Diagram({
+            diagramContainer,
+            nodeContainer,
+            edgeContainer,
+            panInput,
+            zoomInput,
+            coordsLive: false,
+            coordinateContainer: null,
+            diagram: parent,
+            background: {
+                svg_element,
+                svg_bg_element,
+                svg_viewmat_element,
+                svg_mousePath_element
+            },
+            id,
+        });
+        return {diagramContainer, diagram};
+    }
+
+    proxyEventListeners(){
+
+    }
+
+    onResize(newWidth, newHeight) {
+        super.onResize(newWidth, newHeight);
+        // Set the new dimensions for the diagram wrapper div
+        this.diagramContainer.style.width = `${newWidth}px`;
+        this.diagramContainer.style.height = `${newHeight - 65}px`;
+
+
+    }
+}
+
 createMainDiagram();
 
 function createDiagram(id, parent){
-    let diagramContainer = document.createElement("div");
-    let nodeContainer = document.createElement("a");
-    nodeContainer.id = "nodes-" + id;
-    let edgeContainer = document.createElement("g");
-    edgeContainer.id = "edges-" + id;
-    let panInput = document.createElement("input")
-    panInput.id = "pan-" + id;
-    panInput.type = "text";
-    panInput.style.background = "none";
-    panInput.style.border = "none";
-    panInput.size = "28";
-    let zoomInput = document.createElement("input")
-    zoomInput.id = "zoom-" + id;
-    zoomInput.type = "text";
-    zoomInput.style.background = "none";
-    zoomInput.style.border = "none";
-    zoomInput.size = "25";
-    let svg_element = document.createElement("svg");
-    svg_element.id = "svg_bg-" + id;
-    svg_element.viewBox= "0 0 0 0"
-    svg_element.width = "100%";
-    svg_element.height = "100vh";
-    svg_element.top = "0";
-    svg_element.left = "0";
-    svg_element.position = "fixed";
-    let svg_viewmat_element = document.createElement("g");
-    svg_viewmat_element.id = "viewmatrix-" + id;
-    let svg_bg_element = document.createElement("g");
-    svg_bg_element.id = "bg-" + id;
-    let svg_mousePath_element = document.createElement("path");
-    svg_mousePath_element.id = "mousePath-" + id;
-
-    svg_bg_element.append(svg_mousePath_element)
-    svg_viewmat_element.append(svg_bg_element, edgeContainer)
-    svg_element.append(svg_viewmat_element)
-    diagramContainer.append(svg_element, nodeContainer)
-
-    let diagram = new Diagram({
-        diagramContainer,
-        nodeContainer,
-        edgeContainer,
-        panInput,
-        zoomInput,
-        coordsLive: false,
-        coordinateContainer: null,
-        diagram: parent,
-        background: {
-            svg_element,
-            svg_bg_element,
-            svg_viewmat_element,
-            svg_mousePath_element
-        }
-    });
-    // diagram.fo
-    return diagram;
+    return new WindowedDiagram({id, parent})
 }
+
+// function createDiagram(id, parent){
+//     let diagramContainer = document.createElement("div");
+//     let nodeContainer = document.createElement("a");
+//     nodeContainer.id = "nodes-" + id;
+//     let edgeContainer = document.createElement("g");
+//     edgeContainer.id = "edges-" + id;
+//     let panInput = document.createElement("input")
+//     panInput.id = "pan-" + id;
+//     panInput.type = "text";
+//     panInput.style.background = "none";
+//     panInput.style.border = "none";
+//     panInput.size = "28";
+//     let zoomInput = document.createElement("input")
+//     zoomInput.id = "zoom-" + id;
+//     zoomInput.type = "text";
+//     zoomInput.style.background = "none";
+//     zoomInput.style.border = "none";
+//     zoomInput.size = "25";
+//     let svg_element = document.createElement("svg");
+//     svg_element.id = "svg_bg-" + id;
+//     svg_element.viewBox= "0 0 0 0"
+//     svg_element.width = "100%";
+//     svg_element.height = "100vh";
+//     svg_element.top = "0";
+//     svg_element.left = "0";
+//     svg_element.position = "fixed";
+//     let svg_viewmat_element = document.createElement("g");
+//     svg_viewmat_element.id = "viewmatrix-" + id;
+//     let svg_bg_element = document.createElement("g");
+//     svg_bg_element.id = "bg-" + id;
+//     let svg_mousePath_element = document.createElement("path");
+//     svg_mousePath_element.id = "mousePath-" + id;
+//
+//     svg_bg_element.append(svg_mousePath_element)
+//     svg_viewmat_element.append(svg_bg_element, edgeContainer)
+//     svg_element.append(svg_viewmat_element)
+//     diagramContainer.append(svg_element, nodeContainer)
+//
+//     let diagram = new Diagram({
+//         diagramContainer,
+//         nodeContainer,
+//         edgeContainer,
+//         panInput,
+//         zoomInput,
+//         coordsLive: false,
+//         coordinateContainer: null,
+//         diagram: parent,
+//         background: {
+//             svg_element,
+//             svg_bg_element,
+//             svg_viewmat_element,
+//             svg_mousePath_element
+//         }
+//     });
+//     let diagramNode = new WindowedNode({content: [diagramContainer], title: "diagram: " + id, ...WindowedNode.getNaturalScaleParameters() });
+//     parent.addNode(diagramNode)
+//     // diagram.fo
+//     return {diagram, diagramNode};
+// }

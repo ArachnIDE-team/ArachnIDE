@@ -8,4 +8,5 @@
 // new NodeFilesUI({node: textNode});
 
 
-// createDiagram(1, rootDiagram)
+let subd = createDiagram(1, rootDiagram);
+subd.pos = rootDiagram.background.pan;
