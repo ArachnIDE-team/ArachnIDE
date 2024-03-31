@@ -483,7 +483,7 @@ class MandelbrotBG extends Background {
         if (this.mousePath === "" || Number.isNaN(this.mousePathPos.x)) {
 
             this.mousePathPos = this.toZ(this.mousePos.minus(topLeft));
-            if(this.container !== window.body) console.log("Mouse Path pos: ", this.mousePathPos)
+            // if(this.container !== window.body) console.log("Mouse Path pos: ", this.mousePathPos)
             if(!Number.isNaN(this.mousePathPos.x))this.mousePath = "M " + this.toSVG(this.mousePathPos).str() + " L ";
         }
         for (let i = 0; i < settings.orbitStepRate; i++) {
@@ -499,7 +499,7 @@ class MandelbrotBG extends Background {
 
 
         }
-        let width = this.zoom.mag() * 0.005 * this.SVGzoom;
+        let width = this.zoom.mag() * 0.0005 * this.SVGzoom;
 
         if (nodeMode && prevNodeToConnect !== undefined) {
             Diagram.clearTextSelection();

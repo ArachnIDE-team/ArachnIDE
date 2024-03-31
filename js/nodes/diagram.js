@@ -157,11 +157,6 @@ class Diagram extends Node {
         this.nodeStep();
     }
 
-
-
-
-
-
     // FROM interface_v2
 
     skipAutopilot() {
@@ -584,7 +579,7 @@ class Diagram extends Node {
 
     // END RENDERING STEPS
 
-
+    // OVERRIDE Node default handlers
     onclick(event) {
         if(this.diagram !== null) super.onclick(event)
     }
@@ -603,7 +598,9 @@ class Diagram extends Node {
     onwheel(event) {
         if(this.diagram !== null) super.onwheel(event)
     }
+    // End OVERRIDE
 
+    // Diagram handlers
     onWheel(event){
 
         // Get the element that the user is scrolling on
@@ -841,11 +838,54 @@ class Diagram extends Node {
     addNode(node){
         this.htmlnodes_parent.appendChild(node.content);
         this.registerNode(node)
+        if(this.parentNode && node instanceof WindowedDiagram) {
+            // Nested WindowedDiagram
+            let diagram = this;
+            while(diagram) {
+                diagram.bumpHeight();
+                diagram = diagram.diagram;
+            }
+        }
+    }
+
+    bumpHeight(){
+        if(this.parentNode) {
+            // Nested WindowedDiagram
+            this.parentNode.applyResize(this.parentNode.width, 0, this.parentNode.height, 120 )
+        }
     }
 
     registerNode(node) {
         this.nodes.push(node);
         this.nodeMap[node.uuid] = node;
+    }
+
+    // Utility for background
+
+    absoluteScaleAndOffset(element, pos, innerScale){
+        let diagram = this;
+        let {scale, offset} = diagram.background.windowScaleAndOffset();
+        pos.x = scale * pos.x + offset.x;
+        pos.y = scale * pos.y + offset.y;
+        let bb = element.getBoundingClientRect();
+        pos = pos.minus(new vec2(bb.width, bb.height).scale(0.5 / innerScale));
+        // diagram = diagram.diagram;
+        while (diagram !== null) {
+            // let {scale, offset} = diagram.background.windowScaleAndOffset();
+            // pos.x = scale * pos.x;
+            // pos.y = scale * pos.y;// + offset.y;
+
+            if(diagram.parentNode) {
+                let scale = diagram.parentNode.intrinsicScale * diagram.parentNode.scale * (diagram.diagram.background.zoom.mag2() ** -settings.zoomContentExp)
+                // if(scale !== 1) console.log("Diagram: ", this.uuid,"->", diagram.uuid,  " scale: ", scale)
+                pos.x /= scale;
+                pos.y /= scale;
+            }
+            diagram = diagram.diagram;
+        }
+        // pos.x += offset.x;
+        // pos.y += offset.y;
+        return pos;
     }
 }
 
@@ -864,7 +904,8 @@ function createMainDiagram(){
             svg_bg_element: svg.getElementById("bg"),
             svg_viewmat_element: svg.getElementById("viewmatrix"),
             svg_mousePath_element: svg.getElementById("mousePath"),
-        }
+        },
+        id: 0
    })
    Node.DEFAULT_CONFIGURATION.diagram = rootDiagram;
 }
@@ -879,7 +920,7 @@ class WindowedDiagram extends WindowedNode {
     // constructor(title, content, pos, scale, iscale, link) {
     constructor(configuration= WindowedDiagram.DEFAULT_CONFIGURATION) {
         let {diagramContainer, diagram} = WindowedDiagram._getContentElement(configuration.id, configuration.parent);
-        super({content: [diagramContainer], title: "diagram: " + configuration.id, ...WindowedNode.getNaturalScaleParameters() });
+        super({ content: [diagramContainer],  diagram: configuration.parent,  title: "diagram: " + configuration.id, ...WindowedNode.getNaturalScaleParameters() });
         configuration.parent.addNode(this)
         this.diagramContainer = diagramContainer;
         this.innerDiagram = diagram;

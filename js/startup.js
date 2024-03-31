@@ -10,3 +10,9 @@
 
 let subd = createDiagram(1, rootDiagram);
 subd.pos = rootDiagram.background.pan;
+//
+let subd2 = createDiagram(2, subd.innerDiagram);
+subd2.pos = rootDiagram.background.pan;
+
+let subd3 = createDiagram(3, subd2.innerDiagram);
+subd3.pos = subd.innerDiagram.background.pan;

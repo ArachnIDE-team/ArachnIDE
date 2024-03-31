@@ -131,7 +131,7 @@ class Node {
     }
 
     draw() {
-        put(this.content, this.pos, this.intrinsicScale * this.scale * (this.diagram.background.zoom.mag2() ** -settings.zoomContentExp));
+        put(this.content, this.pos, this.intrinsicScale * this.scale * (this.diagram.background.zoom.mag2() ** -settings.zoomContentExp), this.diagram);
 
         // Before saving, get the current title input value and store it in a data-attribute
         let titleInput = this.content.querySelector('.title-input');

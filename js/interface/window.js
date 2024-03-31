@@ -29,7 +29,7 @@ class WindowedNode extends Node {
                                     configuration.content :
                                     WindowedNode._createWindow(configuration.saveData.json.title || configuration.title, configuration.content) :
                                 WindowedNode._createWindow(configuration.title, configuration.content);
-        super({pos: configuration.pos, content: windowElement, scale: configuration.scale, intrinsicScale: configuration.intrinsicScale || new vec2(1, 1), saved: configuration.saved, saveData: configuration.saveData});
+        super({...configuration, content: windowElement, intrinsicScale: configuration.intrinsicScale || new vec2(1, 1)});
         this.title = configuration.title;
         this.addCloseButton = configuration.addCloseButton;
         this.addFullScreenButton = configuration.addFullScreenButton;
@@ -616,28 +616,27 @@ function registernode(node) {
     rootDiagram.nodeMap[node.uuid] = node;
 }
 
-function posToLeftTop(element, pos, scale){
-    let svgbb = rootDiagram.background.svg.getBoundingClientRect();
-    pos = rootDiagram.background.fromZtoUV(pos);
+function posToLeftTop(element, pos, scale, diagram=null){
+    if(diagram === null) diagram = rootDiagram;
+    pos = diagram.background.fromZtoUV(pos);
     let hide = pos.minus(new vec2(0.5, 0.5)).mag2() > 16;
-    let w = Math.min(svgbb.width, svgbb.height);
-    let off = svgbb.width < svgbb.height ? svgbb.right : svgbb.bottom;
-    pos.x = w * pos.x - (off - svgbb.right) / 2;
-    pos.y = w * pos.y - (off - svgbb.bottom) / 2;
-    let bb = element.getBoundingClientRect();
-    pos = pos.minus(new vec2(bb.width, bb.height).scale(0.5 / scale));
+    pos = diagram.absoluteScaleAndOffset(element, pos, scale);
     return {pos, hide};
 }
 // used in interfaces_v2 Node.draw method
-function put(element, p, scale = 1) {
+function put(element, p, scale = 1, diagram=null) {
     element.style.position = "absolute";
     element.style.transform = "scale(" + scale + "," + scale + ")";
-    let {pos, hide} = posToLeftTop(element, p, scale);
+    let {pos, hide} = posToLeftTop(element, p, scale, diagram);
     if (hide) {
         element.style.display = "none";
     } else {
         element.style.display = "initial";
     }
+    // if(diagram !== null) {
+    //     let bounds = diagram.diagramContainer.getBoundingClientRect()
+    //     pos = pos.minus(new vec2(bounds.x, bounds.y))
+    // }
     element.style.left = pos.x + "px";
     element.style.top = pos.y + "px";
 

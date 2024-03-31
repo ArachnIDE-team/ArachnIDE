@@ -960,7 +960,6 @@ class Background {
             scale,
             offset
         }
-
     }
     // windowScaleAndOffset() {
     //     let svgBoundingBox = this.svg.getBoundingClientRect();
