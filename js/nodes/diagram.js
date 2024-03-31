@@ -1,5 +1,7 @@
 
 // Utility escape method for RegExp
+//https://github.com/tc39/proposal-regex-escaping/blob/main/specInJs.js
+// this is a direct translation to code of the spec
 if (!RegExp.escape) {
     RegExp.escape = (S) => {
         // 1. let str be ToString(S).
@@ -133,8 +135,6 @@ class Diagram extends Node {
         // globals.js
         this.nodes = [];
         this.edges = [];
-        this.nodeMode_v = 0;
-        this.nodeMode = 0;
 
         this.movingNode = undefined;
         this.NodeUUID = 0;
@@ -424,7 +424,7 @@ class Diagram extends Node {
         for (let e of this.edges) {
             e.step(dt);
         }
-        this.nodeMode_v = lerp(this.nodeMode_v, this.nodeMode, 0.125);
+        nodeMode_v = lerp(nodeMode_v, nodeMode, 0.125);
         window.requestAnimationFrame(this.nodeStep.bind(this));
     }
 
@@ -484,61 +484,13 @@ class Diagram extends Node {
 
         document.getElementById("debug_layer").children[1].textContent = "fps:" + this.avgFPS;
         document.getElementById("fps").textContent = Math.round(this.avgFPS).toString() + " fps";
-        dt *= (1 - this.nodeMode_v) ** 5;
+        dt *= (1 - nodeMode_v) ** 5;
         return dt;
     }
 
     backgroundStep() {
-        this.prevNodeToConnect = this.background.step(this.nodeMode, this.nodeMode_v, this.prevNodeToConnect)
+        this.prevNodeToConnect = this.background.step(nodeMode, nodeMode_v, this.prevNodeToConnect)
     }
-    // backgroundStep() {
-    //     this.background.updateViewbox();
-    //
-    //     if (this.background.mousePath == "") {
-    //         this.background.mousePathPos = this.background.toZ(this.background.mousePos);
-    //         this.background.mousePath = "M " + this.background.toSVG(this.background.mousePathPos).str() + " L ";
-    //     }
-    //     for (let i = 0; i < settings.orbitStepRate; i++) {
-    //         //let g = mandGrad(settings.iterations,mousePathPos);
-    //         //mousePathPos = mousePathPos.plus(g.unscale((g.mag()+1e-10)*1000));
-    //
-    //         this.background.mousePathPos = MandelbrotBG.mand_step(this.background.mousePathPos, this.background.toZ(this.background.mousePos));
-    //
-    //         //let p = findPeriod(mousePathPos);
-    //         //mousePathPos = mand_iter_n(p,mousePathPos,mousePathPos);
-    //         if (this.background.toSVG(this.background.mousePathPos).isFinite() && this.background.toSVG(this.background.mousePathPos).mag2() < 1e60)
-    //             this.background.mousePath += this.background.toSVG(this.background.mousePathPos).str() + " ";
-    //
-    //
-    //     }
-    //     let width = this.background.zoom.mag() * 0.0005 * this.background.SVGzoom;
-    //
-    //     if (this.nodeMode && this.prevNodeToConnect !== undefined) {
-    //         Diagram.clearTextSelection();
-    //         this.background.svg_mousePath.setAttribute("d", "M " + this.background.toSVG(this.prevNodeToConnect.pos).str() + " L " + this.background.toSVG(this.background.toZ(this.background.mousePos)).str());
-    //         width *= 50; // This will increase the width when connecting nodes. Adjust as needed.
-    //     } else {
-    //         this.background.svg_mousePath.setAttribute("d", this.background.mousePath);
-    //     }
-    //
-    //     // Moved the check to clear prevNodeToConnect outside of the if-else block
-    //     if (!this.nodeMode && this.prevNodeToConnect !== undefined) {
-    //         this.prevNodeToConnect = undefined;
-    //
-    //         // Clear the mouse path
-    //         this.background.mousePath = "";
-    //         this.background.svg_mousePath.setAttribute("d", "");
-    //         Diagram.clearTextSelection();
-    //     }
-    //
-    //     this.background.svg_mousePath.setAttribute("stroke-width", width + "");
-    //
-    //     this.background.regenDebt = Math.min(16, this.background.regenDebt + lerp(settings.regenDebtAdjustmentFactor, this.background.regenAmount, Math.min(1, (this.nodeMode_v ** 5) * 1.01)));
-    //     for (; this.background.regenDebt > 0; this.background.regenDebt--) {
-    //         this.background.render_hair(Math.random() * settings.renderSteps);
-    //     }
-    //     this.background.regenAmount = 0;
-    // }
 
     autoPilotStep() {
         let autopilot_travelDist = 0;
@@ -611,12 +563,14 @@ class Diagram extends Node {
             if (targetElement.tagName.toLowerCase() === 'textarea' ||
                 targetElement.contentEditable === 'true' ||
                 (targetElement.classList.contains("scrollable-content") &&
-                this.diagramContainer.parentNode.parentNode.parentNode !== targetElement)) {
+                !targetElement.classList.contains("diagram-window"))) {
                 return;
             }
             targetElement = targetElement.parentElement;
         }
-        if (this.nodeMode !== 1 && event.getModifierState(settings.rotateModifier)) {
+
+        // console.log("Diagram.onWheel: uuid:", this.uuid, "nodeMode: ", nodeMode)
+        if (nodeMode !== 1 && event.getModifierState(settings.rotateModifier)) {
             this.autopilot.speed = 0;
             this.coordsLive = true;
             let amount = event.wheelDelta * settings.rotateModifierSpeed;
@@ -928,6 +882,7 @@ class WindowedDiagram extends WindowedNode {
         super.setMinSize(808, 500);
         this.onResize(808,500)
         WindowedNode.makeContentScrollable(this.content)
+        this.windowDiv.parentNode.classList.add("diagram-window")
         this.proxyEventListeners();
 
     }

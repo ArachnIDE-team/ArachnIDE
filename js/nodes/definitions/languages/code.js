@@ -26,9 +26,9 @@ class CodeNode extends WindowedNode {
         configuration.settings =  {...CodeNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
         configuration.content = [CodeNode._getContentElement()];
         if (!configuration.saved) {// Create CodeNode
-            super({ title: configuration.name, content: configuration.content, ...WindowedNode.getNaturalScaleParameters() });
+            super({...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters() });
         } else {// Restore CodeNode
-            super({ title: configuration.name, content: configuration.content, scale: true, saved: true, saveData: configuration.saveData })
+            super({...configuration, title: configuration.name, scale: true })
         }
         this._codeListeners = [];
         this.diagram.addNode(this);

@@ -165,14 +165,14 @@ class Node {
         //this.force = this.force.plus(d.scale(this.followingMouse/(d.mag2()+1)));
         if (this.followingMouse) {
             let p = this.diagram.background.toZ(this.diagram.background.mousePos).minus(this.mouseAnchor);
-            let velocity = p.minus(this.pos).unscale(rootDiagram.nodeMode ? 1 : dt);
+            let velocity = p.minus(this.pos).unscale(nodeMode ? 1 : dt);
 
             this.vel = velocity;
             this.pos = p;
             this.anchor = this.pos;
 
             // Update the edges of the current node being dragged
-            if (this.diagram.nodeMode === 1) {
+            if (nodeMode === 1) {
                 Diagram.updateNodeEdgesLength(this);
             }
 
@@ -184,7 +184,7 @@ class Node {
                         node.vel = velocity;
 
                         // Update the edges for each selected node
-                        if (this.diagram.nodeMode === 1) {
+                        if (nodeMode === 1) {
                             Diagram.updateNodeEdgesLength(node);
                         }
                     }
@@ -279,7 +279,7 @@ class Node {
         this.followingMouse = 1;
         window.draggedNode = this;
         this.diagram.movingNode = this;
-        if (this.diagram.nodeMode) {
+        if (nodeMode) {
             if (this.diagram.prevNodeToConnect === undefined) {
                 this.diagram.prevNodeToConnect = this;
             } else {
@@ -333,7 +333,7 @@ class Node {
     }
 
     onwheel(event) {
-        if (this.diagram.nodeMode) {
+        if (nodeMode) {
             let amount = Math.exp(event.wheelDelta * -settings.zoomSpeed);
 
             if (this.diagram.autopilot.speed !== 0 && this.uuid === this.diagram.autopilot.referenceFrame.uuid) {

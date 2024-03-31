@@ -19,17 +19,17 @@ class ImageNode extends WindowedNode {
         configuration = {...ImageNode.DEFAULT_CONFIGURATION, ...configuration}
         if (!configuration.saved) {// Create ImageNode
             if (configuration.isUrl) {
-                super({ title: configuration.name, content: [ImageNode._getContentElement(configuration.imageSrc)], ...WindowedNode.getNaturalScaleParameters() });
+                super({...configuration,  title: configuration.name, content: [ImageNode._getContentElement(configuration.imageSrc)], ...WindowedNode.getNaturalScaleParameters() });
             } else {
                 if (!(configuration.imageSrc instanceof HTMLImageElement) || !configuration.imageSrc.src) {
                     console.error('createImageNode was called without a valid image element or src');
                     return null;
                 }
-                super({ title: configuration.name, content: [configuration.imageSrc], ...WindowedNode.getNaturalScaleParameters() });
+                super({...configuration,  title: configuration.name, content: [configuration.imageSrc], ...WindowedNode.getNaturalScaleParameters() });
             }
         } else {// Restore ImageNode
             configuration.imageSrc = configuration.saveData.json.imageUrl;
-            super({title: configuration.name, content: [ImageNode._getContentElement(configuration.imageSrc)], scale: true, saved: true, saveData: configuration.saveData})
+            super({...configuration, title: configuration.name, content: [ImageNode._getContentElement(configuration.imageSrc)], scale: true})
         }
 
         this.diagram.addNode(this);

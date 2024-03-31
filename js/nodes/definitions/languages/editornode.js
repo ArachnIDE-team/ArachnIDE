@@ -17,9 +17,9 @@ class WebEditorNode extends WindowedNode {
         configuration = {...WebEditorNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.content = [WebEditorNode._getContentElement()];
         if (!configuration.saved) {// Create WebEditorNode
-            super({ title: configuration.name, content: configuration.content, ...WindowedNode.getNaturalScaleParameters() });
+            super({...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters() });
         } else {// Restore WebEditorNode
-            super({ title: configuration.name, content: configuration.content, scale: true, saved: true, saveData: configuration.saveData })
+            super({...configuration, title: configuration.name, scale: true })
         }
         this.diagram.addNode(this);
         this._initialize(configuration.name, configuration.saved)

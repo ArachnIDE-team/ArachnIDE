@@ -17,14 +17,15 @@ class WorkspaceExplorerNode extends WindowedNode {
     constructor(configuration = WorkspaceExplorerNode.DEFAULT_CONFIGURATION){
         configuration = {...WorkspaceExplorerNode.DEFAULT_CONFIGURATION, ...configuration}
         if(!selectedWorkspacePath) throw new Error("Please load a workspace before creating a WorkspaceExplorerNode")
+        configuration.content = WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index);
         if (!configuration.saved) {// Create WorkspaceExplorerNode
             configuration.index = workspaceExplorerNodeCount;
-            super({ title: configuration.name, content: WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index), addFileButton:false, ...WindowedNode.getNaturalScaleParameters() });
+            super({...configuration,  title: configuration.name, addFileButton:false, ...WindowedNode.getNaturalScaleParameters() });
             workspaceExplorerNodeCount++;
             this.followingMouse = 1;
         } else {// Restore WorkspaceExplorerNode
             configuration.index = configuration.saveData.json.index;
-            super({ title: configuration.name, content: WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index), addFileButton:false, scale: true, saved: true, saveData: configuration.saveData })
+            super({...configuration,  title: configuration.name, addFileButton:false, scale: true})
         }
 
         this.diagram.addNode(this);

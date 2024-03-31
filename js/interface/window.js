@@ -604,17 +604,6 @@ class WindowedNode extends Node {
     }
 }
 
-// DONE (Used by WindowedNode)
-function registernode(node) {
-    let id = rootDiagram.nodes.length;
-    let div = node.content;
-    /*div.setAttribute("onclick","(e)=>nodes["+id+"].onclick(e)");
-    div.setAttribute("onmousedown","(e)=>nodes["+id+"].onmousedown(e)");
-    div.setAttribute("onmouseup","(e)=>nodes["+id+"].onmouseup(e)");
-    div.setAttribute("onmousemove","(e)=>nodes["+id+"].onmousemove(e)");*/
-    rootDiagram.nodes.push(node);
-    rootDiagram.nodeMap[node.uuid] = node;
-}
 
 function posToLeftTop(element, pos, scale, diagram=null){
     if(diagram === null) diagram = rootDiagram;
@@ -633,10 +622,7 @@ function put(element, p, scale = 1, diagram=null) {
     } else {
         element.style.display = "initial";
     }
-    // if(diagram !== null) {
-    //     let bounds = diagram.diagramContainer.getBoundingClientRect()
-    //     pos = pos.minus(new vec2(bounds.x, bounds.y))
-    // }
+    element.style.clipPath = "content-box";
     element.style.left = pos.x + "px";
     element.style.top = pos.y + "px";
 

@@ -19,11 +19,11 @@ class MetaNode extends WindowedNode {
     constructor(configuration = MetaNode.DEFAULT_CONFIGURATION){
         configuration = {...MetaNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.settings =  {...MetaNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
-        const textarea = MetaNode._getContentElement();
+        configuration.content = [MetaNode._getContentElement()];
         if(!configuration.saved) {// Create MetaNode
-            super({title: configuration.name, content: [textarea], ...WindowedNode.getNaturalScaleParameters()});
+            super({...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters()});
         } else {// Restore MetaNode
-            super({title: configuration.name, content:  [textarea], scale: true, saved: true, saveData:  configuration.saveData});
+            super({...configuration, title: configuration.name, scale: true});
         }
         this.diagram.addNode(this);
         this._initialize(textarea, configuration.settings, configuration.saved)

@@ -23,12 +23,12 @@ class TextNode extends WindowedNode {
 
     constructor(configuration = TextNode.DEFAULT_CONFIGURATION){
         configuration = {...TextNode.DEFAULT_CONFIGURATION, ...configuration}
-        const textarea = TextNode._getContentElement();
+        configuration.content = [TextNode._getContentElement()];
         if(!configuration.saved) {// Create TextNode
-            super({title: configuration.name, content: [textarea], ...WindowedNode.getNaturalScaleParameters()});
+            super({...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters()});
         } else {// Restore TextNode
             configuration.addCodeButton = configuration.saveData.json.addCodeButton;
-            super({title: configuration.name, content:  [textarea], scale: true, saved: true, saveData:  configuration.saveData});
+            super({...configuration, title: configuration.name, scale: true});
         }
         this.diagram.addNode(this);
         this._initialize(textarea, configuration.sx, configuration.sy, configuration.x, configuration.y, configuration.addCodeButton)

@@ -20,15 +20,9 @@ class LLMOldNode extends WindowedNode {
         configuration = {...LLMOldNode.DEFAULT_CONFIGURATION, ...configuration}
         let [ainodewrapperDiv, aiResponseTextArea] = LLMOldNode._getContentElement(configuration);
         if (!configuration.saved) {// Create LLMOldNode
-            super({title: configuration.name, content: [], ...WindowedNode.getNaturalScaleParameters()});
+            super({...configuration, title: configuration.name, content: [], ...WindowedNode.getNaturalScaleParameters()});
         } else {// Restore LLMOldNode
-            super({
-                title: configuration.name,
-                content: [],
-                scale: true,
-                saved: true,
-                saveData: configuration.saveData
-            })
+            super({ ...configuration, title: configuration.name, content: [], scale: true })
         }
         this.diagram.addNode(this);
         this._initialize(ainodewrapperDiv, aiResponseTextArea, configuration.saved)

@@ -311,7 +311,7 @@ class Edge {
         this.length *= amount;
     }
     onwheel = (event) => {
-        if (rootDiagram.nodeMode) {
+        if (nodeMode) {
             let amount = Math.exp(event.wheelDelta * -settings.zoomSpeed);
             this.length *= amount;
             let avg = this.center();
@@ -325,13 +325,13 @@ class Edge {
         }
     }
     onclick = (event) => {
-        if (!rootDiagram.nodeMode) {
+        if (!nodeMode) {
             this.toggleDirection();
             this.draw();
         }
     }
     ondblclick = (event) => {
-        if (rootDiagram.nodeMode) {
+        if (nodeMode) {
             // Capture the titles and textNode flags of the connected nodes for later use
             const connectedNodes = this.pts.map(node => ({ title: node.getTitle(), isTextNode: node.isTextNode }));
 

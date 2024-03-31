@@ -18,12 +18,13 @@ class AudioNode extends WindowedNode {
 
     constructor(configuration = AudioNode.DEFAULT_CONFIGURATION){
         configuration = {...AudioNode.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.content = AudioNode._getContentElement(configuration.audioUrl, configuration.blob);
         if (!configuration.saved) {// Create AudioNode
-            super({ title: configuration.name, content: AudioNode._getContentElement(configuration.audioUrl, configuration.blob), ...WindowedNode.getNaturalScaleParameters() });
+            super({...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters() });
             this.followingMouse = 1;
         } else {// Restore AudioNode
             configuration.audioUrl = configuration.saveData.json.audioUrl;
-            super({ title: configuration.name, content: AudioNode._getContentElement(configuration.audioUrl, configuration.blob), scale: true, saved: true, saveData: configuration.saveData })
+            super({...configuration, title: configuration.name, scale: true})
         }
 
         this.diagram.addNode(this);

@@ -16,13 +16,14 @@ class WolframNode extends WindowedNode {
 
     constructor(configuration = WolframNode.DEFAULT_CONFIGURATION){
         configuration = {...WolframNode.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.content = WolframNode._getContentElement(configuration.wolframData);
         if (!configuration.saved) {// Create WolframNode
             if(!configuration.name) configuration.name = `${configuration.wolframData.reformulatedQuery} - Wolfram Alpha Result`;
-            super({ title: configuration.name, content: WolframNode._getContentElement(configuration.wolframData), ...WindowedNode.getNaturalScaleParameters() });
+            super({ ...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters() });
             this.followingMouse = 1;
         } else {// Restore WolframNode
             configuration.wolframData = configuration.saveData.json.wolframData;
-            super({ title: configuration.name, content: WolframNode._getContentElement(configuration.wolframData), scale: true, saved: true, saveData: configuration.saveData })
+            super({ ...configuration, title: configuration.name, scale: true })
         }
         this.diagram.addNode(this);
         this._initialize(configuration.wolframData, configuration.saved);

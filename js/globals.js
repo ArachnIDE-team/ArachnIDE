@@ -65,7 +65,7 @@ const overlays = [];
 
 const autoToggleAllOverlays = () => {
     for (const overlay of overlays) {
-        if (altHeld || rootDiagram.nodeMode === 1) {
+        if (altHeld || nodeMode === 1) {
             overlay.style.display = 'block';
         } else {
             overlay.style.display = 'none';
@@ -97,7 +97,7 @@ window.addEventListener('message', function (event) {
         autoToggleAllOverlays();
     }
     if (typeof event.data.nodeMode !== 'undefined') {
-        rootDiagram.nodeMode = event.data.nodeMode;
+        nodeMode = event.data.nodeMode;
     } else {
         // TO-DO: Understand why next instruction abruptly interrupt edge dragging
         // nodeMode = 0;
@@ -108,6 +108,9 @@ window.addEventListener('message', function (event) {
 // var edges = [];
 // var nodeMode_v = 0;
 // var nodeMode = 0;
+// Set back as globals after erroneous import to Diagram class
+var nodeMode_v = 0;
+var nodeMode = 0;
 
 // var movingNode = undefined;
 // var NodeUUID = 0;

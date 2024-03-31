@@ -17,12 +17,13 @@ class VideoNode extends WindowedNode {
 
     constructor(configuration = VideoNode.DEFAULT_CONFIGURATION){
         configuration = {...VideoNode.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.content = VideoNode._getContentElement(configuration.videoUrl, configuration.blob);
         if (!configuration.saved) {// Create VideoNode
-            super({ title: configuration.name, content: VideoNode._getContentElement(configuration.videoUrl, configuration.blob), ...WindowedNode.getNaturalScaleParameters() });
+            super({...configuration,  title: configuration.name, ...WindowedNode.getNaturalScaleParameters() });
             this.followingMouse = 1;
         } else {// Restore VideoNode
             // configuration.videoUrl = configuration.saveData.json.videoUrl;
-            super({ title: configuration.name, content: VideoNode._getContentElement(configuration.videoUrl, configuration.blob), scale: true, saved: true, saveData: configuration.saveData })
+            super({...configuration,  title: configuration.name, scale: true })
         }
         this.diagram.addNode(this);
         this._initialize(configuration.videoUrl, configuration.blob, configuration.saved);

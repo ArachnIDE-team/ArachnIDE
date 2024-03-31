@@ -20,15 +20,9 @@ class LLMAgentNode extends WindowedNode {
         configuration = {...LLMAgentNode.DEFAULT_CONFIGURATION, ...configuration}
         let [ainodewrapperDiv, aiResponseTextArea] = configuration.content ? configuration.content : LLMAgentNode._getContentElement(configuration);
         if (!configuration.saved) {// Create LLMAgentNode
-            super({title: configuration.name, content: [], ...WindowedNode.getNaturalScaleParameters()});
+            super({...configuration, title: configuration.name, content: [], ...WindowedNode.getNaturalScaleParameters()});
         } else {// Restore LLMAgentNode
-            super({
-                title: configuration.name,
-                content: [],
-                scale: true,
-                saved: true,
-                saveData: configuration.saveData
-            })
+            super({ ...configuration, title: configuration.name, content: [], scale: true})
         }
         this.diagram.addNode(this);
         this._initialize(ainodewrapperDiv, aiResponseTextArea, configuration.saved)

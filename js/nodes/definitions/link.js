@@ -16,12 +16,13 @@ class LinkNode extends WindowedNode {
 
     constructor(configuration = LinkNode.DEFAULT_CONFIGURATION) {
         configuration = {...LinkNode.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.content = [];
         if (!configuration.saved) {// Create LinkNode
-            super({title: configuration.name, content: [], ...WindowedNode.getNaturalScaleParameters()});
+            super({...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters()});
         } else {// Restore LinkNode
             configuration.text = configuration.saveData.json.linkText;
             configuration.link = configuration.saveData.json.linkUrl;
-            super({title: configuration.name, content: [], scale: true, saved: true, saveData: configuration.saveData});
+            super({...configuration, title: configuration.name, scale: true});
         }
         let [contentWrapper, linkWrapper] = LinkNode._getContentElement(configuration.name, configuration.text, configuration.link);
         this.diagram.addNode(this);
