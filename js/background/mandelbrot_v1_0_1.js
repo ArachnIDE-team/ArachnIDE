@@ -64,12 +64,10 @@ class MandelbrotBG extends Background {
     }
 
     updateViewbox() {
-        //let lc = toSVG(toZ(new vec2(0,0)));
         let zm = this.zoom.mag();
         let lc = this.toSVG(new vec2(-zm, -zm).plus(this.pan));
         let d = zm * 2 * this.SVGzoom;
         let r = this.zoom.ang();
-        //let rotCenter = fromZ(pan);// = {let s = window.innerWidth; return new vec2(.5*s,.5*s);}
         let oldSVGzoom = this.SVGzoom;
         let oldSVGpan = this.SVGpan;
 
@@ -109,17 +107,10 @@ class MandelbrotBG extends Background {
 
         // the below has the issue of low-res svg when changing the matrix in firefox
         this.svg.setAttribute("viewBox", (-this.svg_viewbox_size / 2) + " " + (-this.svg_viewbox_size / 2) + " " + this.svg_viewbox_size + " " + this.svg_viewbox_size);
-        // z = bal(uv)*zoom+pan
-        // svg = (z-svgpan)*svgzoom
-        // want matrix to go svg -> bal(uv)*65536
-        // bal(uv)*65536 = 65536*(z-pan)/zoom = 65536*(svg/svgzoom-svgpan-pan)/zoom
-        // d/dsvg = 65536/svgzoom/zoom
-        // f(0) = -65536*(svgpan+pan)/zoom
         let t = this.zoom.crecip().scale(this.svg_viewbox_size / this.SVGzoom / 2);
         let p = this.pan.minus(this.SVGpan).scale(-this.svg_viewbox_size / 2).cdiv(this.zoom);
 
         this.svg_viewmat.setAttribute("transform", "matrix(" + t.x + " " + (t.y) + " " + (-t.y) + " " + (t.x) + " " + (p.x) + " " + (p.y) + ")");
-        //svg_bg.setAttribute("transform","matrix("+z.x+" "+(-z.y)+" "+(z.y)+" "+(z.x)+" "+SVGpan.x+" "+SVGpan.y+")");
 
     }
 
@@ -320,22 +311,12 @@ class MandelbrotBG extends Background {
                 for (let i = (1 - Math.random() ** 2) * (tries * 4); i > 1; i--) {
                     let gz = MandelbrotBG.mandGrad(iters, pt)
                     pt = pt.plus(gz.unscale(gz.mag2() * 10 + 1));
-                    //if (mand_i(pt,iters) > iters){
-                    //    pt = (new vec2(Math.random()*2-1,Math.random()*2-1)).cmult(zoom).cadd(pan);
-                    //}
                 }
                 tries--;
             } while (tries > 0 && MandelbrotBG._mand_i(pt, iters) > iters)
-            /*if (mand_i(pt,iters) > iters || pt.mag2()>8){
-              return;
-              }*/
         }else{
             pt = MandelbrotBG._gaussianRandom2().scale(flashlight_stdev).cmult(this.zoom).cadd(this.toZ(this.mousePos));
         }
-
-        //let level = mandelbrott_dist(256,pt);
-        //let width = 1/(level+5)**2;
-        //let width = 1/(mandGrad(256,pt).mag()**1.5+1);
 
 
         let r = "M " + this.toSVG(pt).str() + " " + settings.renderDChar + " ";
@@ -346,20 +327,6 @@ class MandelbrotBG extends Background {
         let opacity = settings.outerOpacity;
 
         if (MandelbrotBG._mand_i(pt, iters) > iters) {
-            //interior coloring
-            /*let p = findPeriod(pt,pt,1e-12,iters);
-            for (; n > 0; n--){
-                let npt = mand_iter_n(p,pt,pt);
-                let delta = npt.minus(pt);
-                delta = delta.cpow(new vec2(0.5,0));
-                npt = pt.plus(delta.scale(0.1));
-                if (mand_i(npt,iters)<=iters){
-                    break;
-                }
-                r += toSVG(npt).str()+" ";
-                length += npt.minus(pt).mag();
-                pt = npt;
-            }*/
             let p = MandelbrotBG._findInfimum(iters, pt);
             for (; n > 0; n--) {
                 let delta = MandelbrotBG._gradzr(((z) => (MandelbrotBG._mand_iter_n(p.i, z, z).mag2())), pt, 1e-5);
@@ -381,8 +348,6 @@ class MandelbrotBG extends Background {
         } else {
             if (MandelbrotBG._mandelbrott_dist(iters, pt) < settings.maxDist) return;
             for (let p of MandelbrotBG._trace_circle(iters, pt, Math.random() > 0.5 ? settings.renderStepSize : -settings.renderStepSize)) {
-                //console.log(p);
-                //if ((n&3) == 0)
                 if (!this.toSVG(p).isFinite()) break;
                 r += this.toSVG(p).str() + " ";
                 na += 1;
@@ -528,19 +493,5 @@ class MandelbrotBG extends Background {
         this.regenAmount = 0;
         return prevNodeToConnect;
     }
-
 }
-
-// let background = new MandelbrotBG({
-//     svg_element: svg,
-//     svg_bg_element: svg.getElementById("bg"),
-//     svg_viewmat_element: svg.getElementById("viewmatrix"),
-//     svg_mousePath_element: svg.getElementById("mousePath"),
-//     rSlider: document.getElementById("rSlider"),
-//     cSlider: document.getElementById("cSlider"),
-//     sSlider: document.getElementById("sSlider"),
-//     colorPickerR: document.getElementById("rColor"),
-//     colorPickerG: document.getElementById("gColor"),
-//     colorPickerB: document.getElementById("bColor")
-// })
 

@@ -70,8 +70,8 @@ class Diagram extends Node {
         this.prevNodeToConnect = undefined;
         this.selectedNodeUUIDs = new Set();// Global or scoped array for selected UUIDs
         this.edgeDirectionalityMap = new Map();
-        // this.background = new GridBG({
-        this.background = new MandelbrotBG({
+        this.background = new GridBG({
+        // this.background = new MandelbrotBG({
             svg_element: configuration.background.svg_element,
             svg_bg_element: configuration.background.svg_bg_element,
             svg_viewmat_element: configuration.background.svg_viewmat_element,
