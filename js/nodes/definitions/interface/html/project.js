@@ -1,6 +1,6 @@
 
 // https://github.com/daweilv/treejs/tree/master
-class FileSystemTree extends Tree {
+class ProjectPanelHTML extends Tree {
     static DEFAULT_CONFIGURATION = {
         container: undefined,
         fsTree: undefined,
@@ -16,10 +16,10 @@ class FileSystemTree extends Tree {
         afterInit: () => {}
     }
     // constructor(container, fsTree, root, selection=true) {
-    constructor(configuration= FileSystemTree.DEFAULT_CONFIGURATION) {
-        configuration = {...FileSystemTree.DEFAULT_CONFIGURATION, ...configuration}
+    constructor(configuration= ProjectPanel.DEFAULT_CONFIGURATION) {
+        configuration = {...ProjectPanelHTML.DEFAULT_CONFIGURATION, ...configuration}
         if(configuration.multiple && configuration.selectFolders && !configuration.selectFiles) throw new Error("Multiple folders excluding files is not supported")
-        const treeData = FileSystemTree._build_tree(configuration.fsTree, configuration.root);
+        const treeData = ProjectPanelHTML._build_tree(configuration.fsTree, configuration.root);
         super(configuration.container, {
             data: treeData,
             loaded: function() {
@@ -67,8 +67,8 @@ class FileSystemTree extends Tree {
 
     async reloadNode(rootPath, liElement){
         this.lastSelection = [...this.values];
-        let {fsTree, root} = await FileSystemTree.getFSTree(rootPath.length > 0 && rootPath.length < 3 && !rootPath.endsWith("/") ? rootPath + "/" :rootPath);
-        const treeData = FileSystemTree._build_tree(fsTree, root);
+        let {fsTree, root} = await ProjectPanel.getFSTree(rootPath.length > 0 && rootPath.length < 3 && !rootPath.endsWith("/") ? rootPath + "/" :rootPath);
+        const treeData = ProjectPanelHTML._build_tree(fsTree, root);
         // Node data replacement
         this.nodesById[rootPath].children = treeData;
         // console.log("reloaded: ", rootPath , " with data: ", treeData, "element:", liElement.querySelector("ul.treejs-node"), "with" , this.buildTree(treeData, 1))
@@ -236,12 +236,20 @@ class FileSystemTree extends Tree {
         }
     }
 
-    addEventListener(event, callback){
-        this.eventListeners[event].push(callback);
+    addValueListener(callback){
+        this.eventListeners.value.push(callback);
     }
 
-    removeEventListener(event, callback){
-        this.eventListeners[event].splice(this.eventListeners[event].indexOf(callback), 1)
+    removeValueListener(callback){
+        this.eventListeners.value.splice(this.eventListeners.value.indexOf(callback), 1)
+    }
+
+    addSwitchListener(callback){
+        this.eventListeners.switcher.push(callback);
+    }
+
+    removeSwitchListener(callback){
+        this.eventListeners.switcher.splice(this.eventListeners.switcher.indexOf(callback), 1)
     }
 
     static _build_tree(fsTree, currentPosition=""){
@@ -256,7 +264,7 @@ class FileSystemTree extends Tree {
                 item.children = [];
                 item.attributes = {isDirectory: fsTree[node] === "DIR"}
             } else if(typeof fsTree[node] === "object") {
-                item.children = FileSystemTree._build_tree(fsTree[node], currentNode)
+                item.children = ProjectPanelHTML._build_tree(fsTree[node], currentNode)
                 item.attributes = {isDirectory: true};
             }
             tree_root.push(item);
@@ -264,6 +272,31 @@ class FileSystemTree extends Tree {
         return tree_root;
     }
 
+
+}
+
+class ProjectPanel extends HTMLNode{
+    static DEFAULT_CONFIGURATION = {
+        container: undefined,
+        fsTree: undefined,
+        root: undefined,
+        selection: true,
+        multiple: false,
+        selectFiles: true,
+        selectFolders: true,
+        eventListeners: {
+            switcher: [],
+            value: []
+        },
+        afterInit: () => {}
+    }
+    // constructor(container, fsTree, root, selection=true) {
+    constructor(configuration= ProjectPanel.DEFAULT_CONFIGURATION) {
+        configuration = {...ProjectPanel.DEFAULT_CONFIGURATION, ...configuration}
+        let content = new ProjectPanelHTML(configuration);
+        let container = document.querySelector(configuration.container)
+        super({content, container})
+    }
     static async getFSTree(rootPath){
         let fsTree = await FileManagerAPI.getFSTree(rootPath, 2)
         let root = Object.keys(fsTree)[0]
@@ -273,8 +306,9 @@ class FileSystemTree extends Tree {
 }
 
 async function createWorkspaceFSTree(elementID, afterInit){
-    let {fsTree, root} = await FileSystemTree.getFSTree(selectedWorkspacePath);
-    return new FileSystemTree({
+let {fsTree, root} = await ProjectPanel.getFSTree(selectedWorkspacePath);
+
+return new ProjectPanel({
         container: "#" + elementID,
         fsTree,
         root,
@@ -284,11 +318,11 @@ async function createWorkspaceFSTree(elementID, afterInit){
         selectFolders: false,
         afterInit
     })
-    // return new FileSystemTree("#" + elementID, fsTree, root, true)
+    // return new ProjectPanel("#" + elementID, fsTree, root, true)
 }
 async function createFilePickerFSTree(elementID, root, multiple, files, folders, afterInit){
-    let tree = await FileSystemTree.getFSTree(root);
-    return new FileSystemTree({
+    let tree = await ProjectPanel.getFSTree(root);
+    return new ProjectPanel({
         container: "#" + elementID,
         fsTree: tree.fsTree,
         root: tree.root,
@@ -298,5 +332,5 @@ async function createFilePickerFSTree(elementID, root, multiple, files, folders,
         selectFolders: folders,
         afterInit
     })
-    // return new FileSystemTree("#" + elementID, fsTree, root, true)
+    // return new ProjectPanel("#" + elementID, fsTree, root, true)
 }

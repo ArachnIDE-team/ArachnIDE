@@ -216,9 +216,6 @@ const tagValues = {
     }
 };
 
-// definition.js ainodemessage.js
-let llmNodeCount = 0;
-
 //ai.js and interface.js
 class LRUCache {
     constructor(maxSize) {

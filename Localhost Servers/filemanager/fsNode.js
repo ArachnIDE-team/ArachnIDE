@@ -178,4 +178,40 @@ proto.unwatchFile = function (callback){
         fs.unwatchFile(this.path, callback);
     }
 }
+
+fs.Node.chunkPath = function(dirOrFile){
+    let array = [];
+    // dirOrFile = new fs.Node(dirOrFile).path;
+    while (!dirOrFile.startsWith(".")){//path.join(dirOrFile, "..") ){
+        // console.log(dirOrFile)
+        array.push(path.basename(dirOrFile));
+        dirOrFile = path.join(dirOrFile, "..")
+    }
+    return array.reverse();
+}
+fs.Node.toFSTree = function(root, array){
+    let response = {};
+    response[root] = {};
+    for(let dirOrFilePath of array){
+        let pathChunks = fs.Node.chunkPath(dirOrFilePath);
+        let dirOrFile = new fs.Node(path.join(root, dirOrFilePath))
+        let responseCursor = response[root];
+        let i = 0;
+        for(let chunk of pathChunks){
+            if(!responseCursor.hasOwnProperty(chunk)) {
+                if(i === pathChunks.length - 1) {
+                    responseCursor[chunk] = dirOrFile.isFile ? "FILE" : "DIR";
+                } else {
+                    responseCursor[chunk] = {};
+                }
+            } else if (responseCursor[chunk] === "DIR") {
+                responseCursor[chunk] = {};
+            }
+            responseCursor = responseCursor[chunk];
+            i++;
+        }
+    }
+    return response;
+}
+
 export default fs;

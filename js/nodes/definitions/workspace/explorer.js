@@ -1,4 +1,3 @@
-let workspaceExplorerNodeCount = 0;
 
 class WorkspaceExplorerNode extends WindowedNode {
     static DEFAULT_CONFIGURATION = {
@@ -17,14 +16,12 @@ class WorkspaceExplorerNode extends WindowedNode {
     constructor(configuration = WorkspaceExplorerNode.DEFAULT_CONFIGURATION){
         configuration = {...WorkspaceExplorerNode.DEFAULT_CONFIGURATION, ...configuration}
         if(!selectedWorkspacePath) throw new Error("Please load a workspace before creating a WorkspaceExplorerNode")
-        configuration.content = WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index);
+        configuration.index = configuration.saved ? configuration.saveData.json.index : generateUUID();
+            configuration.content = WorkspaceExplorerNode._getContentElement(selectedWorkspacePath, configuration.index);
         if (!configuration.saved) {// Create WorkspaceExplorerNode
-            configuration.index = workspaceExplorerNodeCount;
             super({...configuration,  title: configuration.name, addFileButton:false, ...WindowedNode.getNaturalScaleParameters() });
-            workspaceExplorerNodeCount++;
             this.followingMouse = 1;
         } else {// Restore WorkspaceExplorerNode
-            configuration.index = configuration.saveData.json.index;
             super({...configuration,  title: configuration.name, addFileButton:false, scale: true})
         }
 
@@ -106,7 +103,7 @@ class WorkspaceExplorerNode extends WindowedNode {
             }
         }).then((fileSystemTree) => {
             this.fileSystemTree = fileSystemTree;
-            this.fileSystemTree.addEventListener("value", (selected, newSelection) => {
+            this.fileSystemTree.addValueListener((selected, newSelection) => {
                 console.log("Selected: ", selected, " newSelection: ", newSelection)
                 if(selected.length === 0){
                     saveFileSelectionButton.disabled = true;
@@ -136,7 +133,7 @@ class WorkspaceExplorerNode extends WindowedNode {
 
     onLoadFile(){
         if(this.selectedFile !== ""){
-            let fileName = this.fileSystemTree.nodesById[this.selectedFile].text
+            let fileName = this.fileSystemTree.content.nodesById[this.selectedFile].text
             this.readFileAndCreateTextNode(this.selectedFile, fileName).then(() => {});
         }
     }

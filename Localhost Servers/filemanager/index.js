@@ -5,6 +5,8 @@ import path from 'path'
 const app = express();
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer'; // For binary writes
+import { glob } from 'glob';
+
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
@@ -119,6 +121,35 @@ app.get('/fs-tree', async (req, res) => {
     } catch (error) {
         console.error('Error GET fs-tree:', error);
         res.status(500).send('Error GET fs-tree');
+    }
+
+});
+
+// Get the File-System tree rooted on the given path with files and folder matching the given glob pattern query
+app.post('/fs-tree', async (req, res) => {
+    try {
+        const folderPath = req.body.path;
+        const {includes, excludes} = req.body;
+        let fsNode = new fs.Node(folderPath)
+        if(!fsNode.exists) {
+            console.error('Error POST fs-tree: the directory does not exist');
+            return res.status(404).send("Error getting the filesystem tree, directory '" + folderPath +"' not found");
+        }
+        let globResponse = await glob(
+            includes,
+            {
+                cwd: fsNode.path,
+                mark: true,
+                ignore: excludes,
+                absolute: false
+            }
+        );
+        let response = fs.Node.toFSTree(fsNode.path, globResponse)
+        // response[fsNode.path] = await fsNode.getFSTree(depth)
+         res.send(response);
+    } catch (error) {
+        console.error('Error POST fs-tree:', error);
+        res.status(500).send('Error POST fs-tree');
     }
 
 });

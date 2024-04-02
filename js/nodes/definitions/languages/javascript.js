@@ -8,7 +8,7 @@ class JavascriptNode extends CodeNode {
             libURL: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/javascript/javascript.min.js",
             extension: "js",
             showHint: true,
-            showHintFunction: `var WORD = /[\w$]+/, RANGE = 500;
+            showHintFunction: `var WORD = /[\\w$]+/, RANGE = 500;
             CodeMirror.registerHelper("hint", "anyword", function(editor, options) {
                 var word = options && options.word || WORD;
                 var range = options && options.range || RANGE;

@@ -1,7 +1,7 @@
 
 
 
-globalThis.nodeClasses = [TextNode, LinkNode, LLMNode, ImageNode, AudioNode, VideoNode, WolframNode, WorkspaceExplorerNode, WebEditorNode, MetaNode, JavascriptNode]
+globalThis.nodeClasses = [TextNode, LinkNode, LLMNode, ImageNode, AudioNode, VideoNode, WolframNode, WorkspaceExplorerNode, WebEditorNode, MetaNode, JavascriptNode,ProjectNode, ModuleNode, JavascriptFrontendModuleNode]
 
 function restoreNode(saveData) {
     let classIndex = globalThis.nodeClasses.map((classObject) => classObject.name).indexOf(saveData.json.type);

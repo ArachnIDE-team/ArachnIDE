@@ -63,18 +63,7 @@ class TextNode extends WindowedNode {
         textarea.onmousedown = cancel;
         textarea.setAttribute("type", "text");
         textarea.setAttribute("size", "11");
-        //textarea.setAttribute("style", "background-color: #222226; color: #bbb; overflow-y: scroll; resize: both; width: 259px; line-height: 1.4; display: none;");
         textarea.style.position = "absolute";
-        // var jsEditor = CodeMirror(document.getElementById('jsEditor'), {
-        //    mode: 'javascript', theme: 'dracula', lineNumbers: true, lineWrapping: false, scrollbarStyle: 'simple'
-        // });
-        // jsEditor.display.wrapper.style.clipPath = 'inset(0px)';
-        // jsEditor.display.wrapper.style.backgroundColor = 'rgb(34, 34, 38)';
-        // jsEditor.display.wrapper.style.borderStyle = 'inset';
-        // jsEditor.display.wrapper.style.borderColor = 'rgba(136, 136, 136, 0.133)';
-        // jsEditor.display.wrapper.style.fontSize = '15px';
-        // jsEditor.display.wrapper.style.resize = 'vertical';
-        // jsEditor.display.wrapper.style.userSelect = 'none';
         return textarea;
     }
 

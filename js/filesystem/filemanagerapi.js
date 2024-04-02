@@ -50,8 +50,20 @@ class FileManagerAPI {
     }
 
     // FilePicker > WindowedUI
+    // FileSystemTree > HTMLNode
     static async getFSTree(root, depth=1){
         return await (await fetch("http://localhost:7000/fs-tree?path=" + encodeURIComponent(root) + "&depth=" + depth)).json()
+    }
+
+    // FileSystemTree > HTMLNode
+    static async getFSTreeGLOB(path, includes, excludes){
+        return await (await fetch("http://localhost:7000/fs-tree", {
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({path, includes, excludes})
+        })).json()
     }
 
     // WorkspaceExplorerNode

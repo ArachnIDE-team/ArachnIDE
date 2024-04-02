@@ -18,14 +18,14 @@ class LLMOldNode extends WindowedNode {
 
     constructor(configuration = LLMOldNode.DEFAULT_CONFIGURATION){
         configuration = {...LLMOldNode.DEFAULT_CONFIGURATION, ...configuration}
-        let [ainodewrapperDiv, aiResponseTextArea] = LLMOldNode._getContentElement(configuration);
+        let [ainodewrapperDiv, aiResponseTextArea, index] = LLMOldNode._getContentElement(configuration);
         if (!configuration.saved) {// Create LLMOldNode
             super({...configuration, title: configuration.name, content: [], ...WindowedNode.getNaturalScaleParameters()});
         } else {// Restore LLMOldNode
             super({ ...configuration, title: configuration.name, content: [], scale: true })
         }
         this.diagram.addNode(this);
-        this._initialize(ainodewrapperDiv, aiResponseTextArea, configuration.saved)
+        this._initialize(ainodewrapperDiv, aiResponseTextArea, index, configuration.saved)
     }
 
     get chat(){
@@ -95,7 +95,7 @@ class LLMOldNode extends WindowedNode {
 
         // Create the AI response textarea
         let aiResponseTextArea = document.createElement("textarea");
-        const index = configuration.saved ? configuration.saveData.json.index : llmNodeCount;
+        const index = configuration.saved ? configuration.saveData.json.index : generateUUID();
         aiResponseTextArea.id = `LLMnoderesponse-${index}`;  // Assign unique id to each aiResponseTextArea
         aiResponseTextArea.style.display = 'none';  // Hide the textarea
 
@@ -241,7 +241,7 @@ class LLMOldNode extends WindowedNode {
         // Add settings container to the ainodewrapperDiv
         ainodewrapperDiv.appendChild(aiNodeSettingsContainer);
 
-        return [ainodewrapperDiv, aiResponseTextArea];
+        return [ainodewrapperDiv, aiResponseTextArea, index];
     }
 
     static _createSettingsContainer() {
@@ -364,7 +364,7 @@ class LLMOldNode extends WindowedNode {
         return textareaDiv;
     }
 
-    _initialize(ainodewrapperDiv, aiResponseTextArea, saved){
+    _initialize(ainodewrapperDiv, aiResponseTextArea, index, saved){
         let windowDiv = this.windowDiv;
         windowDiv.style.resize = 'both';
 
@@ -373,7 +373,7 @@ class LLMOldNode extends WindowedNode {
         if(!saved){
             // Additional configurations
             this.id = aiResponseTextArea.id;  // Store the id in the node object
-            this.index = llmNodeCount;
+            this.index = index;
             this.aiResponding = false;
             this.localAiResponding = false;
             this.latestUserMessage = null;
@@ -392,7 +392,6 @@ class LLMOldNode extends WindowedNode {
     }
 
     afterInit() {
-        llmNodeCount++;
 
         this.ainodewrapperDiv = this.content.querySelector('.ainodewrapperDiv');
 

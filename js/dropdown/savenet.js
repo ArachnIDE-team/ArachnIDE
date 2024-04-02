@@ -315,9 +315,6 @@ function clearnet() {
         rootDiagram.nodes[rootDiagram.nodes.length - 1].remove();
     }
 
-    // Reset LLM node count
-    llmNodeCount = 0;
-
     // Clear the CodeMirror content
     window.myCodemirror.setValue('');
 }

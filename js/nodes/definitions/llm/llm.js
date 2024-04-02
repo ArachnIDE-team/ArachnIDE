@@ -125,7 +125,7 @@ class LLMNode extends LLMAgentNode {
 
         // Create the AI response textarea
         let aiResponseTextArea = document.createElement("textarea");
-        const index = configuration.saved ? configuration.saveData.json.index : llmNodeCount;
+        const index = configuration.saved ? configuration.saveData.json.index : generateUUID();
         aiResponseTextArea.id = `LLMnoderesponse-${index}`;  // Assign unique id to each aiResponseTextArea
         aiResponseTextArea.style.display = 'none';  // Hide the textarea
 
