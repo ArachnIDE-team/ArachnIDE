@@ -204,8 +204,8 @@ class GridBG extends Background {
         let complexBotRight = this.toDZ(new vec2(svgBounds.width, svgBounds.height))
         let complexBounds = {...this.toDZ(new vec2(0,0)), width: complexBotRight.x, height: complexBotRight.y }
 
-        complexBounds.x = this.pan.x - complexBounds.width*1.5;
-        complexBounds.y = this.pan.y - complexBounds.height*1.5;
+        complexBounds.x = this.pan.x - complexBounds.width * 1.5;
+        complexBounds.y = this.pan.y - complexBounds.height * 1.5;
 
         let magnitude = Math.floor(Math.log10(complexBounds.width)) - 1 + Math.floor(GridBG._gaussianRandom2().x);
         let gridSize = Math.pow(10 , magnitude);
@@ -220,14 +220,14 @@ class GridBG extends Background {
             let i = Math.floor(Math.random() * numHorizontalLines);
             let x = i * gridSize + complexBounds.x - (complexBounds.x % gridSize);
             let p1 = this.toSVG(new vec2(x, complexBounds.y));
-            let p2 = this.toSVG(new vec2(x, complexBounds.height*1.5));
+            let p2 = this.toSVG(new vec2(x, complexBounds.y + complexBounds.height * 3));
             // meanpoint = p1.minus(p2).scale(0.5)
             path += `M ${p1.x},${p1.y} L ${p2.x},${p2.y} `;
         }else{
             let i = Math.floor(Math.random() * numVerticalLines);
             let y = i * gridSize + complexBounds.y - (complexBounds.y % gridSize);
             let p1 = this.toSVG(new vec2(complexBounds.x, y));
-            let p2 = this.toSVG(new vec2(complexBounds.width*1.5, y));
+            let p2 = this.toSVG(new vec2(complexBounds.x + complexBounds.width * 3, y));
             // meanpoint = p1.minus(p2).scale(0.5)
             path += `M ${p1.x},${p1.y} L ${p2.x},${p2.y} `;
         }
