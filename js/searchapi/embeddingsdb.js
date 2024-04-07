@@ -187,15 +187,15 @@ for (let i = 0; i < nodes.length; i++) {
 
 
 const nodeTitlesAndContent = [];
-
-for (let key in rootDiagram.nodes) {
-    let nodeTitle = rootDiagram.nodes[key].title;
-    let nodeContent = rootDiagram.nodes[key].plainText;
-    nodeTitlesAndContent.push({
-        title: nodeTitle,
-        content: nodeContent
-    });
-}
+//
+// for (let key in rootDiagram.nodes) {
+//     let nodeTitle = rootDiagram.nodes[key].title;
+//     let nodeContent = rootDiagram.nodes[key].plainText;
+//     nodeTitlesAndContent.push({
+//         title: nodeTitle,
+//         content: nodeContent
+//     });
+// }
 
 function clearSearchHighlights(nodesArray) {
     for (const node of nodesArray) {
@@ -337,7 +337,7 @@ async function chunkAndStoreInputExtract() {
         }
 
         // Chunk the input text
-        const chunkedText = chunkText(inputText, MAX_CHUNK_SIZE, overlapSize);
+        const chunkedText = chunkText(inputText, dropdown.dataTab.maxChunkSize, overlapSize);
 
         // Fetch the embeddings for the chunks
         const chunkedEmbeddings = await fetchChunkedEmbeddings(chunkedText);
@@ -405,7 +405,7 @@ async function storeEmbeddingsAndChunksInDatabase(key, chunks, embeddings) {
 }
 
 async function storeTextData(storageKey, text) {
-    const chunkedText = chunkText(text, MAX_CHUNK_SIZE, overlapSize);
+    const chunkedText = chunkText(text, dropdown.dataTab.maxChunkSize, overlapSize);
     const chunkedEmbeddings = await fetchChunkedEmbeddings(chunkedText);
     await storeEmbeddingsAndChunksInDatabase(storageKey, chunkedText, chunkedEmbeddings);
 }

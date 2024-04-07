@@ -302,7 +302,7 @@ class MandelbrotBG extends Background {
 
     render_hair(n) {
         let iters = settings.iterations;
-        let maxLines = getMaxLines();
+        let maxLines = dropdown.editTab.getMaxLines();
         let tries = 1;
         let pt;
         if (Math.random() > flashlight_fraction){

@@ -2282,13 +2282,19 @@ textarea[id^='custom-instructions-textarea-'] {
 
 
 .metadata-container {
-    white-space: pre;
-    font-family: monospace;
+
     padding: 5px;
     background: #2a2a2a;
     border-radius: 5px;
     margin: 5px 5px 0 5px;
 
+}
+.metadata-button-container {
+    margin: 5px 0 0 0;
+}
+.code {
+    white-space: pre;
+    font-family: monospace;
 }
 
 

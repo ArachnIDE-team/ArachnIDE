@@ -263,7 +263,6 @@ function handleSavedNetworksDrop(e) {
 }
 
 
-
 document.getElementById("clear-button").addEventListener("click", function () {
     document.getElementById("clear-sure").setAttribute("style", "display:block");
     document.getElementById("clear-button").text = "Are you sure?";
@@ -277,21 +276,17 @@ document.getElementById("clear-sure-button").addEventListener("click", function 
     document.getElementById("clear-sure").setAttribute("style", "display:none");
     document.getElementById("clear-button").text = "Clear";
 });
-
-
-
 document.getElementById("clearLocalStorage").onclick = function () {
     localStorage.clear();
     alert('Local storage has been cleared.');
 }
-
-
 
 for (let n of htmlnodes) {
     // let node = new Node(undefined, n, true);  // Indicate edge creation with `true`
     let node = new WindowedNode({title: n.dataset.title, content: n, scale: true});
     node.diagram.registerNode(node);
 }
+
 function reloadDiagram(diagram){
     for (let n of diagram.nodes) {
         n.init(diagram.nodeMap);
@@ -335,7 +330,7 @@ function restoreAdditionalSaveObjects(data) {
     }
 
     // Restore sliders immediately after their values have been set
-    restoreInputValues();
+    dropdown.editTab.restoreInputValues();
 }
 
 document.getElementById("load-button").addEventListener("click", function () {
@@ -344,6 +339,43 @@ document.getElementById("load-button").addEventListener("click", function () {
 
 });
 
+function cloneNodes(nodeList, diagram) {
+    let newNodesData = [];
+    let newUUIDmap = {}
+    for (let node of nodeList){
+        let saveData = node.save();
+        let oldUUID = saveData.json.uuid;
+        let newUUID = diagram.nextUUID();
+        diagram.nodeMap[newUUID] = "placeholder";
+        newUUIDmap[oldUUID] = newUUID;
+        saveData.json.uuid = newUUID;
+        if(saveData.json.index) saveData.json.index = generateUUID();
+        newNodesData.push(saveData)
+    }
+
+    let newNodes = [];
+    for (let saveData of newNodesData){
+        for (let edge of saveData.edges) {
+            if(newUUIDmap.hasOwnProperty(edge.directionality.start)) edge.directionality.start = newUUIDmap[edge.directionality.start];
+            if(newUUIDmap.hasOwnProperty(edge.directionality.end)) edge.directionality.end = newUUIDmap[edge.directionality.end];
+            // if(edge.directionality.end === oldUUID) {
+            //     edge.directionality.end = edge.directionality.start;
+            //     edge.directionality.start = newUUID;
+            // }
+            if(newUUIDmap.hasOwnProperty(edge.p[0])) edge.p[0] = newUUIDmap[edge.p[0]];
+            if(newUUIDmap.hasOwnProperty(edge.p[1])) edge.p[1] = newUUIDmap[edge.p[1]];
+        }
+        let copy = restoreNode(saveData);
+        newNodes.push(copy);
+    }
+    populateDirectionalityMap(newNodes.map((node) => node.content), diagram.nodeMap);
+
+    for (let n of newNodes) {
+        n.init(diagram.nodeMap); // Initialize the node
+        reconstructSavedNode(n); // Reconstruct the saved node
+    }
+    return newNodes;
+}
 
 function loadnet(text, clobber, createEdges = true) {
     if (clobber) {
@@ -379,7 +411,6 @@ function loadnet(text, clobber, createEdges = true) {
         window.myCodemirror.setValue(zettelkastenContent);
     }
 }
-
 
 function loadnetFile(name, clobber) {
     FileManagerAPI.loadWorkspace(name).then((workspaceData) => {

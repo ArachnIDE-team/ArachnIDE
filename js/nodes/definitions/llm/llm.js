@@ -506,13 +506,13 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
             const relevantKeys = await getRelevantKeys(this.latestUserMessage, truncatedRecentContext, searchQuery);
 
             // Get relevant chunks based on the relevant keys
-            const relevantChunks = await getRelevantChunks(this.latestUserMessage, searchResults, topN, relevantKeys);
-            const topNChunksContent = groupAndSortChunks(relevantChunks, MAX_CHUNK_SIZE);
+            const relevantChunks = await getRelevantChunks(this.latestUserMessage, searchResults, dropdown.dataTab.topN, relevantKeys);
+            const topNChunksContent = groupAndSortChunks(relevantChunks, dropdown.dataTab.maxChunkSize);
 
             // Construct the embed message
             const embedMessage = {
                 role: "system",
-                content: `Top ${topN} MATCHED chunks of TEXT from extracted WEBPAGES:\n` + topNChunksContent + `\n Use the given chunks as context. CITE your sources!`
+                content: `Top ${dropdown.dataTab.topN} MATCHED chunks of TEXT from extracted WEBPAGES:\n` + topNChunksContent + `\n Use the given chunks as context. CITE your sources!`
             };
 
             messages.push(embedMessage);

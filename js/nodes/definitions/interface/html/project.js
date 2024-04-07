@@ -306,9 +306,9 @@ class ProjectPanel extends HTMLNode{
 }
 
 async function createWorkspaceFSTree(elementID, afterInit){
-let {fsTree, root} = await ProjectPanel.getFSTree(selectedWorkspacePath);
+    let {fsTree, root} = await ProjectPanel.getFSTree(selectedWorkspacePath);
 
-return new ProjectPanel({
+    return new ProjectPanel({
         container: "#" + elementID,
         fsTree,
         root,

@@ -296,7 +296,7 @@ async function fetchGitHubRepoContent(owner, repo, path = '') {
             const sanitizedText = sanitizeGitHubText(text);  // Assume this function is defined
 
             const fileExtension = getFileExtension(item.path); // Use the getFileExtension function
-            const parser = getGitHubParser(fileExtension, sanitizedText, MAX_CHUNK_SIZE, overlapSize);
+            const parser = getGitHubParser(fileExtension, sanitizedText, dropdown.dataTab.maxChunkSize, overlapSize);
 
             const parsedText = parser.parse();
 

@@ -173,13 +173,13 @@ async function sendMessage(event, autoModeMessage = null) {
         const relevantKeys = await getRelevantKeys(message, null, searchQuery);
 
         // Get relevant chunks based on the relevant keys
-        const relevantChunks = await getRelevantChunks(searchQuery, searchResults, topN, relevantKeys);
-        const topNChunksContent = groupAndSortChunks(relevantChunks, MAX_CHUNK_SIZE);
+        const relevantChunks = await getRelevantChunks(searchQuery, searchResults, dropdown.dataTab.topN, relevantKeys);
+        const topNChunksContent = groupAndSortChunks(relevantChunks, dropdown.dataTab.maxChunkSize);
 
         // Construct the embed message
         const embedMessage = {
             role: "system",
-            content: `Top ${topN} MATCHED snippets of TEXT from extracted WEBPAGES:\n <topNchunks>` + topNChunksContent + `</topNchunks>\n Provide RELEVANT information from the given <topNchunks>. CITE sources!`
+            content: `Top ${dropdown.dataTab.topN} MATCHED snippets of TEXT from extracted WEBPAGES:\n <topNchunks>` + topNChunksContent + `</topNchunks>\n Provide RELEVANT information from the given <topNchunks>. CITE sources!`
         };
 
         messages.push(embedMessage);

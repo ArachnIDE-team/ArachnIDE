@@ -1,0 +1,4 @@
+{
+    "name": "clone",
+    "description": "Clone a set of nodes with their edges.\nThe cloned node will be placed specular to the tool node.\nKnown limitations: can't copy edge directions."
+}

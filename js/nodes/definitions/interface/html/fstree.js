@@ -51,7 +51,7 @@ class FileSystemTreeHTML extends Tree {
         }
         if(found) {
             if(liElement.classList.contains('treejs-node__close')) {
-                console.log("Opening: ", found )
+                // console.log("Opening: ", found )
                 this.reloadNode(found, liElement).then(() => {
                     super.onSwitcherClick(switcherElement);
                 });
@@ -326,16 +326,21 @@ async function createWorkspaceFSTree(elementID, afterInit){
     // return new FileSystemTree("#" + elementID, fsTree, root, true)
 }
 
-async function createModuleFSTree(elementID, path, includes, excludes, afterInit){
+async function createModuleFSTree(elementID, path, includes, excludes, forceFSTree=null, afterInit) {
+    let fsTree, root;
+    if(forceFSTree === null) {
+        let getFSTree = async function(){
+            let fsTree = await FileManagerAPI.getFSTreeGLOB(path, includes, excludes);
+            let root = Object.keys(fsTree)[0]
+            fsTree = fsTree[root]
+            return {fsTree, root};
+        }
 
-    let getFSTree = async function(){
-        let fsTree = await FileManagerAPI.getFSTreeGLOB(path, includes, excludes);
-        let root = Object.keys(fsTree)[0]
-        fsTree = fsTree[root]
-        return {fsTree, root};
+        forceFSTree = await getFSTree(path, includes, excludes);
+        // {fsTree, root} = await getFSTree(path, includes, excludes); // for what reason this should not work?
     }
-
-    let {fsTree, root} = await getFSTree(path, includes, excludes);
+    fsTree = forceFSTree.fsTree;
+    root = forceFSTree.root;
 
     let fileSystemTree = new FileSystemTree({
         container: "#" + elementID,
@@ -347,6 +352,7 @@ async function createModuleFSTree(elementID, path, includes, excludes, afterInit
         selectFolders: false,
         afterInit
     });
+
     fileSystemTree.disableReloadOnExpand();
     return {fileSystemTree, fsTree}
     // return new FileSystemTree("#" + elementID, fsTree, root, true)

@@ -79,7 +79,7 @@ myCodeMirror.on("mousedown", function (cm, event) {
                 // Check if click is at the start or end of the marked text
                 if (pos.ch === from.ch || pos.ch === to.ch) {
                     if (title.length === 1) {
-                        // If the title is one character long, perform click behavior
+                        // If the title is one character long, getTopLevelNodeClassDeclarations click behavior
                         handleTitleClick(title, cm);
                     } else {
                         // If click is at the start or end of a title longer than one character, just place the cursor

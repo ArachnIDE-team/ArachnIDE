@@ -1,0 +1,4 @@
+{
+    "name": "get codebase",
+    "description": "Given a JavascriptFrontendModule, extracts and concatenates javascript files.\nCreate a JavascriptNode containing the whole codebase."
+}

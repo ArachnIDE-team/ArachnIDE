@@ -1,0 +1,4 @@
+{
+    "name": "get code",
+    "description": "Get the class code of the connected nodes\nCreate a JavascriptNode with the whole hierarchy of classes this node is instance of."
+}

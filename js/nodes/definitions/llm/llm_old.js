@@ -579,7 +579,7 @@ class LLMOldNode extends WindowedNode {
         let promptTextArea = this.promptTextArea
 
         promptTextArea.onmousedown = cancel;  // Prevent dragging
-        promptTextArea.addEventListener('input', autoGrow);
+        promptTextArea.addEventListener('input', dropdown.aiTab.autoGrow);
         promptTextArea.addEventListener('mouseenter', () => {
             promptTextArea.style.userSelect = "text";
         });
@@ -762,7 +762,7 @@ class LLMOldNode extends WindowedNode {
             });
         });
 
-        setupCustomDropdown(selectElement, true);
+        dropdown.aiTab.setupCustomDropdown(selectElement, true);
     }
 
     _setupAiNodeSliderListeners() {
@@ -779,7 +779,7 @@ class LLMOldNode extends WindowedNode {
                     const baseLabelText = label.innerText.split(':')[0];
                     label.innerText = `${baseLabelText}: ${slider.value}`;
 
-                    setSliderBackground(slider);  // Assuming this is a predefined function
+                    dropdown.setSliderBackground(slider);  // Assuming this is a predefined function
                 }
                 // Additional logic for each slider, if needed
             });
@@ -845,7 +845,7 @@ class LLMOldNode extends WindowedNode {
 
         // Handle synchronization if both sliders are present
         if (maxTokensSlider && maxContextSizeSlider) {
-            autoContextTokenSync(maxTokensSlider, maxContextSizeSlider);
+            dropdown.dataTab.autoContextTokenSync(maxTokensSlider, maxContextSizeSlider);
         }
 
         // Additional specific behaviors for other sliders can be added here
@@ -1081,13 +1081,13 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
             const relevantKeys = await getRelevantKeys(this.latestUserMessage, truncatedRecentContext, searchQuery);
 
             // Get relevant chunks based on the relevant keys
-            const relevantChunks = await getRelevantChunks(this.latestUserMessage, searchResults, topN, relevantKeys);
-            const topNChunksContent = groupAndSortChunks(relevantChunks, MAX_CHUNK_SIZE);
+            const relevantChunks = await getRelevantChunks(this.latestUserMessage, searchResults, dropdown.dataTab.topN, relevantKeys);
+            const topNChunksContent = groupAndSortChunks(relevantChunks, dropdown.dataTab.maxChunkSize);
 
             // Construct the embed message
             const embedMessage = {
                 role: "system",
-                content: `Top ${topN} MATCHED chunks of TEXT from extracted WEBPAGES:\n` + topNChunksContent + `\n Use the given chunks as context. CITE your sources!`
+                content: `Top ${dropdown.dataTab.topN} MATCHED chunks of TEXT from extracted WEBPAGES:\n` + topNChunksContent + `\n Use the given chunks as context. CITE your sources!`
             };
 
             messages.push(embedMessage);

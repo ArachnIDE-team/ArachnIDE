@@ -17,10 +17,10 @@ class ProjectNode extends WindowedNode {
     constructor(configuration = ProjectNode.DEFAULT_CONFIGURATION) {
         configuration = {...ProjectNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.content = ProjectNode._getContentElement(configuration.name);
-        if (!configuration.saved) {// Create ModuleNode
+        if (!configuration.saved) {// Create ModulePanel
             super({...configuration, title: "Project: " + configuration.name, ...WindowedNode.getNaturalScaleParameters()});
             this.followingMouse = 1;
-        } else {// Restore ModuleNode
+        } else {// Restore ModulePanel
             super({...configuration, title: configuration.name, scale: true});
         }
         this.diagram.addNode(this);

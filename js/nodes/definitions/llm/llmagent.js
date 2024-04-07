@@ -549,7 +549,7 @@ class LLMAgentNode extends WindowedNode {
         let promptTextArea = this.promptTextArea
 
         promptTextArea.onmousedown = cancel;  // Prevent dragging
-        promptTextArea.addEventListener('input', autoGrow);
+        promptTextArea.addEventListener('input', dropdown.aiTab.autoGrow);
         promptTextArea.addEventListener('mouseenter', () => {
             promptTextArea.style.userSelect = "text";
         });
@@ -732,7 +732,7 @@ class LLMAgentNode extends WindowedNode {
             });
         });
 
-        setupCustomDropdown(selectElement, true);
+        dropdown.aiTab.setupCustomDropdown(selectElement, true);
     }
 
     _setupAiNodeSliderListeners() {
@@ -749,7 +749,7 @@ class LLMAgentNode extends WindowedNode {
                     const baseLabelText = label.innerText.split(':')[0];
                     label.innerText = `${baseLabelText}: ${slider.value}`;
 
-                    setSliderBackground(slider);  // Assuming this is a predefined function
+                    dropdown.setSliderBackground(slider);  // Assuming this is a predefined function
                 }
                 // Additional logic for each slider, if needed
             });
@@ -815,7 +815,7 @@ class LLMAgentNode extends WindowedNode {
 
         // Handle synchronization if both sliders are present
         if (maxTokensSlider && maxContextSizeSlider) {
-            autoContextTokenSync(maxTokensSlider, maxContextSizeSlider);
+            dropdown.dataTab.autoContextTokenSync(maxTokensSlider, maxContextSizeSlider);
         }
 
         // Additional specific behaviors for other sliders can be added here

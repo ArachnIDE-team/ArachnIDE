@@ -14,16 +14,16 @@ function handlePanelMouseMove(event) {
     // For all other elements, stop propagation
     cancel(event);
 }
+//
+// // Add event listeners to the node panel for different types of events
+// dropdown.nodePanel.addEventListener('click', handlePanelEvent);
+// dropdown.nodePanel.addEventListener('mousedown', handlePanelEvent); // For drag (mousedown)
+// dropdown.nodePanel.addEventListener('mousemove', handlePanelMouseMove);
+// dropdown.nodePanel.addEventListener('wheel', handlePanelEvent);     // For scroll (wheel event)
+// dropdown.nodePanel.addEventListener('dragstart', handlePanelEvent); // Prevents dragging from propagating
+// dropdown.nodePanel.addEventListener('dragend', handlePanelEvent);   // Optional, handle end of drag
 
-// Add event listeners to the node panel for different types of events
-nodePanel.addEventListener('click', handlePanelEvent);
-nodePanel.addEventListener('mousedown', handlePanelEvent); // For drag (mousedown)
-nodePanel.addEventListener('mousemove', handlePanelMouseMove);
-nodePanel.addEventListener('wheel', handlePanelEvent);     // For scroll (wheel event)
-nodePanel.addEventListener('dragstart', handlePanelEvent); // Prevents dragging from propagating
-nodePanel.addEventListener('dragend', handlePanelEvent);   // Optional, handle end of drag
-
-const functionCallPanel = nodePanel.querySelector('.function-call-panel');
+// const functionCallPanel = dropdown.nodePanel.querySelector('.function-call-panel');
 
 
 const functionLoadingIcon = document.getElementById('functionLoadingIcon');

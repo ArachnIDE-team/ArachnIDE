@@ -1,16 +1,44 @@
+// Probably useless
+// class HTMLTemplate {
+//     constructor(container, clone=true) {
+//         this.container = container;
+//         this.backup = container;
+//         if (clone) {
+//             this.container = container.cloneNode(true);
+//             if(this.container.style.display === "none") this.container.style.display = "";
+//         } else {
+//             this.backup = container.cloneNode(true);
+//         }
+//     }
+//
+//     getContainer() {
+//         return this.container
+//     }
+//
+//     static byId(id, clone = true) {
+//         return new HTMLTemplate(document.getElementById(id), clone).getContainer();
+//     }
+// }
+
 
 class HTMLNode extends Node {
     static DEFAULT_CONFIGURATION = {
         content: undefined,
-        container: undefined
+        container: undefined,
+        // templates: []
     }
     // constructor(title, content, scaleProportions) {
     constructor(configuration = HTMLNode.DEFAULT_CONFIGURATION) {
         configuration = {...HTMLNode.DEFAULT_CONFIGURATION, ...configuration};
-        HTMLNode.proxyMethods(configuration.content, configuration.container);
+        if(configuration.content) {
+            HTMLNode.proxyMethods(configuration.content, configuration.container);
+        } else {
+            configuration.content = configuration.container;
+        }
         // HTMLNode.proxyMethods(configuration.container, configuration.content);
         super({title: configuration.title, content: configuration.content, pos: rootDiagram.background.pan, scale: (rootDiagram.background.zoom.mag2() ** settings.zoomContentExp), intrinsicScale: 1, addFullScreenButton: false, addCollapseButton: false, addSettingsButton: false, addFileButton: false});
         this.container = configuration.container;
+        // this.templates = configuration.templates;
         // HTMLNode.proxyMethods(this, this.container);
         HTMLNode.proxyMethods(this, this.content);
         // this.diagram.addNode(this);
@@ -46,3 +74,4 @@ class HTMLNode extends Node {
         return null;
     }
 }
+

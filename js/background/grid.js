@@ -94,9 +94,6 @@ class GridBG extends Background {
             //console.log("rezooming...");
             recalc = true;
         }
-        if (recalc) {
-            this._recalc_svg(oldSVGpan,oldSVGzoom);
-        }
 
         let c = this.toSVG(this.pan); //center of rotation
         //where it ends up if you do the rotation about SVGpan
@@ -129,26 +126,6 @@ class GridBG extends Background {
         return coords.minus(this.SVGpan).scale(this.SVGzoom);
     }
 
-    _recalc_svg(oldSVGpan, oldSVGzoom) {
-        for (let c of this.svg_bg.children){
-            let path = c.getAttribute("d");
-            let parts = path.split(/[, ]+/g);
-            let coord = 0;
-            let r = [];
-            for (let p of parts){
-                if (p.length && !isNaN(Number(p))){
-                    let c = coord?'y':'x';
-                    p = Number(p)/oldSVGzoom + oldSVGpan[c];
-                    p = (p-this.SVGpan[c])*this.SVGzoom;
-                    coord = 1-coord;
-                }
-                r.push(p);
-            }
-            c.setAttribute("d",r.join(" "));
-            c.setAttribute("stroke-width",c.getAttribute("stroke-width")*this.SVGzoom/oldSVGzoom);
-        }
-    }
-
     col(i, r = null, c = null, s = null) {
         if (nodeMode) {
             r = nodeMode_v;
@@ -170,6 +147,27 @@ class GridBG extends Background {
         if(c === null) c = this.cSlider.value;
         if(s === null) s = this.sSlider.value;
         c = this.col(i, r, c, s);
+        return "RGB(" + Math.round(c[0]) + "," + Math.round(c[1]) + "," + Math.round(c[2]) + ")";
+    }
+
+
+    gcol(i, r = null, c = null, s = null) {
+        if(r === null) r = this.rSlider.value;
+        if(c === null) c = this.cSlider.value;
+        if(s === null) s = this.sSlider.value;
+        c = this.col(i, r, c, s);
+        if(c[0] < 0) c[0] = 0;
+        if(c[0] > 255) c[0] = 255;
+        if(c[1] < 0) c[1] = 0;
+        if(c[1] > 255) c[1] = 255;
+        if(c[2] < 0) c[2] = 0;
+        if(c[2] > 255) c[2] = 255;
+        if(c[0] + c[1] + c[2] < 255) {
+            // when the light fades out...
+            c[0] = 255 - c[0]
+            c[1] = 255 - c[1]
+            c[2] = 255 - c[2]
+        }
         return "RGB(" + Math.round(c[0]) + "," + Math.round(c[1]) + "," + Math.round(c[2]) + ")";
     }
 
@@ -200,21 +198,21 @@ class GridBG extends Background {
 
     renderGrid(n) {
 
-        let maxLines = getMaxLines();
+        let maxLines = dropdown.editTab.getMaxLines();
         let svgBounds = this.svg.getBoundingClientRect();
         if(svgBounds.width === 0 || svgBounds.height === 0) return;
         let complexBotRight = this.toDZ(new vec2(svgBounds.width, svgBounds.height))
         let complexBounds = {...this.toDZ(new vec2(0,0)), width: complexBotRight.x, height: complexBotRight.y }
 
-        complexBounds.x = this.pan.x - complexBounds.width;
-        complexBounds.y = this.pan.y - complexBounds.height;
+        complexBounds.x = this.pan.x - complexBounds.width*1.5;
+        complexBounds.y = this.pan.y - complexBounds.height*1.5;
 
         let magnitude = Math.floor(Math.log10(complexBounds.width)) - 1 + Math.floor(GridBG._gaussianRandom2().x);
         let gridSize = Math.pow(10 , magnitude);
         // let strokeSize =  magnitude > 3 ? 1 : Math.pow(10 , magnitude * 0.5);// can't get under 10^-7 for svg stroke size limitations
         // if(this.svg.id === "svg_bg-3") console.log("Magnitude:", magnitude, "gridSize: ", gridSize,  "n: ", n)// "strokeSize: ", strokeSize,
-        let numHorizontalLines = Math.ceil(2*complexBounds.width / gridSize);
-        let numVerticalLines = Math.ceil(2*complexBounds.height / gridSize);
+        let numHorizontalLines = Math.ceil(3*complexBounds.width / gridSize);
+        let numVerticalLines = Math.ceil(3*complexBounds.height / gridSize);
 
         let path = "";
         // let meanpoint = null;
@@ -222,14 +220,14 @@ class GridBG extends Background {
             let i = Math.floor(Math.random() * numHorizontalLines);
             let x = i * gridSize + complexBounds.x - (complexBounds.x % gridSize);
             let p1 = this.toSVG(new vec2(x, complexBounds.y));
-            let p2 = this.toSVG(new vec2(x, complexBounds.height*2));
+            let p2 = this.toSVG(new vec2(x, complexBounds.height*1.5));
             // meanpoint = p1.minus(p2).scale(0.5)
             path += `M ${p1.x},${p1.y} L ${p2.x},${p2.y} `;
         }else{
             let i = Math.floor(Math.random() * numVerticalLines);
             let y = i * gridSize + complexBounds.y - (complexBounds.y % gridSize);
             let p1 = this.toSVG(new vec2(complexBounds.x, y));
-            let p2 = this.toSVG(new vec2(complexBounds.width*2, y));
+            let p2 = this.toSVG(new vec2(complexBounds.width*1.5, y));
             // meanpoint = p1.minus(p2).scale(0.5)
             path += `M ${p1.x},${p1.y} L ${p2.x},${p2.y} `;
         }
@@ -241,12 +239,20 @@ class GridBG extends Background {
         // cute
         // let iters = settings.iterations;
         // pathn.setAttribute("stroke", this.mcol(iters, meanpoint));
-        pathn.setAttribute("stroke", this.scol(magnitude));//, (1 - nodeMode_v), 128, 32 + (1 - nodeMode_v) * 48));
+        // let color = this.scol(magnitude);
+        // let color = this.scol( magnitude*1.5 + 1);
+        // let color = this.scol(2 / (magnitude + 0.1));
+        // let color = this.gcol(2 / (magnitude + 0.1));
+        let color = this.gcol(2 * Math.cos(magnitude + 0.1));
+        // console.log("Magnitude:", 2 * Math.cos(magnitude + 0.1), "color: ", color)
+        pathn.setAttribute("stroke", color);//, (1 - nodeMode_v), 128, 32 + (1 - nodeMode_v) * 48));
 
         pathn.setAttribute("d", path);
         // pathn.setAttribute("stroke-width", "" + this.gridStrokeWidth * strokeSize );
-        pathn.setAttribute("stroke-width", "0.1px")
+        pathn.setAttribute("stroke-width",  (settings.renderWidthMult)+ "")
         pathn.setAttribute("vector-effect", "non-scaling-stroke")
+        // this.svg_bg.setAttribute("vector-effect", "non-scaling-stroke")
+        // this.svg_bg.setAttributeNS("http://www.w3.org/2000/svg", "vector-effect", "non-scaling-stroke")
         this.svg_bg.appendChild(pathn);
         while (this.svg_bg.children.length > maxLines) {
             this.svg_bg.removeChild(this.svg_bg.children[0]);

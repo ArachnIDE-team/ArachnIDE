@@ -25,7 +25,21 @@ class Node {
         this.anchor = new vec2(0, 0);
         this.anchorForce = 0;
         this.mouseAnchor = new vec2(0, 0);
-        this.edges = [];
+        // this.edges = [];
+        // a proxy for our array
+        let that = this;
+        this.edges = new Proxy([], {
+            deleteProperty: function(target, property) {
+                delete target[property];
+                that.onDisconnect(property)
+                return true;
+            },
+            set: function(target, property, value, receiver) {
+                target[property] = value;
+                if(property !== 'length') that.onConnect(value)
+                return true;
+            }
+        });
         this.createdAt = new Date().toISOString();
         this.files = [...configuration.files];
         this.init = (nodeMap) => { };
@@ -85,6 +99,13 @@ class Node {
             this.attach();
         }
         this.diagram = configuration.diagram;
+    }
+
+    onDisconnect(index){
+        // console.log("disconnected node: ", this, " removed edge: ", index)
+    }
+    onConnect(edge){
+        // console.log("connected node: ", this, " new edge: ", edge)
     }
 
     startInitialization() {

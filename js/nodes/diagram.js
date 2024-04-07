@@ -40,6 +40,7 @@ class Diagram extends Node {
         coordinateContainer: undefined,
         diagram: null,
         background: {
+            type: "grid",
             svg_element: undefined,
             svg_bg_element: undefined,
             svg_viewmat_element: undefined,
@@ -70,8 +71,7 @@ class Diagram extends Node {
         this.prevNodeToConnect = undefined;
         this.selectedNodeUUIDs = new Set();// Global or scoped array for selected UUIDs
         this.edgeDirectionalityMap = new Map();
-        this.background = new GridBG({
-        // this.background = new MandelbrotBG({
+        let backgroundConfiguration = {
             svg_element: configuration.background.svg_element,
             svg_bg_element: configuration.background.svg_bg_element,
             svg_viewmat_element: configuration.background.svg_viewmat_element,
@@ -84,7 +84,8 @@ class Diagram extends Node {
             colorPickerB: document.getElementById("bColor"),
             diagram: this,
             container: this.diagramContainer
-        })
+        };
+        this.background = configuration.background.type === "grid" ? new GridBG(backgroundConfiguration) : new MandelbrotBG(backgroundConfiguration)
         this.gen = this.background.iter();
         this.panInput = configuration.panInput;
         if(this.panInput) {
@@ -144,7 +145,7 @@ class Diagram extends Node {
 
 
         if(configuration.diagram === null){ // Root Diagram
-            // savenet.js (moved from top-level to function)
+            // diagramfile.js (moved from top-level to function)
             reloadDiagram(this)
             // this.diagram = window;
 
@@ -844,26 +845,27 @@ class Diagram extends Node {
 }
 
 window.rootDiagram = null;
+//
+// function createMainDiagram(){
+//     window.rootDiagram = new Diagram({
+//         nodeContainer: document.getElementById("nodes"),
+//         edgeContainer: document.getElementById("edges"),
+//         panInput: document.getElementById("pan"),
+//         zoomInput: document.getElementById("zoom"),
+//         coordsLive: true,
+//         coordinateContainer: document.getElementById("coordinates"),
+//         background: {
+//             svg_element: svg,
+//             svg_bg_element: svg.getElementById("bg"),
+//             svg_viewmat_element: svg.getElementById("viewmatrix"),
+//             svg_mousePath_element: svg.getElementById("mousePath"),
+//         },
+//         id: 0
+//    })
+//    Node.DEFAULT_CONFIGURATION.diagram = rootDiagram;
+// }
 
-function createMainDiagram(){
-    window.rootDiagram = new Diagram({
-        nodeContainer: document.getElementById("nodes"),
-        edgeContainer: document.getElementById("edges"),
-        panInput: document.getElementById("pan"),
-        zoomInput: document.getElementById("zoom"),
-        coordsLive: true,
-        coordinateContainer: document.getElementById("coordinates"),
-        background: {
-            svg_element: svg,
-            svg_bg_element: svg.getElementById("bg"),
-            svg_viewmat_element: svg.getElementById("viewmatrix"),
-            svg_mousePath_element: svg.getElementById("mousePath"),
-        },
-        id: 0
-   })
-   Node.DEFAULT_CONFIGURATION.diagram = rootDiagram;
-}
-
+// createMainDiagram();
 
 class WindowedDiagram extends WindowedNode {
     static DEFAULT_CONFIGURATION = { // just for eg, we cant pass default values
@@ -967,7 +969,6 @@ class WindowedDiagram extends WindowedNode {
     }
 }
 
-createMainDiagram();
 
 function createDiagram(id, parent){
     return new WindowedDiagram({id, parent})

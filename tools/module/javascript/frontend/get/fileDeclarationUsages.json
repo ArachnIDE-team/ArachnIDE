@@ -1,0 +1,4 @@
+ {
+    "name": "get file declaration usages",
+    "description": "Given a JavascriptFrontendModule, extracts file declarations usages.\nCreate a JavascriptNode for each file composing the module and connects them based on the declaration usages."
+}
