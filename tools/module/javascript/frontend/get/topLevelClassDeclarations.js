@@ -1,4 +1,4 @@
-import CONFIGURATION from './TopLevelClassDeclarations.json'
+import CONFIGURATION from './topLevelClassDeclarations.json'
 
 class TopLevelClassDeclarations extends ToolNode {
     constructor() {
@@ -59,7 +59,10 @@ class TopLevelClassDeclarations extends ToolNode {
                 console.log("Scanning: ", fileName, "Found: ", topLevelClassDeclartions)
             }
             console.log(classDeclarations)
-
+            let textNode = createTextNode("Class Declarations for module: " + inputNodes[0].name, classDeclarations.join("\n"))
+            let distance = textNode.pos.minus(this.pos).scale(2);
+            textNode.pos = textNode.pos.minus(distance)
+            connectDistance(this, textNode);
         })
     }
 }

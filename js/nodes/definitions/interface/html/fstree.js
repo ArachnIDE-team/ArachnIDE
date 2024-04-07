@@ -29,7 +29,9 @@ class FileSystemTreeHTML extends Tree {
                 this.selectFiles = configuration.selectFiles;
                 this.selectFolders = configuration.selectFolders;
                 this.rootPath = configuration.root;
-                this.eventListeners = configuration.eventListeners;
+                this.eventListeners = {}; // prevent undesirable sharing of event listener
+                this.eventListeners.value = [...configuration.eventListeners.value]
+                this.eventListeners.switcher = [...configuration.eventListeners.switcher]
                 this.afterInit = configuration.afterInit;
                 // Don't worry about the warning
                 this.onLoaded();
@@ -326,7 +328,7 @@ async function createWorkspaceFSTree(elementID, afterInit){
     // return new FileSystemTree("#" + elementID, fsTree, root, true)
 }
 
-async function createModuleFSTree(elementID, path, includes, excludes, forceFSTree=null, afterInit) {
+async function createModuleFSTree(elementID, path, includes, excludes, forceFSTree=null, configuration, afterInit) {
     let fsTree, root;
     if(forceFSTree === null) {
         let getFSTree = async function(){
@@ -346,10 +348,7 @@ async function createModuleFSTree(elementID, path, includes, excludes, forceFSTr
         container: "#" + elementID,
         fsTree,
         root,
-        selection: true,
-        multiple: false,
-        selectFiles: true,
-        selectFolders: false,
+        ...configuration,
         afterInit
     });
 

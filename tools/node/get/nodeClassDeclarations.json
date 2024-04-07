@@ -1,4 +1,4 @@
 {
-    "name": "get top level class declarations",
-    "description": "Given a JavascriptFrontendModule, extracts class declarations.\nCreate a JavascriptNode for each file composing the module and connects them based on the declaration usages."
+    "name": "get Node class declarations",
+    "description": "Given a JavascriptFrontendModule, extracts class declarations extending Node class.\nCreate a NodeModule witch tree reflects the class hierarchy of Node."
 }

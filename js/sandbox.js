@@ -64,8 +64,8 @@ chrysalIDEFrontend.followingMouse = 0;
 
 // // Get JavascriptFrontend File merge:
 // let MergedCode = (await import('/tools/module/javascript/get/mergedCode.js')).default
-// let Tool = (await import("H:/projects/ChrysalIDE/tools/module/javascript/frontend/get/toplevelClassDeclarations.js")).default
-let Tool = (await import("H:/projects/ChrysalIDE/tools/node/get/nodeClassDeclarations.js")).default
+let Tool = (await import("H:/projects/ChrysalIDE/tools/module/javascript/frontend/get/toplevelClassDeclarations.js")).default
+// let Tool = (await import("H:/projects/ChrysalIDE/tools/node/get/nodeClassDeclarations.js")).default
 
 let codeTool = new Tool()
 

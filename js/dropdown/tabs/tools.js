@@ -81,7 +81,7 @@ class ToolsTab {
                     label.innerText = toolName
                     let codePath = descriptionFile.substr(0, descriptionFile.length - ".json".length) + ".js";
                     this.toolBox.addTool(new Tool(toolName, codePath, descriptionFile));
-                    // label.style.color = "red";
+                    this.setMaxSize(280,480)
                 }
             }
             let footerPanels = this.moduleNode.content.footerContainer.children;//.querySelectorAll("button.footer-button");
@@ -133,6 +133,11 @@ class ToolsTab {
     onUseToolButtonClick() {
         if(this.selectedTool === null) return;
         this.selectedTool.downloadCode();
+    }
+
+    setMaxSize(maxWidth, maxHeight) {
+        this.moduleNode.content.moduleContainer.style.maxWidth = maxWidth + "px";
+        this.moduleNode.content.moduleContainer.style.maxHeight = maxHeight + "px";
     }
 }
 

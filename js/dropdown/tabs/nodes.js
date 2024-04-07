@@ -3,7 +3,8 @@ class NodesTab {
     constructor() {
         this.nodeTreeContainerId = "node-tree-container";
         this.nodeTreeContainer = document.getElementById(this.nodeTreeContainerId);
-
+        this.constructionContainer = document.createElement("div");
+        this.constructionContainer.className = "code"
         document.addEventListener('DOMContentLoaded', this.getTopLevelNodeClassDeclarations.bind(this));
     }
 
@@ -18,7 +19,6 @@ class NodesTab {
 
         return classDeclarations;
     }
-
 
     async getFilesContent(fileList) {
 
@@ -100,10 +100,33 @@ class NodesTab {
         this.moduleNode = new ModulePanel({name: "ChrysalIDE Class Declarations"})
         this.nodeTreeContainer.append(this.moduleNode.container)
         this.moduleNode.reloadModule(() => {
-            this.moduleNode.content.headerContainer.innerText = "Available nodes: (" + this.moduleNode.sources.files.length + ")"
+            let length = Object.keys(dropdown.nodesTab.moduleNode.content.fileSystemTree.content.liElementsById).length
+            this.moduleNode.content.headerContainer.innerText = "Available nodes: (" + length + ")"
             this.moduleNode.content.moduleContainer.querySelector(".metadata-container").remove();
-            this.moduleNode.content.footerContainer.innerHTML = "";
-        }, {fsTree: classMap, root: ""});
+            this.moduleNode.content.moduleContainer.append(this.constructionContainer);
+            this.moduleNode.content.footerContainer.remove();
+            this.moduleNode.content.fileSystemTree.addValueListener(this.onNodeSelectionChange.bind(this))
+            this.setMaxSize(280,510)
+        }, {fsTree: classMap, root: ""}, {selectFolders: true});
+    }
+
+    onNodeSelectionChange(selection) {
+        if(selection[0]){
+            let classNames = selection[0].split("/");
+            let trueClassName = classNames[classNames.length - 1];
+            let trueClass = eval(trueClassName);
+            console.log("Selected class: ", trueClass)
+            let configuration = {...trueClass.DEFAULT_CONFIGURATION};
+            if(classNames.length === 1 && classNames[0] === "Node") configuration.diagram = "window.rootDiagram"
+            this.constructionContainer.innerText = JSON.stringify(configuration, null, 2);
+        }else{
+            this.constructionContainer.innerText = "";
+        }
+    }
+
+    setMaxSize(maxWidth, maxHeight) {
+        this.moduleNode.content.moduleContainer.style.maxWidth = maxWidth + "px";
+        this.moduleNode.content.moduleContainer.style.maxHeight = maxHeight + "px";
     }
 
 }

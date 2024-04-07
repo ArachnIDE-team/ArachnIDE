@@ -1,3 +1,5 @@
+
+
 class ModuleNodeHTML {
     static DEFAULT_CONFIGURATION = {
         name: "",
@@ -6,8 +8,16 @@ class ModuleNodeHTML {
             dir: "",
             includes: [],
             excludes: [],
+        },
+        fsTree: {
+            selection: true,
+            multiple: false,
+            selectFiles: true,
+            selectFolders: false
         }
     }
+
+
 
 
     constructor(configuration = ModuleNodeHTML.DEFAULT_CONFIGURATION) {
@@ -54,9 +64,10 @@ class ModuleNodeHTML {
 
     }
 
-    reloadModule(callback, forceFSTree=null) {
+    reloadModule(callback, forceFSTree=null, configuration=ModuleNodeHTML.DEFAULT_CONFIGURATION.fsTree) {
+        configuration = {...ModuleNodeHTML.DEFAULT_CONFIGURATION.fsTree, ...configuration}
         const elementID = `moduleContainer-${this.index}`
-        createModuleFSTree(elementID, this.sources.dir, this.sources.includes, this.sources.excludes, forceFSTree, () => {
+        createModuleFSTree(elementID, this.sources.dir, this.sources.includes, this.sources.excludes, forceFSTree, configuration, () => {
         }).then((result) => {
             this.fileSystemTree = result.fileSystemTree;
             let fsTree = result.fsTree;
@@ -158,7 +169,7 @@ class ModuleNode extends WindowedNode {
         saveData: undefined,
     }
 
-    static SAVE_PROPERTIES = ['sources'];
+    static SAVE_PROPERTIES = ['name', 'sources'];
 
     static OBSERVERS = {}
 
@@ -178,7 +189,7 @@ class ModuleNode extends WindowedNode {
         this.diagram.addNode(this);
         this.moduleNode = content;
         this.moduleNode.setModuleType(this.constructor.name)
-        this._initialize(configuration.sources, configuration.fsTree, configuration.saved)
+        this._initialize(configuration.name, configuration.sources, configuration.fsTree, configuration.saved)
     }
 
 
@@ -201,14 +212,15 @@ class ModuleNode extends WindowedNode {
         return new ModulePanel(configuration);
     }
 
-    _initialize(sources, fsTree, saved){
+    _initialize(name, sources, fsTree, saved){
         this.anchorForce = 1;
         this.toggleWindowAnchored(true);
 
         this.draw();
-        // if(!saved){
-        //     this.sources = sources;
-        // }
+        if(!saved){
+            // this.sources = sources;
+            this.name = name;
+        }
 
         this.setMinSize(420)
         this.innerContent.style.width = "100%";

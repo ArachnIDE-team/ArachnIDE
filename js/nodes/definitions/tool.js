@@ -58,10 +58,11 @@ class ToolNode extends WindowedNode {
         this.innerContent.style.width = "100%";
         this.innerContent.append(this.performButton);
     }
+
     getInputNodes(){
         let inputs = [];
         for (let edge of this.edges) {
-            if (edge.directionality.end !== this) {
+            if (edge && edge.directionality.end !== this) {
                 if(edge.pts[0] === this) inputs.push(edge.pts[1])
                 if(edge.pts[1] === this) inputs.push(edge.pts[0])
             }
