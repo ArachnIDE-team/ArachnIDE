@@ -8,7 +8,8 @@ class CodeNode extends WindowedNode {
             extension: "",
             libURL: "",
             showHint: false,
-            showHintFunction: ""
+            showHintFunction: "",
+            versions: []
         },
         saved: undefined,
         saveData: undefined,
@@ -24,6 +25,7 @@ class CodeNode extends WindowedNode {
     constructor(configuration = CodeNode.DEFAULT_CONFIGURATION) {
         configuration = {...CodeNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.settings =  {...CodeNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
+        configuration.settings.versions =  [...CodeNode.DEFAULT_CONFIGURATION.settings.versions, ...configuration.settings.versions]
         configuration.content = [CodeNode._getContentElement()];
         if (!configuration.saved) {// Create CodeNode
             super({...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters() });
@@ -90,6 +92,7 @@ class CodeNode extends WindowedNode {
             })
         }
     }
+
     onCodeChange(code){
         for (let listener of this._codeListeners){
             listener(code);
@@ -99,9 +102,11 @@ class CodeNode extends WindowedNode {
     addEventListener(event, listener){
         if(event === "change"){ this._codeListeners.push(listener) }
     }
+
     removeEventListener(event, listener){
         if(event === "change") { this._codeListeners.indexOf(listener) > -1 ? this._codeListeners.splice(this._codeListeners.indexOf(listener), 1) : "" }
     }
+
     static _getContentElement(){
         // Create the wrapper div
         let editorWrapperDiv = document.createElement('div');
@@ -127,11 +132,31 @@ class CodeNode extends WindowedNode {
         let footerButtonContainer = document.createElement('div');
         footerButtonContainer.classList.add("content-sticky-footer");
 
+
+
+        let versionDropdown = document.createElement("select");
+        versionDropdown.classList.add('inline-container');
+        versionDropdown.classList.add('version-select');
+        versionDropdown.style.backgroundColor = "#222226";
+        versionDropdown.style.border = "none";
+
         let runButton = document.createElement("button");
         runButton.innerHTML = "Run Code";
         runButton.classList.add("code-button");
 
+        let typeConvertDropdown = document.createElement("select");
+        typeConvertDropdown.classList.add('inline-container');
+        typeConvertDropdown.classList.add('transform-select');
+        typeConvertDropdown.style.backgroundColor = "#222226";
+        typeConvertDropdown.style.border = "none";
+
+        let conversionButton = document.createElement("button");
+        conversionButton.classList.add("transform-button");
+
+        footerButtonContainer.append(versionDropdown);
         footerButtonContainer.append(runButton);
+        footerButtonContainer.append(typeConvertDropdown);
+        footerButtonContainer.append(conversionButton);
 
         // Create the overlay div dynamically
         let overlay = document.createElement('div');
@@ -166,7 +191,15 @@ class CodeNode extends WindowedNode {
         if(!this.settings.libURL){//retro-compatibility
             this.settings = settings;
         }
+        if(!this.settings.versions){//retro-compatibility
+            this.settings.versions = CodeNode.DEFAULT_CONFIGURATION.settings.versions;
+        }
+        this.editorWrapperDiv = this.content.querySelector('.editorWrapperDiv>iframe')
+        this.versionDropdown = this.content.querySelector('.version-select');
         this.codeButton = this.content.querySelector('.code-button');
+        this.conversionButton = this.content.querySelector('.transform-button');
+        this.typeConvertDropdown = this.content.querySelector('.transform-select');
+
         this._addEventListeners();
         this.afterInit()
     }
@@ -193,6 +226,12 @@ class CodeNode extends WindowedNode {
     }
 
     _addEventListeners() {
+        let versionDropdown = this.versionDropdown;
+        if(this.settings.versions.length === 0) versionDropdown.remove();
+        this.settings.versions.forEach((version, index) => {
+            versionDropdown.add(new Option(version, version, false, index === 0), index);
+        })
+
         let button = this.codeButton;
 
         // Reattach the handleCodeButton callback
@@ -200,10 +239,41 @@ class CodeNode extends WindowedNode {
             // Assuming handleCodeButton sets up the button event listener
             button.addEventListener('click', this.onClickRun.bind(this))
         }
+
+        let typeConvertDropdown = this.typeConvertDropdown;
+        globalThis.textNodeClasses.forEach((nodeClass, index) => {
+            if(nodeClass !== this.constructor)
+                typeConvertDropdown.add(new Option(nodeClass.name, nodeClass.name, false, index === 0), index);
+        })
+        let conversionButton = this.conversionButton;
+        // conversionButton.innerText = "To JavascriptNode";
+        conversionButton.onclick = () => {
+            this.convertNode(typeConvertDropdown.value);
+        };
+        typeConvertDropdown.addEventListener("change", () => {
+            conversionButton.innerText = "To " + typeConvertDropdown.value;
+        })
+        typeConvertDropdown.dispatchEvent(new Event("change"))
     }
 
     onClickRun(){
         // override this method
+    }
+
+    convertNode(type){
+        let codeNodeClass = eval(type);
+        let codeNode;
+        if(codeNodeClass === TextNode) {
+            codeNode = new TextNode({name: this.title, text: this.code})
+        } else {
+             codeNode = new codeNodeClass({name: this.title, code: this.code})
+        }
+        codeNode.pos.x = this.pos.x
+        codeNode.pos.y = this.pos.y
+        codeNode.width = this.width;
+        codeNode.height = this.height;
+        codeNode.scale = this.scale;
+        this.onDelete();
     }
 
     // From editor

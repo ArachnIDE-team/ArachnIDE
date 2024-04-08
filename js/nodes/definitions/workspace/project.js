@@ -1,4 +1,158 @@
 
+class ProjectNodeHTML {
+    static DEFAULT_CONFIGURATION = {
+        name: "",
+        sources: {
+            files : [],
+            dir: "",
+            includes: [],
+            excludes: [],
+        },
+        fsTree: {
+            selection: true,
+            multiple: false,
+            selectFiles: true,
+            selectFolders: false
+        }
+    }
+
+    constructor(configuration = ProjectNodeHTML.DEFAULT_CONFIGURATION) {
+        configuration = {...ProjectNodeHTML.DEFAULT_CONFIGURATION, ...configuration}
+        this.sources = {...ProjectNodeHTML.DEFAULT_CONFIGURATION.sources, ...configuration.sources}
+        this.moduleType = "";
+        this.index = generateUUID();
+        // Create the section container
+        this.container = document.createElement('div')
+        this.container.className = 'header-content-footer';
+        // Create a div element to show the root directory name
+        this.headerContainer = document.createElement('div');
+        this.headerContainer.className = "content-sticky-header"
+        // Create a div element to host the filesystem tree
+        this.moduleContainer = document.createElement('div');
+        this.moduleContainer.id = `moduleContainer-${this.index}`;
+        this.moduleContainer.style.height = "100%";
+        // Creates a div element for the footer
+        this.footerContainer = document.createElement('div');
+        this.footerContainer.className = "content-sticky-footer"
+        this.container.append(this.headerContainer,  this.moduleContainer, this.footerContainer)
+
+        let footerContainerLeftContainer = document.createElement("div");
+        footerContainerLeftContainer.className = "footer-left-container";
+        let footerContainerRightContainer = document.createElement("div");
+        footerContainerRightContainer.className = "footer-right-container";
+
+        let saveFileSelectionButton = document.createElement("button");
+        saveFileSelectionButton.innerText = "→ SAVE";
+        saveFileSelectionButton.className = "footer-button";
+        saveFileSelectionButton.disabled = true;
+        // saveFileSelectionButton.onclick = this.onSaveFile.bind(this);
+        let loadFileSelectionButton = document.createElement("button");
+        loadFileSelectionButton.innerText = "LOAD →";
+        loadFileSelectionButton.className = "footer-button";
+        loadFileSelectionButton.disabled = true;
+        // loadFileSelectionButton.onclick = this.onLoadFile.bind(this);/
+
+        footerContainerLeftContainer.appendChild(saveFileSelectionButton);
+        footerContainerRightContainer.appendChild(loadFileSelectionButton);
+        this.footerContainer.appendChild(footerContainerLeftContainer);
+        this.footerContainer.appendChild(footerContainerRightContainer);
+        WindowedNode.makeContentScrollable(this.moduleContainer, true)
+
+    }
+
+    reloadModule(callback, forceFSTree=null, configuration=ProjectNodeHTML.DEFAULT_CONFIGURATION.fsTree) {
+        configuration = {...ProjectNodeHTML.DEFAULT_CONFIGURATION.fsTree, ...configuration}
+        const elementID = `moduleContainer-${this.index}`
+        createModuleFSTree(elementID, this.sources.dir, this.sources.includes, this.sources.excludes, forceFSTree, configuration, () => {
+        }).then((result) => {
+            this.fileSystemTree = result.fileSystemTree;
+            let fsTree = result.fsTree;
+            this.sources.files = this.getFilesFromFSTree(fsTree);
+            // console.log("Set source files for module: ", this, " Files: ",  this.sources.files )
+            this.fileSystemTree.addValueListener((selected, newSelection) => {
+
+            })
+            this.afterReload(callback);
+        })
+    }
+
+    afterReload(callback) {
+        this.headerContainer.innerText = "Module " + this.sources.dir + " (" + this.sources.files.length + " files)";
+        let metadataContainer = document.createElement("div");
+        metadataContainer.className = "metadata-container"
+
+        let metadataGLOGContainer = document.createElement("div");
+        metadataGLOGContainer.innerText = "Includes:\n\t" + this.sources.includes.join("\n\t") + "\nExcludes:\n\t" +
+            this.sources.excludes.join("\n\t") + "\nType: " + this.moduleType;
+        metadataGLOGContainer.className = "code";
+
+
+        let metadataButtonContainer = document.createElement("div");
+        metadataButtonContainer.className = "metadata-button-container"
+        let reloadButton = document.createElement("button")
+        reloadButton.innerHTML = "RELOAD"
+        reloadButton.className = "footer-button";
+
+        reloadButton.onclick = this.reloadModule.bind(this)
+
+        metadataButtonContainer.append(reloadButton)
+        metadataContainer.append(metadataGLOGContainer, metadataButtonContainer)
+
+        WindowedNode.makeContentScrollable(metadataContainer)
+        this.moduleContainer.prepend(metadataContainer)
+        if(typeof callback === 'function') callback();
+    }
+
+    getFilesFromFSTree(fsTree, relative=""){
+        let basePath = path.join(this.sources.dir, relative);
+        if(typeof fsTree === "string") return [basePath]
+        let array = []
+        for(let dirOrFile of Object.keys(fsTree)){
+            array.push(...this.getFilesFromFSTree(fsTree[dirOrFile], path.join(relative, dirOrFile)))
+        }
+        return array;
+    }
+
+    setModuleType(moduleType){
+        this.moduleType = moduleType;
+    }
+}
+
+class ProjectPanel extends HTMLNode {
+    static DEFAULT_CONFIGURATION = {
+        name: "",
+        sources: {
+            files : [],
+            dir: "",
+            includes: [],
+            excludes: [],
+        }
+    }
+
+    constructor(configuration = ProjectPanel.DEFAULT_CONFIGURATION) {
+        configuration = {...ProjectPanel.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.sources = {...ProjectPanel.DEFAULT_CONFIGURATION.sources, ...configuration.sources}
+        let content = new ProjectNodeHTML(configuration);
+        let container = content.container
+        super({content, container})
+    }
+
+    get sources() {
+        return this.content.sources;
+    }
+
+    set sources(v) {
+        if(this.initialized){
+            this.content.sources = v;
+        } else {
+            this.addAfterInitCallback(() => {
+                this.content.sources = v;
+            })
+        }
+
+    }
+}
+
 class ProjectNode extends WindowedNode {
     static DEFAULT_CONFIGURATION = {
         name: "",
@@ -17,10 +171,10 @@ class ProjectNode extends WindowedNode {
     constructor(configuration = ProjectNode.DEFAULT_CONFIGURATION) {
         configuration = {...ProjectNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.content = ProjectNode._getContentElement(configuration.name);
-        if (!configuration.saved) {// Create ModulePanel
+        if (!configuration.saved) {// Create ProjectNode
             super({...configuration, title: "Project: " + configuration.name, ...WindowedNode.getNaturalScaleParameters()});
             this.followingMouse = 1;
-        } else {// Restore ModulePanel
+        } else {// Restore ProjectNode
             super({...configuration, title: configuration.name, scale: true});
         }
         this.diagram.addNode(this);

@@ -10,7 +10,6 @@ class ToolNode extends WindowedNode {
 
     static OBSERVERS = {}
 
-
     constructor(configuration = ToolNode.DEFAULT_CONFIGURATION) {
         configuration = {...ToolNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.sources = {...ToolNode.DEFAULT_CONFIGURATION.sources, ...configuration.sources}
@@ -31,7 +30,7 @@ class ToolNode extends WindowedNode {
     _initialize(name, description, index, saved){
         this.anchorForce = 1;
         this.toggleWindowAnchored(true);
-
+        this.setMinSize(250, 210)
         if(!saved){
             this.name = name;
             this.description = description;
@@ -44,7 +43,7 @@ class ToolNode extends WindowedNode {
     }
     _addDescription(){
         this.descriptionPanel = document.createElement("div");
-        this.descriptionPanel.className = "code";
+        this.descriptionPanel.className = "tool-description";
         this.descriptionPanel.innerText = this.description;
         this.descriptionPanel.style.width = "100%"
         this.innerContent.append(this.descriptionPanel);

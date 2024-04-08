@@ -83,6 +83,10 @@ class TextNode extends WindowedNode {
         pythonView.id = 'python-frame';
         pythonView.classList.add('python-frame', 'hidden'); // Add hidden class
 
+
+        let footerContainer = document.createElement("div");
+        footerContainer.classList.add('content-sticky-footer')
+
         let runButton = document.createElement("button");
         runButton.innerHTML = "Run Code";
         runButton.classList.add("code-button");
@@ -94,17 +98,33 @@ class TextNode extends WindowedNode {
             runButton.style.display = "block";
         }
 
-        let toJavascriptButton = document.createElement("button");
-        toJavascriptButton.classList.add("transform-button");
-        toJavascriptButton.innerText = "To JavascriptNode";
-        toJavascriptButton.onclick = this.toJavascriptNode.bind(this);
+        let typeConvertDropdown = document.createElement("select");
+        typeConvertDropdown.classList.add('inline-container');
+        typeConvertDropdown.style.backgroundColor = "#222226";
+        typeConvertDropdown.style.border = "none";
+        globalThis.textNodeClasses.forEach((nodeClass, index) => {
+            if(nodeClass !== this.constructor)
+                typeConvertDropdown.add(new Option(nodeClass.name, nodeClass.name, false, index === 0), index);
+
+        })
+        let conversionButton = document.createElement("button");
+        conversionButton.classList.add("transform-button");
+        // conversionButton.innerText = "To JavascriptNode";
+        conversionButton.onclick = () => {
+            this.convertNode(typeConvertDropdown.value);
+        };
+        typeConvertDropdown.addEventListener("change", () => {
+            conversionButton.innerText = "To " + typeConvertDropdown.value;
+        })
+        typeConvertDropdown.dispatchEvent(new Event("change"))
 
         windowDiv.appendChild(htmlView);
         windowDiv.appendChild(pythonView);
         windowDiv.appendChild(editableDiv);  // Append the contentEditable div to .content div
-        windowDiv.appendChild(runButton);
-        windowDiv.appendChild(toJavascriptButton);
-
+        footerContainer.appendChild(runButton);
+        footerContainer.append(typeConvertDropdown);
+        footerContainer.appendChild(conversionButton);
+        windowDiv.appendChild(footerContainer);
         this.addCodeButton = addCodeButton;
 
         if (sx !== undefined) {
@@ -126,7 +146,7 @@ class TextNode extends WindowedNode {
         this.afterInit()
     }
 
-    toJavascriptNode(){
+    convertNode(type){
         let code = this.text;
         let title = this.title;
         if(code.trim().startsWith("```")) {
@@ -135,14 +155,14 @@ class TextNode extends WindowedNode {
         }
         if(code.trim().endsWith("```")) {
             code = code.substring(0, code.indexOf("```"));
-
         }
-        let metaNode = createJavascriptNode(title, code)
-        metaNode.pos.x = this.pos.x
-        metaNode.pos.y = this.pos.y
-        metaNode.width = this.width;
-        metaNode.height = this.height;
-        metaNode.scale = this.scale;
+        let codeNodeClass = eval(type);
+        let codeNode = new codeNodeClass({name: title, code})
+        codeNode.pos.x = this.pos.x
+        codeNode.pos.y = this.pos.y
+        codeNode.width = this.width;
+        codeNode.height = this.height;
+        codeNode.scale = this.scale;
         this.onDelete();
     }
 

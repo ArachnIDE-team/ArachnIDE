@@ -37,7 +37,11 @@ class MergedCode extends ToolNode {
         if(inputNodes.length > 1) return this.error("Too many input nodes", "This tool takes only one input node")
         if(!(inputNodes[0] instanceof JavascriptFrontendModuleNode)) return this.error("Wrong input node type", "This tool takes only one input node of type JavascriptFrontendModule.")
         this.getFilesContent(inputNodes[0].sources.files).then((fileObject) => {
-            createJavascriptNode(inputNodes[0].name + " Merged Code", fileObject.join("\n"))
+            let javascriptNode = createJavascriptNode("Merged Code for module: " + inputNodes[0].name, fileObject.join("\n"))
+            let distance = javascriptNode.pos.minus(this.pos).scale(2);
+            javascriptNode.pos = javascriptNode.pos.minus(distance)
+            connectDistance(this, javascriptNode);
+
         })
 
     }

@@ -106,8 +106,9 @@
         z-index: 1;
     }
 
-    .window-anchored.selected {
-        background-color: #4a669d;
+    .window-anchored.selected::before {
+        background: rgba(79, 49, 255, 0.05);
+
     }
 
 .drag-box {
@@ -119,8 +120,8 @@
 }
 
 .selected {
-    background-color: #6c7687;
-    color: #222226;
+    /*background-color: #6c7687;*/
+    /*color: #222226;*/
 }
 
 
@@ -132,9 +133,10 @@
             left: -1px;
             right: -1px;
             bottom: -1px;
-            border: 2px solid #007BFF;
+            border: 2px solid #4f31ff;
             pointer-events: none;
             z-index: 1;
+            background: rgba(79, 49, 255, 0.02);
         }
 
 .node-textarea {
@@ -2296,7 +2298,27 @@ textarea[id^='custom-instructions-textarea-'] {
     white-space: pre;
     font-family: monospace;
 }
-
+code {
+    white-space: pre;
+    font-family: monospace;
+    background: rgba(0,0,0,0.2)!important;
+    width: 90%;
+    display: inline-block;
+    padding: 5px;
+    margin-left: 5%;
+    margin-right: 5%;
+    border-radius: 5px;
+}
+div.language-md {
+    white-space: pre;
+    background: rgba(0,0,0,0.2)!important;
+    width: 90%;
+    display: inline-block;
+    padding: 5px;
+    margin-left: 5%;
+    margin-right: 5%;
+    border-radius: 5px;
+}
 
 .cm-chrysalide-function-name {
     color: #8e8eff !important;
@@ -2382,6 +2404,10 @@ textarea[id^='custom-instructions-textarea-'] {
 
 /* WindowedNode */
 
+.tool-description {
+    font-family: monospace;
+}
+
 .window-ui {
     background-color: rgb(50 51 62 / 95%);
 }
@@ -2429,7 +2455,6 @@ textarea[id^='custom-instructions-textarea-'] {
     background-color: #5b5b5d;
     cursor: not-allowed;
 }
-
 
 .header-content-footer {
     display: flex;

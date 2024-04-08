@@ -135,6 +135,7 @@ class FileDeclarationUsages extends ToolNode {
             let selectedFileNode = createJavascriptNode(selectedFile, selectedCode);
             let distance = selectedFileNode.pos.minus(this.pos).scale(2);
             selectedFileNode.pos = selectedFileNode.pos.minus(distance)
+            connectDistance(selectedFileNode, this)
             // for(let fileName of Object.keys(fileScopeUsage.files)) {
             let usageFiles = Array.from(Object.keys(fileScopeUsage.files));
             usageFiles.forEach((fileName, index) => {

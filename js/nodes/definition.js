@@ -2,7 +2,7 @@
 
 
 globalThis.nodeClasses = [TextNode, LinkNode, LLMNode, ImageNode, AudioNode, VideoNode, WolframNode, WorkspaceExplorerNode, WebEditorNode, MetaNode, JavascriptNode,ProjectNode, ModuleNode, JavascriptFrontendModuleNode]
-
+globalThis.textNodeClasses = [TextNode, JavascriptNode, JSONNode, MarkdownNode, PythonNode, HTMLEditorNode, CSSNode];
 function restoreNode(saveData) {
     let classIndex = globalThis.nodeClasses.map((classObject) => classObject.name).indexOf(saveData.json.type);
     if(classIndex === -1){

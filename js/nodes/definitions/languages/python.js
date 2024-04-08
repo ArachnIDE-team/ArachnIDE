@@ -1,14 +1,14 @@
 
-class JavascriptNode extends CodeNode {
+class PythonNode extends CodeNode {
     static DEFAULT_CONFIGURATION = {
         name: "",
         code: "",
         settings: {
-            language: "javascript",
-            libURL: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/javascript/javascript.min.js",
-            extension: "js",
+            language: "python",
+            libURL: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/python/python.min.js",
+            extension: "py",
             showHint: true,
-            versions: ["ES6", "Node.js"],
+            versions: ["pyodide", "backend REPL"],
             showHintFunction: `var WORD = /[\\w$]+/, RANGE = 500;
             CodeMirror.registerHelper("hint", "anyword", function(editor, options) {
                 var word = options && options.word || WORD;
@@ -46,32 +46,53 @@ class JavascriptNode extends CodeNode {
     static SAVE_PROPERTIES = [];
 
 
-    constructor(configuration = JavascriptNode.DEFAULT_CONFIGURATION){
-        configuration = {...JavascriptNode.DEFAULT_CONFIGURATION, ...configuration}
-        configuration.settings =  {...JavascriptNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
+    constructor(configuration = PythonNode.DEFAULT_CONFIGURATION){
+        configuration = {...PythonNode.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.settings =  {...PythonNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
         super(configuration);
     }
 
+    afterInit() {
+        this.pythonView = document.createElement("div");
+        this.pythonView.className = "hidden"
+        this.innerContent.prepend(this.pythonView)
+        super.afterInit();
+    }
 
     onClickRun(){
         this.eval(this.code);
-        // if(!this.settings.local) {
-        //     eval(this.code);
-        // }
     }
 
-    eval(js){
-        return async function() {
-            return await eval("(async () => {" + js + "})()");
-        }.call(this);
+    onClickReset(){
+        this.editorWrapperDiv.classList.remove("hidden")
+        this.pythonView.classList.add('hidden');
+        this.versionDropdown.removeAttribute("disabled")
+        this.codeButton.innerText = "Run Code"
+        this.codeButton.removeEventListener("click", this.onClickReset.bind(this))
+        this.codeButton.addEventListener("click", this.onClickRun.bind(this))
+    }
+
+    eval(python){
+        if(this.versionDropdown.value === "pyodide"){
+            this.editorWrapperDiv.classList.add("hidden")
+            this.pythonView.classList.remove('hidden');
+            this.versionDropdown.setAttribute("disabled","")
+            this.codeButton.setAttribute("disabled","")
+            this.codeButton.innerText = "Code Text"
+            this.codeButton.removeEventListener("click", this.onClickRun.bind(this))
+            runPythonCode(python, this.pythonView, this.uuid).then(() => {
+                this.codeButton.removeAttribute("disabled")
+                this.codeButton.addEventListener("click", this.onClickReset.bind(this))
+            })
+        }
     }
 
 
 }
 
 
-function createJavascriptNode(name = '', code = '', settings=undefined) {
-    return new JavascriptNode({
+function createPythonNode(name = '', code = '', settings=undefined) {
+    return new PythonNode({
         name,
         code,
         settings

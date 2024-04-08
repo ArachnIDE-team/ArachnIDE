@@ -72,4 +72,11 @@ let codeTool = new Tool()
 connectDistance(codeTool, chrysalIDEFrontend)
 // connectDistance(codeTool, chrysalIDENode)
 
+
+// let text = createTextNode("hello", "world!")
+// let text = createPythonNode("hello", "\"world!\"")
+// let text = createHTMLEditorNode("hello", "<div>world!</div>")
+// let text = createMarkdownNode("hello", "# World!\n\nIm proud to announce\n\n\tnothing at all!\n\n\nCodeblock: \n\n```md\n\n\\`\\`\\`html\nHello world!\n\\`\\`\\`\n```")
+let text = createMarkdownNode("hello", "# World!\n\nIm proud to announce\n\nCodeblock: \n\n```md hello nested world\n# md 2\n\\`\\`\\`html more and more\nHello world!\n\\`\\`\\`\n```")
+
 dropdown.menuButton.dispatchEvent(new MouseEvent("click"))

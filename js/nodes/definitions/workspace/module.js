@@ -17,9 +17,6 @@ class ModuleNodeHTML {
         }
     }
 
-
-
-
     constructor(configuration = ModuleNodeHTML.DEFAULT_CONFIGURATION) {
         configuration = {...ModuleNodeHTML.DEFAULT_CONFIGURATION, ...configuration}
         this.sources = {...ModuleNodeHTML.DEFAULT_CONFIGURATION.sources, ...configuration.sources}
@@ -140,9 +137,11 @@ class ModulePanel extends HTMLNode {
         let container = content.container
         super({content, container})
     }
+
     get sources() {
         return this.content.sources;
     }
+
     set sources(v) {
         if(this.initialized){
             this.content.sources = v;
@@ -192,10 +191,10 @@ class ModuleNode extends WindowedNode {
         this._initialize(configuration.name, configuration.sources, configuration.fsTree, configuration.saved)
     }
 
-
     get sources() {
         return this.moduleNode.sources;
     }
+
     set sources(v) {
         if(this.initialized){
             this.moduleNode.sources = v;

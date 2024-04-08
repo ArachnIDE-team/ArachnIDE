@@ -122,17 +122,28 @@ function uploadHandler(file, contentType){
 
 function getFileBaseType(file) {
     let baseType;
-    if (file.type) {
+    if (file.type && (!file.type.toLowerCase().startsWith("application") || file.type.toLowerCase().startsWith("application/pdf"))) {
         return file.type.split("/")[0];
-    } else if (file.name.toLowerCase().endsWith(".txt")) {
-        return "text";
     } else if (file.name.toLowerCase().endsWith(".md")) {
         return "markdown";
     } else {
-        console.log("Unhandled file type:", file);
-        return "unknown";
+        return "text";
     }
 }
+
+// function getFileBaseType(file) {
+//     let baseType;
+//     if (file.type) {
+//         return file.type.split("/")[0];
+//     } else if (file.name.toLowerCase().endsWith(".txt")) {
+//         return "text";
+//     } else if (file.name.toLowerCase().endsWith(".md")) {
+//         return "markdown";
+//     } else {
+//         console.log("Unhandled file type:", file);
+//         return "unknown";
+//     }
+// }
 
 function createPDFNodeFromFile(content, file) {
     let url = URL.createObjectURL(new Blob([content], {type: 'application/pdf'}));
@@ -288,6 +299,10 @@ function dropHandler(ev) {
             // Stop the drop event from being handled further
             return;
         }
+    }
+    if(ev.dataTransfer.types.length > 0 && ev.dataTransfer.types[0] === "text/plain"){
+        let node = createNodeFromWindow(null, data, true);
+        return
     }
     let files = [];
     if (ev.dataTransfer.items) {

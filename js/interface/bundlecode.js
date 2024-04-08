@@ -183,7 +183,7 @@ async function handleCodeButton(button, textarea, htmlView, pythonView, node) {
 
             contentEditableDiv.classList.add('hidden');
 
-            let { allPythonCode, allWebCode } = collectCodeBlocks(textarea);
+            let { allPythonCode, allWebCode } = collectCodeBlocks(textarea.value);
 
             if (allPythonCode !== '') {
                 pythonView.classList.remove('hidden');
@@ -207,9 +207,9 @@ async function handleCodeButton(button, textarea, htmlView, pythonView, node) {
     };
 }
 
-function collectCodeBlocks(textarea) {
+function collectCodeBlocks(text) {
     let re = /```(.*?)\n([\scale\S]*?)```/gs;
-    let codeBlocks = textarea.value.matchAll(re);
+    let codeBlocks = text.matchAll(re);
 
     let allPythonCode = '';
     let allWebCode = [];

@@ -211,8 +211,8 @@ class GridBG extends Background {
         let gridSize = Math.pow(10 , magnitude);
         // let strokeSize =  magnitude > 3 ? 1 : Math.pow(10 , magnitude * 0.5);// can't get under 10^-7 for svg stroke size limitations
         // if(this.svg.id === "svg_bg-3") console.log("Magnitude:", magnitude, "gridSize: ", gridSize,  "n: ", n)// "strokeSize: ", strokeSize,
-        let numHorizontalLines = Math.ceil(3*complexBounds.width / gridSize);
-        let numVerticalLines = Math.ceil(3*complexBounds.height / gridSize);
+        let numHorizontalLines = Math.ceil(3 * complexBounds.width / gridSize);
+        let numVerticalLines = Math.ceil(3 * complexBounds.height / gridSize);
 
         let path = "";
         // let meanpoint = null;

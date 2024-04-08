@@ -9,7 +9,10 @@ class MetaCode extends ToolNode {
         let inputNodes = this.getInputNodes();
         for (let node of inputNodes) {
             let source = node.getExtendedClasses().reverse().join("\n\n");
-            createJavascriptNode("Code of: " + node.title, source);
+            let javascriptNode = createJavascriptNode("Code of: " + node.title, source);
+            let distance = javascriptNode.pos.minus(this.pos).scale(2);
+            javascriptNode.pos = javascriptNode.pos.minus(distance)
+            connectDistance(this, javascriptNode);
         }
     }
 }

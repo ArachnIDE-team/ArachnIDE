@@ -1,14 +1,14 @@
 
-class JavascriptNode extends CodeNode {
+class JSONNode extends CodeNode {
     static DEFAULT_CONFIGURATION = {
         name: "",
         code: "",
         settings: {
-            language: "javascript",
+            language: "json",
             libURL: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/javascript/javascript.min.js",
-            extension: "js",
+            extension: "json",
             showHint: true,
-            versions: ["ES6", "Node.js"],
+            versions: ["local node", "global"],
             showHintFunction: `var WORD = /[\\w$]+/, RANGE = 500;
             CodeMirror.registerHelper("hint", "anyword", function(editor, options) {
                 var word = options && options.word || WORD;
@@ -46,32 +46,36 @@ class JavascriptNode extends CodeNode {
     static SAVE_PROPERTIES = [];
 
 
-    constructor(configuration = JavascriptNode.DEFAULT_CONFIGURATION){
-        configuration = {...JavascriptNode.DEFAULT_CONFIGURATION, ...configuration}
-        configuration.settings =  {...JavascriptNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
+    constructor(configuration = JSONNode.DEFAULT_CONFIGURATION){
+        configuration = {...JSONNode.DEFAULT_CONFIGURATION, ...configuration}
+        configuration.settings =  {...JSONNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
         super(configuration);
     }
 
 
     onClickRun(){
         this.eval(this.code);
-        // if(!this.settings.local) {
-        //     eval(this.code);
-        // }
     }
 
     eval(js){
-        return async function() {
-            return await eval("(async () => {" + js + "})()");
-        }.call(this);
+        let object = JSON.parse(js);
+        if(this.versionDropdown.value === "global"){
+            for(let key in object) {
+                globalThis[key] = object[key];
+            }
+        } else {
+            for(let key in object) {
+                this[key] = object[key];
+            }
+        }
     }
 
 
 }
 
 
-function createJavascriptNode(name = '', code = '', settings=undefined) {
-    return new JavascriptNode({
+function createJSONNode(name = '', code = '', settings=undefined) {
+    return new JSONNode({
         name,
         code,
         settings
