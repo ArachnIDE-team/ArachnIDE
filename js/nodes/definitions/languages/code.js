@@ -71,7 +71,7 @@ class CodeNode extends WindowedNode {
                     //console.log(`save data`, this.editorSaveData);
                     let iframeWindow = iframeElement.contentWindow;
                     iframeWindow.codeEditor.setValue(code);
-                    this.onCodeChange(code)
+                    // this.onCodeChange(code)
                 } catch (error) {
                     console.error('Error restoring editor content:', error);
                     throw new Error('Error restoring editor content:', error)
@@ -80,6 +80,7 @@ class CodeNode extends WindowedNode {
                 console.warn('No iframe editor found for node.');
                 throw new Error('No iframe editor found for node.')
             }
+
         }
 
         if(this.initialized){
@@ -137,8 +138,8 @@ class CodeNode extends WindowedNode {
         let versionDropdown = document.createElement("select");
         versionDropdown.classList.add('inline-container');
         versionDropdown.classList.add('version-select');
-        versionDropdown.style.backgroundColor = "#222226";
-        versionDropdown.style.border = "none";
+        // versionDropdown.style.backgroundColor = "#222226";
+        // versionDropdown.style.border = "none";
 
         let runButton = document.createElement("button");
         runButton.innerHTML = "Run Code";
@@ -147,8 +148,8 @@ class CodeNode extends WindowedNode {
         let typeConvertDropdown = document.createElement("select");
         typeConvertDropdown.classList.add('inline-container');
         typeConvertDropdown.classList.add('transform-select');
-        typeConvertDropdown.style.backgroundColor = "#222226";
-        typeConvertDropdown.style.border = "none";
+        // typeConvertDropdown.style.backgroundColor = "#222226";
+        // typeConvertDropdown.style.border = "none";
 
         let conversionButton = document.createElement("button");
         conversionButton.classList.add("transform-button");
@@ -183,7 +184,7 @@ class CodeNode extends WindowedNode {
     _initialize(name, code, settings, saved){
         let iframeElement = this.content.querySelector('iframe')
         iframeElement.setAttribute('identifier', 'editor-' + this.uuid); // Store the identifier
-        this.setMinSize(350,250)
+        this.setMinSize(480,270)
         if(!saved){
             this.settings = settings;
             this.code = code;// This will be delayed 500ms after iframeElement loads (see afterInit)
@@ -209,6 +210,8 @@ class CodeNode extends WindowedNode {
         let overlay = this.content.querySelector(`.editorWrapperDiv #editorOverlay`)
         overlays.push(overlay);
 
+
+
         let iframeElement = this.content.querySelector('.editorWrapperDiv iframe');
         this.iframeElement = iframeElement;
 
@@ -216,9 +219,17 @@ class CodeNode extends WindowedNode {
             iframeElement.contentWindow.addEventListener('click', () => {
                 this.followingMouse = 0;
             });
+            // console.log("ATTACHING TO : ", iframeElement.contentWindow.codeEditor)
+            iframeElement.contentWindow.codeEditor.on('change', this.onCodeChange.bind(this))
+            this.addAfterInitCallback(() => {
+                if (!nodeTitles.includes(this.title)) {
+                    restoreZettelkastenEvent = true;
+                    addNodeTagToZettelkasten(this.title,  iframeElement.contentWindow.codeEditor.getValue())
+                    restoreZettelkastenEvent = false;
+                }
+            })
             setTimeout(() =>  super.afterInit(), 500); // Delay restoration
         };
-
         let htmlContent = CodeNode._createEditorInterface(this.settings);
         iframeElement.src = `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
         iframeElement.srcdoc = htmlContent;
@@ -291,7 +302,7 @@ class CodeNode extends WindowedNode {
 
             // Optional: You might want to update the iframe size here as well
             editorIframe.style.width = `${newWidth}px`;
-            editorIframe.style.height = `${newHeight - 55}px`;
+            editorIframe.style.height = `${newHeight - 60}px`;
         }
     }
 

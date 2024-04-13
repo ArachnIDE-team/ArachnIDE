@@ -214,7 +214,6 @@ let shouldAddCodeButton = false;
             this._deleteInactiveNodeLines(nodeLines);
         }
 
-
         //Creates nodes either from the Zettelkasten or the window.
         _handleNode(line, i, nodeLines, nodes, currentNodeTitle) {
             currentNodeTitle = line.substr(nodeTag.length).trim();
@@ -261,7 +260,13 @@ let shouldAddCodeButton = false;
                 }
             } else {
                 nodes[currentNodeTitle].plainText = "";
-                nodes[currentNodeTitle].nodeObject.textarea.value = nodes[currentNodeTitle].plainText;
+                if(nodes[currentNodeTitle].nodeObject instanceof TextNode){
+                    nodes[currentNodeTitle].nodeObject.textarea.value = nodes[currentNodeTitle].plainText;
+                    // nodes[currentNodeTitle].nodeObject.text = nodes[currentNodeTitle].plainText;
+                }
+                // else {
+                //     nodes[currentNodeTitle].nodeObject.code = nodes[currentNodeTitle].plainText;
+                // }
                 if (nodeLines[nodes[currentNodeTitle].lineNum] === nodes[currentNodeTitle]) {
                     delete nodeLines[nodes[currentNodeTitle].lineNum];
                 }
@@ -298,9 +303,17 @@ let shouldAddCodeButton = false;
             const titleInputEventHandler = this._createTitleInputEventHandler(node, nodes, noteInput, nodeLines, inputElement);
             inputElement.addEventListener('input', titleInputEventHandler);
 
-            const textarea = node.nodeObject.textarea;
-            const bodyHandler = this._getHandleNodeBodyInputEvent(node, textarea);
-            textarea.addEventListener('input', bodyHandler);
+            if(node.nodeObject instanceof TextNode) {
+                const textarea = node.nodeObject.textarea;
+                // node.nodeObject.constructor.OBSERVERS.text.add(bodyHandler)
+                // const textarea = node.nodeObject.contentEditableDiv;
+                const bodyHandler = this._getHandleNodeBodyInputEvent(node, textarea);
+                textarea.addEventListener('input', bodyHandler);
+            } else {
+                const codeHandler = this._getHandleNodeCodeInputEvent(node.title)
+                node.nodeObject.addEventListener('change', codeHandler);
+
+            }
         }
 
 
@@ -394,6 +407,39 @@ let shouldAddCodeButton = false;
 
                 // Update the textarea value AFTER handling the references
                 textarea.value = body;
+            }
+        }
+
+        _getHandleNodeCodeInputEvent(title) {
+            return (code) => {
+                let body = code.getValue();
+                const name = title;
+                let language = code.options.mode;
+
+                const { startLineNo, endLineNo } = getNodeSectionRange(name, noteInput);
+
+                let originalValue = noteInput.getValue();
+                const lines = originalValue.split('\n');
+
+                // Replace the node's content
+                const newNodeContent = [lines[startLineNo]].concat(["```" + language, ...body.split('\n'), "```"]);
+                lines.splice(startLineNo, endLineNo - startLineNo + 1, ...newNodeContent);
+
+                const newValue = lines.join('\n');
+                noteInput.setValue(newValue);
+                noteInput.refresh();
+
+                // Explicitly update the edges (references)
+                // const nodeLines = ("```" + language + "\n" + body + "\n```").split('\n');
+                const nodeLines = body.split('\n');
+                for (const line of nodeLines) {
+                    if (line.startsWith(refTag)) {
+                        // Passing startLineNo and endLineNo for more explicit reference handling
+                        this._handleReferenceLine(line, title, nodes, lines, false, startLineNo, endLineNo);
+                    }
+                }
+                // Update the textarea value AFTER handling the references
+                // node.nodeObject.code = body;
             }
         }
 
@@ -541,19 +587,28 @@ let shouldAddCodeButton = false;
         _handleTextWithoutTags(line, currentNodeTitle, nodes) {
             let node = nodes[currentNodeTitle];
             let targetTextarea;
-            if (node.isLLM) {
-                targetTextarea = node.nodeObject.promptTextArea;
-            } else {
-                targetTextarea = node.nodeObject.textarea;
-            }
-
             if (node.plainText !== '') {
                 node.plainText += '\n';
             }
             //console.log(`Event triggered for node: ${node.title}`);
             node.plainText += line;
-            targetTextarea.value = node.plainText;
-            targetTextarea.dispatchEvent(new Event('change'));
+            if (node.isLLM) {
+                targetTextarea = node.nodeObject.promptTextArea;
+                targetTextarea.value = node.plainText;
+                targetTextarea.dispatchEvent(new Event('change'));
+            } else if(node.nodeObject instanceof TextNode){
+                targetTextarea = node.nodeObject.textarea;
+                targetTextarea.value = node.plainText;
+                targetTextarea.dispatchEvent(new Event('change'));
+            } else if(node.nodeObject instanceof CodeNode){
+                const codeHandler = this._getHandleNodeCodeInputEvent(currentNodeTitle)
+                // node.nodeObject.removeEventListener('change', codeHandler);
+                // node.nodeObject.code = node.plainText;
+                // node.nodeObject.addEventListener('change', codeHandler);
+            }
+
+
+
             //adjustTextareaHeight(targetTextarea);
 
             node.skipNewLine = false;

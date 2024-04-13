@@ -91,6 +91,16 @@ function syncTextareaWithContentEditable(textarea, contentEditable) {
     isProgrammaticChange = false;
 }
 
+// function setCodeFromZettelkasten(node, code) {
+//     isProgrammaticChange = true;  // Avoid recursive updates
+//     node.code = code;  // Update the textarea
+//     isProgrammaticChange = false;
+// }
+// function getCodeForZettelkasten(codeMirror) {
+//     if(!isProgrammaticChange) return codeMirror.getValue();
+//     return null;
+//
+// }
 
 function addEventsToContentEditable(editableDiv, textarea, node) {
     editableDiv.addEventListener('input', function () {

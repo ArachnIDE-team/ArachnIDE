@@ -99,9 +99,9 @@ class TextNode extends WindowedNode {
         }
 
         let typeConvertDropdown = document.createElement("select");
-        typeConvertDropdown.classList.add('inline-container');
-        typeConvertDropdown.style.backgroundColor = "#222226";
-        typeConvertDropdown.style.border = "none";
+        typeConvertDropdown.classList.add('inline-container', 'transform-select');
+        // typeConvertDropdown.style.backgroundColor = "#222226";
+        // typeConvertDropdown.style.border = "none";
         globalThis.textNodeClasses.forEach((nodeClass, index) => {
             if(nodeClass !== this.constructor)
                 typeConvertDropdown.add(new Option(nodeClass.name, nodeClass.name, false, index === 0), index);
@@ -173,6 +173,13 @@ class TextNode extends WindowedNode {
         this.htmlView = this.content.querySelector('#html-iframe');
         this.pythonView = this.content.querySelector('#python-frame')
         this._addEventListeners();
+        this.addAfterInitCallback(() => {
+            if (!nodeTitles.includes(this.title)) {
+                restoreZettelkastenEvent = true;
+                addNodeTagToZettelkasten(this.title, this.textarea.value)
+                restoreZettelkastenEvent = false;
+            }
+        })
         super.afterInit();
     }
 
@@ -202,7 +209,7 @@ class TextNode extends WindowedNode {
         const contentEditable = this.contentEditableDiv;
         if (contentEditable) {
             if (newHeight > 300) {
-                contentEditable.style.maxHeight = `${newHeight}px`;
+                contentEditable.style.maxHeight = `${newHeight - 55}px`;
             } else {
                 contentEditable.style.maxHeight = `300px`;
             }

@@ -56,6 +56,10 @@ class MarkdownNode extends CodeNode {
     afterInit() {
         this.markdownView = document.createElement("div");
         this.markdownView.className = "hidden"
+        this.markdownView.style.overflowX = "hidden"
+        this.markdownView.style.paddingLeft = "5px";
+        WindowedNode.makeContentScrollable(this.markdownView, true)
+        WindowedNode.makeContentScrollable(this.markdownView)
         this.innerContent.prepend(this.markdownView)
         super.afterInit();
     }
@@ -132,6 +136,14 @@ class MarkdownNode extends CodeNode {
         this.markdownView.innerHTML = marked.parse(markdown, {mangle: false, headerIds: false});;
         this.codeButton.removeAttribute("disabled")
         this.codeButton.addEventListener("click", this.onClickReset.bind(this))
+    }
+    onResize(newWidth, newHeight) {
+        super.onResize(newWidth, newHeight);
+        if (this.markdownView) {
+            // Set the new dimensions for the editor wrapper div
+            this.markdownView.style.width = `${newWidth}px`;
+            this.markdownView.style.height = `${newHeight - 55}px`;
+        }
     }
 }
 

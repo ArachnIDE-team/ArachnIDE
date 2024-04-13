@@ -106,6 +106,7 @@ function handleIconDrop(event, iconName) {
     event.stopPropagation();
     event.preventDefault();
 }
+
 function uploadHandler(file, contentType){
     let ev = {
         dataTransfer: {

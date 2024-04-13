@@ -592,7 +592,11 @@ class WindowedNode extends Node {
     }
 
     afterInit() {
+        this.addAfterInitCallback(this.applyInitialSize.bind(this));
         super.afterInit();
+    }
+
+    applyInitialSize() {
         let [startWidth, startHeight] = this.getWindowSize();
         this.applyResize(startWidth, 0, startHeight, 0);
     }

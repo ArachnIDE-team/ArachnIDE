@@ -55,6 +55,8 @@ class PythonNode extends CodeNode {
     afterInit() {
         this.pythonView = document.createElement("div");
         this.pythonView.className = "hidden"
+        WindowedNode.makeContentScrollable(this.pythonView, true)
+        WindowedNode.makeContentScrollable(this.pythonView)
         this.innerContent.prepend(this.pythonView)
         super.afterInit();
     }
@@ -86,6 +88,15 @@ class PythonNode extends CodeNode {
             })
         }
     }
+    onResize(newWidth, newHeight) {
+        super.onResize(newWidth, newHeight);
+        if (this.pythonView) {
+            // Set the new dimensions for the editor wrapper div
+            this.pythonView.style.width = `${newWidth}px`;
+            this.pythonView.style.height = `${newHeight - 55}px`;
+        }
+    }
+
 
 
 }

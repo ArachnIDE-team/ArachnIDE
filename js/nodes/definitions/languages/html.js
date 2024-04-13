@@ -99,7 +99,14 @@ class HTMLEditorNode extends CodeNode {
         this.codeButton.addEventListener("click", this.onClickReset.bind(this))
     }
 
-
+    onResize(newWidth, newHeight) {
+        super.onResize(newWidth, newHeight);
+        if (this.htmlView) {
+            // Set the new dimensions for the editor wrapper div
+            this.htmlView.style.width = `${newWidth}px`;
+            this.htmlView.style.height = `${newHeight - 60}px`;
+        }
+    }
 }
 
 
