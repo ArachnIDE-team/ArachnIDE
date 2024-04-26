@@ -99,5 +99,5 @@ app.post("/", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Wolfram Alpha API server listening at http://localhost:${PORT}`);
+    console.log(`Wolfram Alpha API server listening on port ${PORT}`);
 });

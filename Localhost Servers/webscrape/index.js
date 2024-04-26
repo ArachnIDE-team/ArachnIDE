@@ -15,7 +15,7 @@ const db = new sqlite3.Database(':memory:', (err) => {
     if (err) {
         console.error(err.message);
     }
-    console.log('Connected to the in-memory SQlite database.');
+    console.log('Webscrape server: Connected to the in-memory SQlite database.');
 });
 
 
@@ -38,7 +38,7 @@ async function extractVisibleText(url) {
 
         return visibleText || ''; // Return an empty string if the visibleText is falsy
     } catch (error) {
-        console.error(`Error extracting text from ${url}: ${error}`);
+        console.error(`Webscrape server: Error extracting text from ${url}: ${error}`);
         return '';
     }
 }
@@ -51,7 +51,7 @@ async function extractTextFromPDF(url) {
         const pdfText = await pdf(data);
         return pdfText.text || ''; // Return an empty string if the pdfText.text is falsy
     } catch (error) {
-        console.error(`Error extracting text from PDF ${url}: ${error}`);
+        console.error(`Webscrape server: Error extracting text from PDF ${url}: ${error}`);
         return '';
     }
 }
@@ -65,7 +65,7 @@ app.get('/raw-proxy', async (req, res) => {
 
         res.send(html);
     } catch (error) {
-        console.error('Error fetching external URL:', error);
+        console.error('Webscrape server: Error fetching external URL:', error);
         res.status(500).send('Error fetching external URL');
     }
 });
@@ -90,7 +90,7 @@ app.get('/proxy', async (req, res) => {
 
         res.send(extractedText);
     } catch (error) {
-        console.error('Error fetching external URL:', error);
+        console.error('Webscrape server: Error fetching external URL:', error);
         res.status(500).send('Error fetching external URL');
     }
 });
@@ -102,13 +102,13 @@ app.post('/store-embedding-and-text', (req, res) => {
             console.error(err.message);
             res.status(500).send('Error storing embedding');
         } else {
-            console.log('Embedding stored successfully');
+            console.log('Webscrape server: Embedding stored successfully');
             db.run('INSERT OR REPLACE INTO webpage_text (url, text) VALUES (?, ?)', [key, text], (err) => {
                 if (err) {
-                    console.error(err.message);
+                    console.error('Webscrape server: ' + err.message);
                     res.status(500).send('Error storing web page text');
                 } else {
-                    console.log('Web page text stored successfully');
+                    console.log('Webscrape server: Web page text stored successfully');
                     res.send('Embedding and text stored successfully');
                 }
             });
@@ -122,7 +122,7 @@ app.get('/fetch-embedding', async (req, res) => {
     // Replace embeddingDatabase.get(key) with the appropriate SQLite query
     db.get('SELECT embedding FROM embeddings WHERE key = ?', [key], (err, row) => {
         if (err) {
-            console.error(err.message);
+            console.error('Webscrape server: ' + err.message);
             res.status(500).send('Error fetching embedding');
         } else if (row) {
             res.json(JSON.parse(row.embedding));
@@ -136,7 +136,7 @@ app.get('/fetch-web-page-text', (req, res) => {
     const url = req.query.url;
     db.get('SELECT text FROM webpage_text WHERE url = ?', [url], (err, row) => {
         if (err) {
-            console.error(err.message);
+            console.error('Webscrape server: ' + err.message);
             res.status(500).send('Error fetching web page text');
         } else if (row) {
             res.send(row.text);
@@ -162,7 +162,7 @@ app.post('/fetch-embeddings-by-keys', async (req, res) => {
     // Here we define the callback function
     const callback = (err, rows) => {
         if (err) {
-            console.error('Database error:', err.message);
+            console.error('Webscrape server: Database error:', err.message);
             res.status(500).json({ error: 'Internal server error' });
             return;
         }
@@ -185,7 +185,7 @@ app.post('/fetch-embeddings-by-keys', async (req, res) => {
 app.get('/fetch-all-embeddings', (req, res) => {
     db.all('SELECT key, embedding, source, text FROM embeddings INNER JOIN webpage_text ON embeddings.key = webpage_text.url', (err, rows) => {
         if (err) {
-            console.error(err.message);
+            console.error('Webscrape server: ' + err.message);
             res.status(500).send('Error fetching all embeddings');
         } else {
             const embeddings = [];
@@ -199,7 +199,7 @@ app.get('/fetch-all-embeddings', (req, res) => {
                         chunks: row.text
                     });
                 } catch (error) {
-                    console.error('Error parsing JSON for row:', row, 'Error:', error.message);
+                    console.error('Webscrape server: Error parsing JSON for row:', row, 'Error:', error.message);
                 }
             }
             res.json(embeddings);
@@ -212,10 +212,10 @@ function logDatabaseContents() {
     // Log the contents of the 'embeddings' table
     db.all('SELECT * FROM embeddings', [], (err, rows) => {
         if (err) {
-            console.error(err.message);
+            console.error('Webscrape server: ' + err.message);
         } else {
-            console.log('Contents of the embeddings table:');
-            console.log(rows);
+            console.log('Webscrape server: Contents of the embeddings table:');
+            console.log('Webscrape server: ', rows);
         }
     });
 
@@ -224,8 +224,8 @@ function logDatabaseContents() {
         if (err) {
             console.error(err.message);
         } else {
-            console.log('Contents of the webpage_text table:');
-            console.log(rows);
+            console.log('Webscrape server: Contents of the webpage_text table:');
+            console.log('Webscrape server: ', rows);
         }
     });
 }
@@ -242,13 +242,13 @@ app.get('/fetch-all', (req, res) => {
 
     db.all('SELECT * FROM embeddings', [], (err, rows) => {
         if (err) {
-            console.error(err.message);
+            console.error('Webscrape server: ' + err.message);
             res.status(500).send('Error fetching embeddings');
         } else {
             response.embeddings = rows;
             db.all('SELECT * FROM webpage_text', [], (err, rows) => {
                 if (err) {
-                    console.error(err.message);
+                    console.error('Webscrape server: ' + err.message);
                     res.status(500).send('Error fetching webpage_text');
                 } else {
                     response.webpage_text = rows;
@@ -262,7 +262,7 @@ app.get('/fetch-all', (req, res) => {
 app.get('/get-keys', (req, res) => {
     db.all('SELECT key FROM embeddings', [], (err, rows) => {
         if (err) {
-            console.error(err.message);
+            console.error('Webscrape server: ' + err.message);
             res.status(500).send('Error fetching keys');
         } else {
             // Initialize an empty set to store distinct keys
@@ -289,7 +289,7 @@ app.delete('/delete-chunks', (req, res) => {
     // Delete all rows where the key starts with the provided key followed by "_chunk_"
     db.run('DELETE FROM embeddings WHERE key LIKE ?', [`${key}_chunk_%`], function (err) {
         if (err) {
-            console.error(err.message);
+            console.error('Webscrape server: ' + err.message);
             res.status(500).send('Error deleting chunks');
         } else {
             res.send(`Deleted ${this.changes} chunks`);
@@ -300,5 +300,5 @@ app.delete('/delete-chunks', (req, res) => {
 // Start the server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
+    console.log(`Webscrape server is listening on port ${PORT}`);
 });

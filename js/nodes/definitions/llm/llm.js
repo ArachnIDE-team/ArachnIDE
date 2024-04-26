@@ -271,7 +271,7 @@ class LLMNode extends LLMAgentNode {
         // Add settings container to the ainodewrapperDiv
         ainodewrapperDiv.appendChild(aiNodeSettingsContainer);
 
-        return [ainodewrapperDiv, aiResponseTextArea];
+        return [ainodewrapperDiv, aiResponseTextArea, index];
     }
 
     afterInit() {
@@ -658,6 +658,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
             return allConnectedNodes.some(n => n.isLLMNode);
         }
 
+
         const clickQueues = {};  // Contains a click queue for each AI node
         // Initiates helper functions for aiNode Message loop.
         const aiNodeMessageLoop = new AiNodeMessageLoop(this, allConnectedNodes, clickQueues);
@@ -688,10 +689,11 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
             // AI call
             callchatLLMnode(messages, this, true, selectedModel)
                 .finally(async () => {
+                    console.log("callchatLLMnode.finally, this:", this)
                     this.aiResponding = false;
                     aiLoadingIcon.style.display = 'none';
 
-                    hasConnectedAiNode = updateConnectedAiNodeState(); // Update state right before the call
+                    hasConnectedAiNode = updateConnectedAiNodeState.bind(this)(); // Update state right before the call
 
                     if (this.shouldContinue && this.shouldAppendQuestion && hasConnectedAiNode && !this.aiResponseHalted) {
                         const aiResponseText = this.aiResponseTextArea.value;
@@ -703,10 +705,11 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
                     }
                 })
                 .catch((error) => {
+                    console.log("callchatLLMnode.catch, this:", this)
                     if (haltCheckbox) {
                         haltCheckbox.checked = true;
                     }
-                    console.error(`An error occurred while getting response: ${error}`);
+                    console.error(`An error occurred while getting response: ${error}\n${error.stack}`);
                     aiErrorIcon.style.display = 'block';
                 });
         }

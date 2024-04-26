@@ -1013,7 +1013,7 @@ function chrysalideAddNote(nodeTitle, nodeText) {
             nodeText = '';
         }
 
-        let contentToAdd = nodeTag + ' ' + formattedNodeTitle + '\n' + nodeText;
+        let contentToAdd = nodeTag + ' ' + formattedNodeTitle + '\n' + nodeText + '\n' + nodeTag;
         let codeMirror = window.myCodemirror;
 
         let lastLine = codeMirror.lastLine();

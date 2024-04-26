@@ -58,6 +58,9 @@ var settings = {
 var flashlight_stdev = 0.25; // this is the radius of the flashlight
 var flashlight_fraction = 0.73; // this is what fraction of samples are diverted to the flashlight
 
+// For IFrame timeouts.
+const IFRAME_LOAD_TIMEOUT = 100; // Milliseconds
+
 
 //interface
 
@@ -124,24 +127,28 @@ let htmledges = document.getElementById("edges");
 
 //Zettelkasten
 
-var nodeTagInput;
+// var nodeTagInput;
 var refTagInput;
 
 // Globally available variables for the tags
-var nodeTag = "";
+var nodeTag = "```";
+var nodeTagRegex = {
+    start: /```\s*\S+.*/g,
+    end: /```\s*$/g
+}
 var refTag = "";
 
-nodeTagInput = document.getElementById('node-tag');
+// nodeTagInput = document.getElementById('node-tag');
 refTagInput = document.getElementById('ref-tag');
 
-nodeTag = nodeTagInput.value;
+// nodeTag = nodeTagInput.value;
 refTag = refTagInput.value;
 
 
 // Event listeners for the input changes to keep the global variables updated
-nodeTagInput.addEventListener('input', function () {
-    nodeTag = nodeTagInput.value;
-});
+// nodeTagInput.addEventListener('input', function () {
+//     nodeTag = nodeTagInput.value;
+// });
 
 refTagInput.addEventListener('input', function () {
     refTag = refTagInput.value;
@@ -154,6 +161,7 @@ let processAll = false;//set to true until made more robust.
 let restoreZettelkastenEvent = false; 
 
 let bypassZettelkasten = false;
+// let ignoreTextAreaChanges = false; // Zettlekasten CodeMirror Textarea
 
 const bracketsMap = {
     '(': ')',

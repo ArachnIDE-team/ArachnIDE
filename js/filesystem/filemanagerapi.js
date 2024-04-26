@@ -185,7 +185,9 @@ class AutoLoadWebsocket extends WebSocket{
         super.onerror = this.onerror.bind(this);
 
     }
+
     onopen(event) {
+        console.log('File AutoLoad Socket is connected');
         // reload autoLoadedFiles server-side
         for (let autoLoadedFile of autoLoadedFiles) {
             this.send(JSON.stringify(autoLoadedFile));
@@ -209,14 +211,14 @@ class AutoLoadWebsocket extends WebSocket{
     }
 
     onclose(event) {
-        console.log('Socket is closed. Reconnect will be attempted in 10 second.', event.reason);
+        console.log('File AutoLoad Socket is closed. Reconnect will be attempted in 10 second.', event.reason);
         setTimeout(function() {
             connectAutoLoadWebsocket();
         }, 10000);
     }
 
     onerror(err) {
-        console.error('Socket encountered error: ', err.message, 'Closing socket');
+        console.error('File AutoLoad Socket encountered error: ', err.message, 'Closing socket');
         autoLoadWebsocket.close();
     }
 
@@ -232,7 +234,6 @@ class AutoLoadWebsocket extends WebSocket{
 
     }
 }
-
 
 globalThis.autoSavedFiles = [];
 

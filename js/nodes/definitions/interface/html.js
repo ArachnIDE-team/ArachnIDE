@@ -70,6 +70,8 @@ class HTMLNode extends Node {
     afterInit(){
         super.afterInit();
     }
+
+    // HTML Nodes are not saved: they get re-instanced every time
     save() {
         return null;
     }

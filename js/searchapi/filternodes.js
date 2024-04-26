@@ -99,7 +99,8 @@ function filterAndProcessNodesByExistingTitles(nodes, existingTitles, titlesToFo
 
             UUID: ${node.uuid}\n       Creation Time: ${createdAt} */
 
-            return `${tagValues.nodeTag} ${title}\n ${contents}`;
+            return `${nodeTag} ${title}\n ${contents}`;
+            // return `${tagValues.nodeTag} ${title}\n ${contents}`;
         })
         .filter(content => content !== null); // Remove nulls
 }

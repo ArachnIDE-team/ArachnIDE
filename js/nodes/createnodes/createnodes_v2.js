@@ -62,6 +62,8 @@ function addNodeTagToZettelkasten(title, content = null) {
         currentZettelkastenValue += '\n' + content;
     }
 
+    currentZettelkastenValue +=  '\n' + nodeTag; // closing tag
+
     // Set processAll to true
     processAll = true;
 

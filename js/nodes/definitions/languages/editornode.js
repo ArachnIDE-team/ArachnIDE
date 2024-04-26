@@ -108,7 +108,7 @@ class WebEditorNode extends WindowedNode {
                 this.followingMouse = 0;
             });
 
-            setTimeout(() => this.restoreEditorContent(), 500); // Delay restoration
+            setTimeout(() => this.restoreEditorContent(), IFRAME_LOAD_TIMEOUT); // Delay restoration
         };
 
         let htmlContent = WebEditorNode._createEditorInterface();

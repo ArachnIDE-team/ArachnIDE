@@ -27,9 +27,9 @@ class CodeNode extends WindowedNode {
         configuration.settings =  {...CodeNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
         configuration.settings.versions =  [...CodeNode.DEFAULT_CONFIGURATION.settings.versions, ...configuration.settings.versions]
         configuration.content = [CodeNode._getContentElement()];
-        if (!configuration.saved) {// Create CodeNode
+        if (!configuration.saved) { // Create CodeNode
             super({...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters() });
-        } else {// Restore CodeNode
+        } else { // Restore CodeNode
             super({...configuration, title: configuration.name, scale: true })
         }
         this._codeListeners = [];
@@ -224,11 +224,13 @@ class CodeNode extends WindowedNode {
             this.addAfterInitCallback(() => {
                 if (!nodeTitles.includes(this.title)) {
                     restoreZettelkastenEvent = true;
-                    addNodeTagToZettelkasten(this.title,  iframeElement.contentWindow.codeEditor.getValue())
+                    let content = iframeElement.contentWindow.codeEditor.getValue();
+                    if(this.settings.language === "markdown") content = content.replace(/`/g, "\\`");
+                    addNodeTagToZettelkasten(this.title,  content)
                     restoreZettelkastenEvent = false;
                 }
             })
-            setTimeout(() =>  super.afterInit(), 500); // Delay restoration
+            setTimeout(() =>  super.afterInit(), IFRAME_LOAD_TIMEOUT); // Delay restoration
         };
         let htmlContent = CodeNode._createEditorInterface(this.settings);
         iframeElement.src = `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;

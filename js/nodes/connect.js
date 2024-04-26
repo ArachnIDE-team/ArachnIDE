@@ -102,7 +102,8 @@ function getNodeData(node) {
     if (isLLM) {
         // Handle AI nodes
         const lastPromptsAndResponses = getLastPromptsAndResponses(4, 400, node.id);
-        const nodeInfo = `${tagValues.nodeTag} ${title} (AI Node)\nLast Prompts and Responses:${lastPromptsAndResponses}`;
+        const nodeInfo = `${nodeTag} ${title} (AI Node)\nLast Prompts and Responses:${lastPromptsAndResponses}\n${nodeTag} `;
+        // const nodeInfo = `${tagValues.nodeTag} ${title} (AI Node)\nLast Prompts and Responses:${lastPromptsAndResponses}`;
         return nodeInfo;
     }
 
@@ -116,10 +117,11 @@ function getNodeData(node) {
         let jsContent = iframeWindow.jsEditor.getValue();
 
         const nodeInfo =
-            `${tagValues.nodeTag} ${title}\n` +
-            `Text Content: \n\`\`\`html\n${htmlContent}\n\`\`\`\n` +
-            `\`\`\`css\n${cssContent}\n\`\`\`\n` +
-            `\`\`\`javascript\n${jsContent}\n\`\`\``;
+            // `${tagValues.nodeTag} ${title}\n` +
+            `${nodeTag} ${title}\n` +
+            `Text Content: \n\\\`\\\`\\\`html\n${htmlContent}\n\\\`\\\`\\\`\n` +
+            `\\\`\\\`\\\`css\n${cssContent}\n\\\`\\\`\\\`\n` +
+            `\\\`\\\`\\\`javascript\n${jsContent}\n\\\`\\\`\\\`\n ${nodeTag}`;
         return nodeInfo;
     } else {
         // Handle regular text content
@@ -128,7 +130,8 @@ function getNodeData(node) {
             console.warn('No content found for node');
             return null;
         }
-        const nodeInfo = `${tagValues.nodeTag} ${title}\nText Content: ${contentText}`;
+        const nodeInfo = `${nodeTag} ${title}\nText Content: ${contentText}\n${nodeTag}`;
+        // const nodeInfo = `${tagValues.nodeTag} ${title}\nText Content: ${contentText}`;
         return nodeInfo;
     }
 }

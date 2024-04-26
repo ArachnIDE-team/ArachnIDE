@@ -129,10 +129,11 @@ async function sendMessage(event, autoModeMessage = null) {
     let tagsChanged = false;
 
     // Check if the node or reference tags have changed
-    const storedNodeTag = localStorage.getItem('nodeTag');
+    // const storedNodeTag = localStorage.getItem('nodeTag');
     const storedRefTag = localStorage.getItem('refTag');
-    if (storedNodeTag !== tagValues.nodeTag || storedRefTag !== tagValues.refTag) {
-        localStorage.setItem('nodeTag', tagValues.nodeTag);
+    // if (storedNodeTag !== tagValues.nodeTag || storedRefTag !== tagValues.refTag) {
+    if (storedRefTag !== tagValues.refTag) {
+        // localStorage.setItem('nodeTag', tagValues.nodeTag);
         localStorage.setItem('refTag', tagValues.refTag);
     }
 

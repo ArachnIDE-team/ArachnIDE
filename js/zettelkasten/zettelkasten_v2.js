@@ -34,15 +34,15 @@ let shouldAddCodeButton = false;
         });
     });
 
-    function nodeRE(name = undefined, tag_prefix = undefined) {
-        if (tag_prefix === undefined) {
-            tag_prefix = nodeTag;
-        }
-        if (name === undefined) {
-            return new RegExp("(\\n|^)" + RegExp.escape(tag_prefix));
-        }
-        return new RegExp("(\\n|^)" + RegExp.escape(tag_prefix) + "[\t ]*" + RegExp.escape(name) + "[\t ]*(\n|$)");
-    }
+    // function nodeRE(name = undefined, tag_prefix = undefined) {
+    //     if (tag_prefix === undefined) {
+    //         tag_prefix = nodeTag;
+    //     }
+    //     if (name === undefined) {
+    //         return new RegExp("(\\n|^)" + RegExp.escape(tag_prefix));
+    //     }
+    //     return new RegExp("(\\n|^)" + RegExp.escape(tag_prefix) + "[\t ]*" + RegExp.escape(name) + "[\t ]*(\n|$)");
+    // }
 
     function replaceInBrackets(s, from, to) {
         const open = refTag;
@@ -97,7 +97,7 @@ let shouldAddCodeButton = false;
             this.prevNoteInputLines = [];
 
             noteInput.on('change', this.processInput.bind(this));
-            nodeTagInput.addEventListener('input', this.processInput.bind(this));
+            // nodeTagInput.addEventListener('input', this.processInput.bind(this));
             refTagInput.addEventListener('input', this.processInput.bind(this));
         }
 
@@ -151,7 +151,11 @@ let shouldAddCodeButton = false;
 
         _processLine(line, lines, index, nodes, currentNodeTitle) {
             const currentNode = nodes[currentNodeTitle];
-            if (line.startsWith(nodeTag)) {
+            if (line.match(nodeTagRegex.end)) {
+                return '';
+            }
+            if (line.match(nodeTagRegex.start)) { //line.startsWith(nodeTag) && line.trim().split(nodeTag).length > 1) {
+            // if (line.startsWith(nodeTag)) {
                 return this._handleNode(line, index, nodeLines, nodes, currentNodeTitle);
             }
 
@@ -191,7 +195,7 @@ let shouldAddCodeButton = false;
 
                 let nodeContainsReferences = false;
                 let nodeReferencesCleared = false;
-                for (let i = startLineNo + 1; i <= endLineNo && i < lines.length; i++) {
+                for (let i = startLineNo + 1; i <= endLineNo - 1 && i < lines.length; i++) {
                     // Process each line and update the nodeContainsReferences flag
                     this._handlePlainTextAndReferences(lines[i], changedNodeTitle, nodes, startLineNo, endLineNo, lines);
                     if (lines[i].includes(refTag)) {
@@ -309,10 +313,10 @@ let shouldAddCodeButton = false;
                 // const textarea = node.nodeObject.contentEditableDiv;
                 const bodyHandler = this._getHandleNodeBodyInputEvent(node, textarea);
                 textarea.addEventListener('input', bodyHandler);
-            } else {
+            } else if(!node.nodeObject.zettlekastenListener && !node.nodeObject._codeListeners.includes(node.nodeObject.zettlekastenListener)){
                 const codeHandler = this._getHandleNodeCodeInputEvent(node.title)
                 node.nodeObject.addEventListener('change', codeHandler);
-
+                node.nodeObject.zettlekastenListener = codeHandler;
             }
         }
 
@@ -373,7 +377,6 @@ let shouldAddCodeButton = false;
             };
         }
 
-
         //Syncs node text and Zettelkasten
         _getHandleNodeBodyInputEvent(node, textarea) {
             return (e) => {
@@ -389,7 +392,8 @@ let shouldAddCodeButton = false;
                 const lines = originalValue.split('\n');
 
                 // Replace the node's content
-                const newNodeContent = [lines[startLineNo]].concat(body.split('\n'));
+                const newNodeContent = [lines[startLineNo]].concat([...body.split('\n'), "```"] );
+                // const newNodeContent = [lines[startLineNo]].concat(body.split('\n'));
                 lines.splice(startLineNo, endLineNo - startLineNo + 1, ...newNodeContent);
 
                 const newValue = lines.join('\n');
@@ -409,11 +413,13 @@ let shouldAddCodeButton = false;
                 textarea.value = body;
             }
         }
-
+        //Syncs node code and Zettelkasten
         _getHandleNodeCodeInputEvent(title) {
             return (code) => {
+                // if(ignoreTextAreaChanges) return;
                 let body = code.getValue();
                 const name = title;
+                // let node = nodes[title];
                 let language = code.options.mode;
 
                 const { startLineNo, endLineNo } = getNodeSectionRange(name, noteInput);
@@ -422,11 +428,25 @@ let shouldAddCodeButton = false;
                 const lines = originalValue.split('\n');
 
                 // Replace the node's content
-                const newNodeContent = [lines[startLineNo]].concat(["```" + language, ...body.split('\n'), "```"]);
+                let newNodeBody = body.split('\n');
+                // console.log("Markdown Replacement before:", newNodeBody)
+                // if(language === 'markdown'){// && !node.escaped
+                //     newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
+                //     node.escaped = true;
+                // }
+                if(language === 'markdown') newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
+                // newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));// this one
+                // newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
+                // console.log("Markdown Replacement after:", newNodeBody)
+                // const newNodeContent = [lines[startLineNo]].concat(newNodeBody);
+                const newNodeContent = [lines[startLineNo]].concat([...newNodeBody, "```"] );
+                // const newNodeContent = [lines[startLineNo]].concat(["```" + language, ...newNodeBody, "```"]); // this one
                 lines.splice(startLineNo, endLineNo - startLineNo + 1, ...newNodeContent);
 
                 const newValue = lines.join('\n');
+                bypassZettelkasten = true;
                 noteInput.setValue(newValue);
+                bypassZettelkasten = false;
                 noteInput.refresh();
 
                 // Explicitly update the edges (references)
@@ -600,11 +620,26 @@ let shouldAddCodeButton = false;
                 targetTextarea = node.nodeObject.textarea;
                 targetTextarea.value = node.plainText;
                 targetTextarea.dispatchEvent(new Event('change'));
+            } else if(node.nodeObject instanceof MarkdownNode){
+                // let cursor = noteInput.getCursor();
+                // cursor.sticky = true;
+                // noteInput.setCursor(cursor)
+                node.nodeObject.removeEventListener('change', node.nodeObject.zettlekastenListener);
+                node.nodeObject.code = node.plainText.replace(/\\`/g, "`");
+                node.nodeObject.addEventListener('change', node.nodeObject.zettlekastenListener);
             } else if(node.nodeObject instanceof CodeNode){
-                const codeHandler = this._getHandleNodeCodeInputEvent(currentNodeTitle)
+                // const codeHandler = this._getHandleNodeCodeInputEvent(currentNodeTitle)
                 // node.nodeObject.removeEventListener('change', codeHandler);
                 // node.nodeObject.code = node.plainText;
                 // node.nodeObject.addEventListener('change', codeHandler);
+                // noteInput.setCursor({line: 15 , ch: 2})
+
+                // let cursor = noteInput.getCursor();
+                // cursor.sticky = true;
+                node.nodeObject.removeEventListener('change', node.nodeObject.zettlekastenListener);
+                node.nodeObject.code = node.plainText;
+                node.nodeObject.addEventListener('change', node.nodeObject.zettlekastenListener);
+                // noteInput.setCursor(cursor);
             }
 
 
@@ -717,7 +752,7 @@ let shouldAddCodeButton = false;
         }
     }
 
-    const zettelkastenProcessor = new ZettelkastenProcessor(noteInput, nodeTagInput, refTagInput);
+    const zettelkastenProcessor = new ZettelkastenProcessor();
 
     //end of enclosure
 }

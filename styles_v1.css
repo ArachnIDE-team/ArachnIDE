@@ -2546,6 +2546,32 @@ div.language-md {
     margin-bottom: 5px;
 }
 
+
+/* Terminal nodes */
+
+.result-line{
+    border-top: 1px solid #bbb;
+    margin-left: 10px;
+    padding: 3px 0;
+    color: #55a2a2;
+    white-space: pre;
+}
+.error-line{
+    border-top: 1px solid #bbb;
+    margin-left: 10px;
+    padding: 3px 0;
+    color: #a25563;
+    white-space: pre;
+}
+
+span.treejs-label>span.key {
+    color: #6d5cbe;
+}
+span.treejs-label>span.value {
+    color: #55a2a2;
+    white-space: pre;
+}
+
 /* treejs */
 
 .treejs .treejs-switcher:before {

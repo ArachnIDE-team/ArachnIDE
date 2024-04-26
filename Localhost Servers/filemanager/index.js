@@ -12,7 +12,7 @@ app.use(express.json({ limit: '10mb' }));
 
 let workspacesJSONFile = new fs.Node("../../workspaces.json");
 if(!workspacesJSONFile.exists) workspacesJSONFile.content = "{}";
-console.log("Startup filemanager: ", JSON.parse(workspacesJSONFile.content));
+// console.log("File-system server: Startup workspaces: ", JSON.parse(workspacesJSONFile.content));
 
 function initializeWorkspaceFolder(folder, diagram) {
     let workspaceID = uuidv4();
@@ -59,10 +59,10 @@ app.delete('/workspace', async (req, res) => {
             return res.status(404).send("Error while deleting a workspace '" + name +"' does not exists");
         }
         let workspaceFolder = workspaceFile.parent;
-        console.log("Hard delete workspace:", name, "at directory", workspaceFolder.path)
+        console.log("File-system server: Hard delete workspace:", name, "at directory", workspaceFolder.path)
         await workspaceFolder.delete()
     }else{
-        console.log("Soft delete workspace:", name)
+        console.log("File-system server: Soft delete workspace:", name)
 
     }
     delete workspaces[name];
@@ -193,7 +193,7 @@ app.get('/read-binary', (req, res) => {
         return res.status(404).send("Error getting the file: '" + filePath +"' is a directory");
     }
     const content = fsNode.contentType;
-    console.log("Serving file: ", fsNode.path, " with content type: ", content)
+    console.log("File-system server: Serving file: ", fsNode.path, " with content type: ", content)
     res.setHeader('Content-Type', content);//'application/octet-stream'); // Set generic binary content type
     res.setHeader('Content-Disposition', `attachment; filename="${fsNode.name}"`); // Set attachment with filename
     res.send(fsNode.binary); // Send the binary
@@ -219,7 +219,7 @@ app.post('/write-binary',upload.single('file'), (req, res) => {
     const fileContent = req.file;
     let file = new fs.Node(filePath);
     let uploaded = new fs.Node(fileContent.path)
-    console.log("file:", uploaded)
+    console.log("File-system server: file:", uploaded)
     file.binary = uploaded.binary;// not working
     uploaded.delete();
     res.send({message: "success"})
@@ -231,7 +231,7 @@ let autoLoadedFiles = [];
 // Start the server
 const PORT = process.env.PORT || 7000;
 let server = app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
+    console.log(`File-system server is listening on port ${PORT}`);
 });
 
 // File change observer websocket
@@ -244,7 +244,7 @@ const fileObserverWebsocket = new WebSocketServer({
 fileObserverWebsocket.on('request', function(request) {
     var connection = request.accept(null, request.origin);
     connection.on('message', function(message) {
-        console.log('Received a message: ' + message.utf8Data);
+        console.log('File-system server socket: Received a message: ' + message.utf8Data);
         let observer = JSON.parse(message.utf8Data);
         let fsNode = new fs.Node(observer.path);
         if(observer.create){
@@ -255,17 +255,17 @@ fileObserverWebsocket.on('request', function(request) {
             autoLoadedFiles.push(fileObserver)
             connection.sendUTF(JSON.stringify(fileObserver));
             fileObserver.onchange = function() {
-                console.log("Observed a change:", fsNode.path)
+                console.log("File-system server socket: Observed a change:", fsNode.path)
                 this.contentUpdate = true;
                 connection.sendUTF(JSON.stringify(this));
             }.bind(fileObserver);
             fsNode.watch(fileObserver.onchange)
-            console.log("START observing file: ", fsNode.path)
+            console.log("File-system server socket: START observing file: ", fsNode.path)
         } else if(observer.remove){
             let fileObserver = autoLoadedFiles.find((autoLoadedFile) => autoLoadedFile.path === observer.path && autoLoadedFile.key === observer.key);
             if(fileObserver) {
                 fsNode.unwatchFile(fileObserver.onchange);
-                console.log("STOP observing file: ", fsNode.path)
+                console.log("File-system server socket: STOP observing file: ", fsNode.path)
             }
             connection.sendUTF(JSON.stringify(observer)); // Send it back for front-end removal
         }
@@ -275,7 +275,7 @@ fileObserverWebsocket.on('request', function(request) {
         // connection.sendBytes(message.binaryData);
     });
     connection.on('close', function(connection) {
-        console.log("Connection closed, closing", autoLoadedFiles )
+        console.log("File-system server socket: Connection closed, closing", autoLoadedFiles )
         for(let autoLoadedFile of autoLoadedFiles) {
             let fsNode = new fs.Node(autoLoadedFile.path);
             fsNode.unwatchFile(autoLoadedFile.onchange);

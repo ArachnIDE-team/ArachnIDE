@@ -19,11 +19,15 @@ class LLMAgentNode extends WindowedNode {
     constructor(configuration = LLMAgentNode.DEFAULT_CONFIGURATION){
         configuration = {...LLMAgentNode.DEFAULT_CONFIGURATION, ...configuration}
         let [ainodewrapperDiv, aiResponseTextArea, index] = configuration.content ? configuration.content : LLMAgentNode._getContentElement(configuration);
+        // console.log("INDEX: ", index)
+        configuration.index = index;
         if (!configuration.saved) {// Create LLMAgentNode
             super({...configuration, title: configuration.name, content: [], ...WindowedNode.getNaturalScaleParameters()});
         } else {// Restore LLMAgentNode
             super({ ...configuration, title: configuration.name, content: [], scale: true})
         }
+        // console.log("INDEX: ", index, "this.index:", this.index);
+
         this.diagram.addNode(this);
         this._initialize(ainodewrapperDiv, aiResponseTextArea, index, configuration.saved)
     }
@@ -340,6 +344,7 @@ class LLMAgentNode extends WindowedNode {
     _initialize(ainodewrapperDiv, aiResponseTextArea, index, saved){
         let windowDiv = this.windowDiv;
         windowDiv.style.resize = 'both';
+        // console.log("INDEX: ", index, "this.index:", this.index);
 
         // Append the ainodewrapperDiv to windowDiv of the node
         windowDiv.appendChild(ainodewrapperDiv);
@@ -361,6 +366,8 @@ class LLMAgentNode extends WindowedNode {
             this.savedTextContent = '';
             this.isLLM = true;
         }
+        // console.log("INDEX: ", index, "this.index:", this.index);
+
         this.afterInit();
     }
 
@@ -404,6 +411,7 @@ class LLMAgentNode extends WindowedNode {
 
 
         this.haltResponse = () => this._aiNodeHaltResponse();
+        // console.log( "this.index:", this.index);
 
         super.afterInit();
     }

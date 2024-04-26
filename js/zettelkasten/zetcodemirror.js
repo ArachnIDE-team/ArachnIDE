@@ -25,21 +25,21 @@ myCodeMirror.on("blur", function () {
 
 //sync codemirror and textarea
 
-myCodeMirror.on("change", function (instance, changeObj) {
-    ignoreTextAreaChanges = true; // Tell the MutationObserver to ignore changes
-    textarea.value = instance.getValue();
-
-    // Create a new 'input' event
-    var event = new Event('input', {
-        bubbles: true,
-        cancelable: true,
-    });
-
-    // Dispatch the event
-    textarea.dispatchEvent(event);
-
-    ignoreTextAreaChanges = false; // Tell the MutationObserver to observe changes again
-});
+// myCodeMirror.on("change", function (instance, changeObj) {
+//     ignoreTextAreaChanges = true; // Tell the MutationObserver to ignore changes
+//     textarea.value = instance.getValue();
+//
+//     // Create a new 'input' event
+//     var event = new Event('input', {
+//         bubbles: true,
+//         cancelable: true,
+//     });
+//
+//     // Dispatch the event
+//     textarea.dispatchEvent(event);
+//
+//     ignoreTextAreaChanges = false; // Tell the MutationObserver to observe changes again
+// });
 
 let userScrolledUp = false;
 
@@ -59,7 +59,8 @@ myCodeMirror.on("mousedown", function (cm, event) {
     const token = cm.getTokenAt(pos);
     //console.log(token.type);
 
-    if (token.type && token.type.includes("node")) {
+    // if (token.type && token.type.includes("node")) {
+    if (token.type && token.type.includes("node") &&  cm.getLine(pos.line).match(nodeTagRegex.start)){ //cm.getLine(pos.line).trim().split(nodeTag).length > 0) {
         const lineContent = cm.getLine(pos.line);
         const title = lineContent.split(nodeTag)[1].trim(); // Title is the rest of the text after the node tag
         if (title) toggleNodeState(title, cm, event); // Pass the event object here
@@ -158,7 +159,7 @@ myCodeMirror.getWrapperElement().style.resize = "vertical";
 
 CodeMirror.defineMode("custom", function (config, parserConfig) {
     const Prompt = `${PROMPT_IDENTIFIER}`;
-    var node = parserConfig.node || "";
+    // var node = parserConfig.node || "";
     var ref = parserConfig.ref || "";
 
     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
@@ -174,6 +175,46 @@ CodeMirror.defineMode("custom", function (config, parserConfig) {
             };
         },
         token: function (stream, state) {
+            // if (stream.sol()) {
+            //     let match = stream.match(/```(html|css|(js|javascript)|python)/, false);
+            //     if (match && match[1]) {
+            //         state.inBlock = match[1] === "javascript" ? "js" : match[1];
+            //         state.subState = CodeMirror.startState({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]);
+            //         stream.skipToEnd();
+            //         return "string";
+            //     }
+            //
+            //     match = stream.match(/```/, false);
+            //     if (match) {
+            //         state.inBlock = null;
+            //         state.subState = null;
+            //         stream.skipToEnd();
+            //         return "string";
+            //     }
+            // }
+            //
+            // if (state.inBlock) {
+            //     return ({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]).token(stream, state.subState);
+            // }
+
+
+            if (stream.match(Prompt)) {
+                return "Prompt";
+            }
+
+            // if (stream.match(node)) {
+            //     return "node";
+            // }
+            if (stream.match(nodeTagRegex.start, false)) {  // Check for the opening bracket
+                stream.match(nodeTagRegex.start);  // Consume the opening bracket
+                return "node";
+            }
+            if (stream.match(nodeTagRegex.end, false)) {  // Check for the corresponding closing bracket
+                stream.match(nodeTagRegex.end);  // Consume the closing bracket
+                return "node";
+            }
+
+
             if (stream.sol()) {
                 let match = stream.match(/```(html|css|(js|javascript)|python)/, false);
                 if (match && match[1]) {
@@ -194,15 +235,6 @@ CodeMirror.defineMode("custom", function (config, parserConfig) {
 
             if (state.inBlock) {
                 return ({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]).token(stream, state.subState);
-            }
-
-
-            if (stream.match(Prompt)) {
-                return "Prompt";
-            }
-
-            if (stream.match(node)) {
-                return "node";
             }
 
             // Check the refTag in the bracketsMap
@@ -231,13 +263,14 @@ CodeMirror.defineMode("custom", function (config, parserConfig) {
 });
 
 function updateMode() {
-    var node = nodeTag;
+    // var node = nodeTag;
     var ref = refTag;
-    myCodeMirror.setOption("mode", { name: "custom", node: node, ref: ref });
+    myCodeMirror.setOption("mode", { name: "custom", ref: ref });
+    // myCodeMirror.setOption("mode", { name: "custom", node: node, ref: ref });
     myCodeMirror.refresh();
 }
 
-nodeTagInput.addEventListener('change', updateMode);
+// nodeTagInput.addEventListener('change', updateMode);
 refTagInput.addEventListener('change', updateMode);
 updateMode();
 
@@ -263,7 +296,8 @@ function identifyNodeTitles() {
     // Clear previous node titles
     nodeTitles = [];
     myCodeMirror.eachLine((line) => {
-        if (line.text.startsWith(nodeTag)) {
+        if (line.text.match(nodeTagRegex.start)) { //line.text.startsWith(nodeTag) && line.text.trim().split(nodeTag).length > 0) {
+        // if (line.text.startsWith(nodeTag)) {
             let title = line.text.split(nodeTag)[1].trim();
             // Remove comma if exists
             if (title.endsWith(',')) {
@@ -282,7 +316,8 @@ function updateNodeTitleToLineMap() {
 
     let currentNodeTitleLineNo = null;
     myCodeMirror.eachLine((line) => {
-        if (line.text.startsWith(nodeTag)) {
+        // if (line.text.startsWith(nodeTag)) {
+        if (line.text.match(nodeTagRegex.start)) {//line.text.startsWith(nodeTag) && line.text.trim().split(nodeTag).length > 0) {
             const title = line.text.split(nodeTag)[1].trim();
             currentNodeTitleLineNo = line.lineNo();  // Store the line number of the "node:" line
             nodeTitleToLineMap.set(title, currentNodeTitleLineNo);
@@ -294,7 +329,8 @@ function updateNodeTitleToLineMap() {
 function getNodeSectionRange(title, cm) {
     const lowerCaseTitle = title.toLowerCase();
     let nodeLineNo;
-    let nextNodeLineNo = cm.lineCount(); // End of the document
+    let lineCount = cm.lineCount();
+    let nextNodeLineNo = lineCount; // End of the document
 
     let foundCurrentNode = false;
 
@@ -311,15 +347,24 @@ function getNodeSectionRange(title, cm) {
     }
 
     let startLineNo = nodeLineNo;
-    let endLineNo;
+    let endLineNo = startLineNo + 1;
 
-    // Set endLineNo to the last line of the document if this node extends to the end
-    if (nextNodeLineNo === cm.lineCount()) {
-        endLineNo = cm.lineCount() - 1;
-    } else {
-        // Otherwise, the end line is the line just before the next node
-        endLineNo = nextNodeLineNo - 1;
+    let lines = cm.getValue().split("\n");
+    for(let i = endLineNo; i < lineCount; i++) {
+        if(lines[i].match(nodeTagRegex.end)) {
+            endLineNo = i;
+            break;
+        }
     }
+
+
+    // // Set endLineNo to the last line of the document if this node extends to the end
+    // if (nextNodeLineNo === cm.lineCount()) {
+    //     endLineNo = cm.lineCount() - 1;
+    // } else {
+    //     // Otherwise, the end line is the line just before the next node
+    //     endLineNo = nextNodeLineNo - 2;
+    // }
 
     //console.log("Title:", title, "Start Line:", startLineNo, "End Line:", endLineNo);
 
@@ -428,7 +473,8 @@ function deleteNodeByTitle(title) {
         // Iterate from the start line until the next node tag is found
         for (let i = startLineNo + 1; i < myCodeMirror.lineCount(); i++) {
             const lineText = myCodeMirror.getLine(i);
-            if (lineText.startsWith(nodeTag)) {
+            if (lineText.match(nodeTagRegex.start)){ //lineText.startsWith(nodeTag) && lineText.trim().split(nodeTag).length > 0) {
+            // if (lineText.startsWith(nodeTag)) {
                 endLineNo = i - 1; // Set the end line to the line before the next node tag
                 break;
             }
@@ -471,7 +517,8 @@ function removeEdgeFromZettelkasten(title1, title2, removeOnlyFromTitle1 = false
         if (nodeLine !== null) {
             for (let j = nodeLine + 1; j < lineCount; j++) {
                 let nextLine = myCodeMirror.getLine(j);
-                if (nextLine.startsWith(nodeTag)) break;
+                if (nextLine.text.match(nodeTagRegex.start)) break; //nextLine.startsWith(nodeTag)  && nextLine.trim().split(nodeTag).length > 0) break;
+                // if (nextLine.startsWith(nodeTag) ) break;
 
                 let escapedRefTag = escapeRegExp(refTag);
                 let lineHasRefTag = new RegExp(escapedRefTag).test(nextLine);
@@ -559,11 +606,12 @@ function addEdgeToZettelkasten(fromTitle, toTitle, cm) {
             let isEndOfDoc = (endLine === cm.lineCount() - 1); // Check if it'scale the last line of the document
 
             if (count === 0) {
-                if (isEndOfDoc) {
-                    cm.replaceRange(`\n\n${tag}\n`, { line: endLine + 1, ch: 0 });
-                } else {
-                    cm.replaceRange(`\n${tag}\n\n`, { line: endLine + 1, ch: 0 });
-                }
+                cm.replaceRange(`\n${tag}\n\n`, { line: endLine, ch: 0 });
+                // if (isEndOfDoc) {
+                    // cm.replaceRange(`\n\n${tag}\n`, { line: endLine + 1, ch: 0 });
+                // } else {
+                    // cm.replaceRange(`\n${tag}\n\n`, { line: endLine + 1, ch: 0 });
+                // }
             } else if (count === 1) {
                 cm.replaceRange(`\n${tag}\n`, { line: endLine, ch: 0 });
             } else if (count === 2) {

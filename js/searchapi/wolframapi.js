@@ -59,7 +59,8 @@ async function fetchWolfram(message, isAINode = false, node = null, wolframConte
         wolframCallCounter++;
 
         // Insert the tag and unique title to the note-input 
-        myCodeMirror.replaceRange(`${tagValues.nodeTag} Wolfram ${wolframCallCounter}\n`, CodeMirror.Pos(myCodeMirror.lastLine()));
+        // myCodeMirror.replaceRange(`${tagValues.nodeTag} Wolfram ${wolframCallCounter}\n`, CodeMirror.Pos(myCodeMirror.lastLine()));
+        myCodeMirror.replaceRange(`${nodeTag} Wolfram ${wolframCallCounter}\n${nodeTag}`, CodeMirror.Pos(myCodeMirror.lastLine()));
     }
 
     let messages = [

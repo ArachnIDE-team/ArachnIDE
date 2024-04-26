@@ -137,8 +137,8 @@
             }
 
             // Open the first tab
-            // openTab('tab1', tablinks[0]);
-            this.openTab('tab8', tablinks[7]);
+            this.openTab('tab1', tablinks[0]);
+            // this.openTab('tab8', tablinks[7]);
 
             // If there's any selected text, deselect it
             if (window.getSelection) {
