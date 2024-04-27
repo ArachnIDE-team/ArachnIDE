@@ -86,7 +86,7 @@ function isEmbedEnabled(nodeIndex = null) {
 async function performSearch(searchQuery) {
     console.log(`Search Query in processLinkInput: ${searchQuery}`);
     // Get the API Key and Search Engine ID from local storage
-    const apiKey = localStorage.getItem('googleApiKey');
+    const apiKey = localStorage.getItem('googleSearchApiKey');
     const searchEngineId = localStorage.getItem('googleSearchEngineId');
 
     console.log(`Search query: ${searchQuery}`);  // Log the search query

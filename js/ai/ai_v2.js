@@ -66,7 +66,7 @@ async function handleStreamingResponse(response) {
 }
 
 function getAPIParams(messages, stream, customTemperature, modelOverride = null) {
-    const API_KEY = document.getElementById("api-key-input").value;
+    const API_KEY = document.getElementById("OpenAI-api-key-input").value;
     if (!API_KEY) {
         alert("Please enter your API key");
         return null;

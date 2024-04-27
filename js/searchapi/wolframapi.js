@@ -118,7 +118,7 @@ async function fetchWolfram(message, isAINode = false, node = null, wolframConte
     console.log("Reformulated query:", reformulatedQuery);
 
     // Call Wolfram Alpha API with the reformulated query
-    const apiKey = document.getElementById("wolframApiKey").value;
+    const apiKey = document.getElementById("Wolfram-api-key-input").value;
 
     const response = await fetch("http://localhost:3000", {
         method: "POST",

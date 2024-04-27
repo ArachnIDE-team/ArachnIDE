@@ -5,10 +5,10 @@ class AITab {
 
         document.getElementById('model-temperature').addEventListener('input', this.updateLabel.bind(this));
 
-        document.getElementById('googleApiKey').value = localStorage.getItem('googleApiKey') || '';
-        document.getElementById('googleSearchEngineId').value = localStorage.getItem('googleSearchEngineId') || '';
-        document.getElementById('api-key-input').value = localStorage.getItem('openaiApiKey') || '';
-        document.getElementById('wolframApiKey').value = localStorage.getItem('wolframApiKey') || '';
+        document.getElementById('Google-search-api-key-input').value = localStorage.getItem('googleSearchApiKey') || '';
+        document.getElementById('Google-search-engine-id-input').value = localStorage.getItem('googleSearchEngineId') || '';
+        document.getElementById('OpenAI-api-key-input').value = localStorage.getItem('openaiApiKey') || '';
+        document.getElementById('Wolfram-api-key-input').value = localStorage.getItem('wolframApiKey') || '';
 
         document.getElementById('node-count-slider').addEventListener('input', function(e) {
             document.getElementById('node-slider-label').innerText = 'Top ' + this.value + '\nnodes';
@@ -206,19 +206,19 @@ class AITab {
 
     saveKeys() {
         // Save keys to local storage
-        localStorage.setItem('googleApiKey', document.getElementById('googleApiKey').value);
-        localStorage.setItem('googleSearchEngineId', document.getElementById('googleSearchEngineId').value);
-        localStorage.setItem('openaiApiKey', document.getElementById('api-key-input').value);
-        localStorage.setItem('wolframApiKey', document.getElementById('wolframApiKey').value);
+        localStorage.setItem('googleSearchApiKey', document.getElementById('Google-search-api-key-input').value);
+        localStorage.setItem('googleSearchEngineId', document.getElementById('Google-search-engine-id-input').value);
+        localStorage.setItem('openaiApiKey', document.getElementById('OpenAI-api-key-input').value);
+        localStorage.setItem('wolframApiKey', document.getElementById('Wolfram-api-key-input').value);
     }
 
     async saveKeysToFile() {
         // Gather the keys
         const keys = {
-            googleApiKey: document.getElementById('googleApiKey').value || '',
-            googleSearchEngineId: document.getElementById('googleSearchEngineId').value || '',
-            openaiApiKey: document.getElementById('api-key-input').value || '',
-            wolframApiKey: document.getElementById('wolframApiKey').value || '',
+            googleSearchApiKey: document.getElementById('Google-search-api-key-input').value || '',
+            googleSearchEngineId: document.getElementById('Google-search-engine-id-input').value || '',
+            openaiApiKey: document.getElementById('OpenAI-api-key-input').value || '',
+            wolframApiKey: document.getElementById('Wolfram-api-key-input').value || '',
         };
 
         try {
@@ -255,10 +255,10 @@ class AITab {
                 const contents = await file.text();
 
                 const keys = JSON.parse(contents);
-                document.getElementById('googleApiKey').value = keys.googleApiKey || '';
-                document.getElementById('googleSearchEngineId').value = keys.googleSearchEngineId || '';
-                document.getElementById('api-key-input').value = keys.openaiApiKey || '';
-                document.getElementById('wolframApiKey').value = keys.wolframApiKey || '';
+                document.getElementById('Google-search-api-key-input').value = keys.googleSearchApiKey || '';
+                document.getElementById('Google-search-engine-id-input').value = keys.googleSearchEngineId || '';
+                document.getElementById('OpenAI-api-key-input').value = keys.openaiApiKey || '';
+                document.getElementById('Wolfram-api-key-input').value = keys.wolframApiKey || '';
             } else {
                 // Handle lack of support for showOpenFilePicker
                 alert('Your browser does not support opening files.');
@@ -272,16 +272,16 @@ class AITab {
 
     clearKeys() {
         // Clear keys from local storage
-        localStorage.removeItem('googleApiKey');
+        localStorage.removeItem('googleSearchApiKey');
         localStorage.removeItem('googleSearchEngineId');
         localStorage.removeItem('openaiApiKey');
         localStorage.removeItem('wolframApiKey');
 
         // Clear input fields
-        document.getElementById('googleApiKey').value = '';
-        document.getElementById('googleSearchEngineId').value = '';
-        document.getElementById('api-key-input').value = '';
-        document.getElementById('wolframApiKey').value = '';
+        document.getElementById('Google-search-api-key-input').value = '';
+        document.getElementById('Google-search-engine-id-input').value = '';
+        document.getElementById('OpenAI-api-key-input').value = '';
+        document.getElementById('Wolfram-api-key-input').value = '';
     }
 
     autoGrow(event) {

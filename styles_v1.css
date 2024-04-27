@@ -649,16 +649,6 @@ input[type="text"i]:hover {
                     color: #222226;
                 }
 
-        #api-key-input {
-            background-color: #222226;
-            border: inset;
-            border-color: #8882;
-        }
-
-.api-container {
-
-}
-
 .linkbuttons {
     padding: 4px 6px;
     font-size: 14px;
@@ -1027,7 +1017,7 @@ select-replacer > div:first-child {
                 color: #222226;
             }
 
-        .google-key-input input {
+        .input-key {
             background-color: #222226;
             border: inset;
             border-color: #8882;
@@ -1041,12 +1031,6 @@ select-replacer > div:first-child {
         }
 
         .model-input {
-            background-color: #222226;
-            border: inset;
-            border-color: #8882;
-        }
-
-        #wolframApiKey {
             background-color: #222226;
             border: inset;
             border-color: #8882;
@@ -1393,10 +1377,12 @@ input[type=range] {
 
 .api-container {
     display: flex;
+    max-height: 184px;
 }
 
 .api-inputs {
     flex-grow: 1;
+    overflow-y: scroll;
 }
 
 .api-buttons {

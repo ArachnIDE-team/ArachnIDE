@@ -53,7 +53,7 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
     console.log("Messages sent to API:", messages);
     console.log("Token count for messages:", getTokenCount(messages));
 
-    const API_KEY = document.getElementById("api-key-input").value;
+    const API_KEY = document.getElementById("OpenAI-api-key-input").value;
     if (!API_KEY) {
         if (haltCheckbox) {
             haltCheckbox.checked = true;
