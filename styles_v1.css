@@ -35,7 +35,7 @@
 
 
 .hidden {
-    display: none;
+    display: none!important;
 }
 
 .collapsed-circle {
@@ -335,6 +335,8 @@
             width: fit-content;
             height: fit-content;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
             /* Add this line */
         }
 
@@ -2453,6 +2455,7 @@ div.language-md {
     overflow: hidden;
     white-space: nowrap;
     display: flex;
+    float: inline-end;
 }
 .footer-left-container {
     flex-grow: 1;
@@ -2544,6 +2547,12 @@ div.language-md {
     font-weight: 700;
     font-family: monospace;
     margin-bottom: 5px;
+}
+
+/* Code editor */
+.editorWrapperDiv {
+    flex-grow: 1;
+    height: 100% !important;
 }
 
 

@@ -114,7 +114,7 @@ class NodeREPLWebsocket extends WebSocket {
             if(this.evaluationCallback !== null) this.evaluationCallback(operation.result)
         }
 
-        console.log('Node.js REPL Socket response: ', operation)
+        // console.log('Node.js REPL Socket response: ', operation)
     }
 
     onclose(event) {

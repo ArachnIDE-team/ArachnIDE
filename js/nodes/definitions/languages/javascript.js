@@ -52,19 +52,140 @@ class JavascriptNode extends CodeNode {
         super(configuration);
     }
 
+    afterInit() {
+        this.javascriptView = document.createElement("div");
+        this.javascriptView.id = "evaluation-" + generateUUID();
+        this.javascriptView.className = "hidden"
+        WindowedNode.makeContentScrollable(this.javascriptView, true)
+        WindowedNode.makeContentScrollable(this.innerContent, true)
+        WindowedNode.makeContentScrollable(this.javascriptView)
+        this.innerContent.prepend(this.javascriptView)
+        super.afterInit();
+
+        // this.innerContent.
+        //     overflow-y: scroll;
+        this.innerContent.style.height = "100%";
+        this.innerContent.style.display = "flex";
+        this.innerContent.style.flexDirection = "column";
+
+        this.javascriptView.style.flexGrow = "1";
+        this.javascriptView.style.height = "100%";
+
+        const editorWrapperDiv = this.windowDiv.querySelector('.editorWrapperDiv');
+        editorWrapperDiv.style.display = "flex";
+        editorWrapperDiv.style.flexDirection = "column";
+        editorWrapperDiv.style.height = "100%";
+        editorWrapperDiv.style.flexGrow = "1";
+
+        const editorIframe = this.iframeElement;
+        editorIframe.style.flexGrow = "1";
+        editorIframe.style.overflowY = "scroll";
+        editorIframe.style.display = "inline-block";
+
+        const footerButtonContainer = this.windowDiv.querySelector('.content-sticky-footer');
+        // footerButtonContainer.style.textOverflow = "ellipsis";
+        footerButtonContainer.style.overflow = "hidden";
+        footerButtonContainer.style.whiteSpace = "nowrap";
+        footerButtonContainer.style.display = "inline-flex";
+        footerButtonContainer.style.float = "inline-end";
+
+    }
+
+    onClickReset(){
+        this.editorWrapperDiv.classList.remove("hidden")
+        this.javascriptView.classList.add('hidden');
+        this.versionDropdown.removeAttribute("disabled")
+        this.codeButton.innerText = "Run Code"
+        this.codeButton.removeEventListener("click", this.onClickReset.bind(this))
+        this.codeButton.addEventListener("click", this.onClickRun.bind(this))
+    }
 
     onClickRun(){
-        this.eval(this.code);
-        // if(!this.settings.local) {
-        //     eval(this.code);
-        // }
+        if(this.versionDropdown.value === "ES6") {
+            this.codeButton.setAttribute("disabled","")
+            this.codeButton.removeEventListener("click", this.onClickRun.bind(this))
+            this.eval(this.code).then((result) => {
+                this.setResult(result);
+            }).catch((error) => {
+                this.setResult(error.stack, true);
+            });
+        } else if(this.versionDropdown.value === "Node.js"){
+            this.codeButton.setAttribute("disabled","")
+            this.codeButton.removeEventListener("click", this.onClickRun.bind(this))
+            nodeREPLWebsocket.createREPLRuntime((createdRuntime) => {
+                let runtimeID = createdRuntime.id;
+                nodeREPLWebsocket.evalInRuntime(runtimeID, this.code, (result) => {
+                    this.setResult(result);
+                });
+            });
+        }
     }
 
-    eval(js){
-        return async function() {
-            return await eval("(async () => {" + js + "})()");
+    setResult(result, isError=false){
+        this.editorWrapperDiv.classList.add("hidden")
+        this.javascriptView.classList.remove('hidden');
+        this.versionDropdown.setAttribute("disabled","")
+        this.codeButton.innerText = "Code Text"
+        this.codeButton.removeAttribute("disabled")
+        this.codeButton.addEventListener("click", this.onClickReset.bind(this))
+        if(isError) {
+            this.javascriptView.innerText = result
+            this.javascriptView.classList.add("error-line");
+            this.javascriptView.classList.remove("result-line");
+
+        }else{
+            this.setJSONResult(result);
+            this.javascriptView.classList.add("result-line");
+            this.javascriptView.classList.remove("error-line");
+        }
+    }
+
+    setJSONResult(result) {
+        if(typeof result === "function") {
+            this.javascriptView.innerText = result.toString()
+        } else if (typeof result === "object") {
+            let jsonTreeExplorer = new JavascriptObjectUtils(result);
+            jsonTreeExplorer.getTree("", 2).then((defaultTree) => {
+                let jsonTreePanel = new ObjectTreePanel( {
+                    container: "#" + this.javascriptView.id,
+                    treeObject: jsonTreeExplorer,
+                    defaultTree // For not awaiting in constructor
+                })
+            });
+        } else if (typeof result === "string") {
+            this.javascriptView.innerText = JSON.stringify(result);
+        } else {
+            this.javascriptView.innerText = result;
+
+        }
+    }
+
+    eval(js) {
+        let array = js.split("\n")
+        if (!array[array.length - 1].startsWith("return ")) {
+            array[array.length - 1] = "return " + array[array.length - 1];
+            js = array.join("\n");
+        }
+        return async function () {
+            try {
+                return await eval("(async () => {" + js + "})()");
+            } catch (e) {
+                throw e;
+            }
         }.call(this);
     }
+
+    // onResize(newWidth, newHeight) {
+    //     super.onResize(newWidth, newHeight);
+    //     const editorWrapperDiv = this.windowDiv.querySelector('.editorWrapperDiv');
+    //     editorWrapperDiv.style.height = "100%";
+    // }
+
+    // eval(js){
+    //     return async function() {
+    //         return await eval("(async () => {" + js + "})()");
+    //     }.call(this);
+    // }
 
 
 }

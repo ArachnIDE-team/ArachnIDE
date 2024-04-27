@@ -77,7 +77,7 @@ class NodeJSTerminalNode extends TerminalNode {
 
 
 }
-
+// Review, the object is only passed by string, we don't have a clue about errors, types, promises etc...
 class NodeJSObjectUtils extends ObjectTreeUtils {
     constructor(object) {
         super(object); // Set the root object (top-level Fields/Attributes)

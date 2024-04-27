@@ -26,7 +26,7 @@ class CodeNode extends WindowedNode {
         configuration = {...CodeNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.settings =  {...CodeNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
         configuration.settings.versions =  [...CodeNode.DEFAULT_CONFIGURATION.settings.versions, ...configuration.settings.versions]
-        configuration.content = [CodeNode._getContentElement()];
+        configuration.content = [...CodeNode._getContentElement()];
         if (!configuration.saved) { // Create CodeNode
             super({...configuration, title: configuration.name, ...WindowedNode.getNaturalScaleParameters() });
         } else { // Restore CodeNode
@@ -173,8 +173,8 @@ class CodeNode extends WindowedNode {
 
         // Append the overlay to the editorWrapperDiv
         editorWrapperDiv.appendChild(overlay);
-        editorWrapperDiv.appendChild(footerButtonContainer);
-        return editorWrapperDiv;
+        // editorWrapperDiv.appendChild(footerButtonContainer);
+        return [editorWrapperDiv, footerButtonContainer];
     }
 
     setMainContentFile(filePath, fileName){
@@ -195,7 +195,7 @@ class CodeNode extends WindowedNode {
         if(!this.settings.versions){//retro-compatibility
             this.settings.versions = CodeNode.DEFAULT_CONFIGURATION.settings.versions;
         }
-        this.editorWrapperDiv = this.content.querySelector('.editorWrapperDiv>iframe')
+        this.editorWrapperDiv = this.content.querySelector('.editorWrapperDiv')
         this.versionDropdown = this.content.querySelector('.version-select');
         this.codeButton = this.content.querySelector('.code-button');
         this.conversionButton = this.content.querySelector('.transform-button');
@@ -295,7 +295,8 @@ class CodeNode extends WindowedNode {
         super.onResize(newWidth, newHeight);
 
         const editorWrapperDiv = this.windowDiv.querySelector('.editorWrapperDiv');
-        const editorIframe = editorWrapperDiv ? editorWrapperDiv.querySelector('iframe') : null;
+        // const editorIframe = editorWrapperDiv ? editorWrapperDiv.querySelector('iframe') : null;
+        const editorIframe = this.iframeElement;
 
         if (editorWrapperDiv) {
             // Set the new dimensions for the editor wrapper div

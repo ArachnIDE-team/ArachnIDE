@@ -64,9 +64,7 @@ class Runtime {
         let oldOutput = this.console.output.write;
         let lines = data.split("\n");
         lines.forEach((line, index) => {
-            // console.log("EXECUTING:", line, "(" + index + "/" + lines.length + ") is the last? ", index === lines.length - 1)
             if(callback && index === lines.length - 1) { // Activate the callback only for the last line
-                // console.log("EXECUTING LAST LINE")
                 this.setOutput(function(response){
                     callback(response);
                     this.setOutput(oldOutput);
@@ -75,20 +73,6 @@ class Runtime {
             this.console.write(line + "\n");
         });
     }
-    // execute(data, callback){//, trace=true) {
-    //
-    //     let oldOutput = this.console.output.write;
-    //     if(callback)
-    //         this.setOutput(function(response){
-    //             callback(response);
-    //             this.setOutput(oldOutput);
-    //         }.bind(this))
-    //     let line = null;
-    //
-    //     for (line of data.split("\n")){
-    //         this.console.write(line + "\n");
-    //     }
-    // }
 
     output(data){
         console.log("Runtime output:", data.toString());
