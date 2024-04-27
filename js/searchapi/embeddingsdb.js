@@ -851,6 +851,11 @@ async function fetchChunkedEmbeddings(textChunks, model = "text-embedding-ada-00
         } else {
             // Use the API for embeddings
             const API_KEY = document.getElementById("OpenAI-api-key-input").value;
+            // const API_KEY = document.getElementById("HuggingFace-api-key-input").value;
+            // const API_KEY = document.getElementById("Anthropic-api-key-input").value;
+            // const API_KEY = document.getElementById("GoogleGemini-api-key-input").value;
+            // const API_KEY = document.getElementById("Mistral-api-key-input").value;
+            // const API_KEY = document.getElementById("Cohere-api-key-input").value;
             if (!API_KEY) {
                 alert("Please enter your API key");
                 return;

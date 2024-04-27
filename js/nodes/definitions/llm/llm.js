@@ -377,7 +377,7 @@ class LLMNode extends LLMAgentNode {
         function determineModel(LocalLLMValue, hasImageNodes) {
             if (hasImageNodes) {
                 return 'gpt-4-vision-preview'; // Switch to vision model if image nodes are present
-            } else if (LocalLLMValue === 'OpenAi') {
+            } else if (LocalLLMValue === 'Default') {
                 const globalModelSelect = document.getElementById('model-select');
                 return globalModelSelect.value; // Use global model selection
             } else {
@@ -666,7 +666,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
         const haltCheckbox = this.haltCheckbox;
 
         // Local LLM call
-        if (document.getElementById("localLLM").checked && selectedModel !== 'OpenAi') {
+        if (document.getElementById("localLLM").checked && selectedModel !== 'Default') {
             window.generateLocalLLMResponse(this, messages)
                 .then(async (fullMessage) => {
                     this.aiResponding = false;

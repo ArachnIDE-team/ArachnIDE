@@ -8,12 +8,16 @@ class AITab {
         document.getElementById('Google-search-api-key-input').value = localStorage.getItem('googleSearchApiKey') || '';
         document.getElementById('Google-search-engine-id-input').value = localStorage.getItem('googleSearchEngineId') || '';
         document.getElementById('OpenAI-api-key-input').value = localStorage.getItem('openaiApiKey') || '';
+        document.getElementById('HuggingFace-api-key-input').value = localStorage.getItem('huggingfaceApiKey') || '';
+        document.getElementById('Anthropic-api-key-input').value = localStorage.getItem('anthropicApiKey') || '';
+        document.getElementById('GoogleGemini-api-key-input').value = localStorage.getItem('googleApiKey') || '';
+        document.getElementById('Mistral-api-key-input').value = localStorage.getItem('mistralApiKey') || '';
+        document.getElementById('Cohere-api-key-input').value = localStorage.getItem('cohereApiKey') || '';
         document.getElementById('Wolfram-api-key-input').value = localStorage.getItem('wolframApiKey') || '';
 
         document.getElementById('node-count-slider').addEventListener('input', function(e) {
             document.getElementById('node-slider-label').innerText = 'Top ' + this.value + '\nnodes';
         }); // Element bound
-
     }
 
     // TO-DO: Review
@@ -65,6 +69,7 @@ class AITab {
             let optionDiv = document.createElement('div');
             optionDiv.innerText = option.innerText;
             optionDiv.setAttribute('data-value', option.value);
+            optionDiv.className = option.className;
 
             // Highlight the selected option
             if (select.selectedIndex === index) {
@@ -73,9 +78,9 @@ class AITab {
 
             if (aiNode) {  // AI node specific logic
                 // Initial visibility based on checkbox state
-                if (option.value === 'OpenAi' ||
-                    (option.value.startsWith('gpt-') && !localLLMCheckbox.checked) ||
-                    (!option.value.startsWith('gpt-') && localLLMCheckbox.checked)) {
+                if (option.value === 'Default' ||
+                    (!option.value.startsWith('webllm:') && !localLLMCheckbox.checked) ||
+                    (option.value.startsWith('webllm:') && localLLMCheckbox.checked)) {
                     optionDiv.style.display = 'block';
                 } else {
                     optionDiv.style.display = 'none';
@@ -209,15 +214,28 @@ class AITab {
         localStorage.setItem('googleSearchApiKey', document.getElementById('Google-search-api-key-input').value);
         localStorage.setItem('googleSearchEngineId', document.getElementById('Google-search-engine-id-input').value);
         localStorage.setItem('openaiApiKey', document.getElementById('OpenAI-api-key-input').value);
+        localStorage.setItem('huggingfaceApiKey', document.getElementById('HuggingFace-api-key-input').value);
+        localStorage.setItem('anthropicApiKey', document.getElementById('Anthropic-api-key-input').value);
+        localStorage.setItem('googleApiKey', document.getElementById('GoogleGemini-api-key-input').value);
+        localStorage.setItem('mistralApiKey', document.getElementById('Mistral-api-key-input').value);
+        localStorage.setItem('cohereApiKey', document.getElementById('Cohere-api-key-input').value);
         localStorage.setItem('wolframApiKey', document.getElementById('Wolfram-api-key-input').value);
     }
 
     async saveKeysToFile() {
         // Gather the keys
+
+
+
         const keys = {
             googleSearchApiKey: document.getElementById('Google-search-api-key-input').value || '',
             googleSearchEngineId: document.getElementById('Google-search-engine-id-input').value || '',
             openaiApiKey: document.getElementById('OpenAI-api-key-input').value || '',
+            huggingfaceApiKey: document.getElementById('HuggingFace-api-key-input').value || '',
+            anthropicApiKey: document.getElementById('Anthropic-api-key-input').value || '',
+            googleApiKey: document.getElementById('GoogleGemini-api-key-input').value || '',
+            mistralApiKey: document.getElementById('Mistral-api-key-input').value || '',
+            cohereApiKey: document.getElementById('Cohere-api-key-input').value || '',
             wolframApiKey: document.getElementById('Wolfram-api-key-input').value || '',
         };
 
@@ -258,6 +276,11 @@ class AITab {
                 document.getElementById('Google-search-api-key-input').value = keys.googleSearchApiKey || '';
                 document.getElementById('Google-search-engine-id-input').value = keys.googleSearchEngineId || '';
                 document.getElementById('OpenAI-api-key-input').value = keys.openaiApiKey || '';
+                document.getElementById('HuggingFace-api-key-input').value = keys.huggingfaceApiKey || '';
+                document.getElementById('Anthropic-api-key-input').value = keys.anthropicApiKey || '';
+                document.getElementById('GoogleGemini-api-key-input').value = keys.googleApiKey || '';
+                document.getElementById('Mistral-api-key-input').value = keys.mistralApiKey || '';
+                document.getElementById('Cohere-api-key-input').value = keys.cohereApiKey || '';
                 document.getElementById('Wolfram-api-key-input').value = keys.wolframApiKey || '';
             } else {
                 // Handle lack of support for showOpenFilePicker
@@ -275,12 +298,26 @@ class AITab {
         localStorage.removeItem('googleSearchApiKey');
         localStorage.removeItem('googleSearchEngineId');
         localStorage.removeItem('openaiApiKey');
+
+        localStorage.removeItem('huggingfaceApiKey');
+        localStorage.removeItem('anthropicApiKey');
+        localStorage.removeItem('googleApiKey');
+        localStorage.removeItem('mistralApiKey');
+        localStorage.removeItem('cohereApiKey');
         localStorage.removeItem('wolframApiKey');
 
         // Clear input fields
         document.getElementById('Google-search-api-key-input').value = '';
         document.getElementById('Google-search-engine-id-input').value = '';
+
         document.getElementById('OpenAI-api-key-input').value = '';
+
+        document.getElementById('HuggingFace-api-key-input').value = '';
+        document.getElementById('Anthropic-api-key-input').value = '';
+        document.getElementById('GoogleGemini-api-key-input').value = '';
+        document.getElementById('Mistral-api-key-input').value = '';
+        document.getElementById('Cohere-api-key-input').value = '';
+
         document.getElementById('Wolfram-api-key-input').value = '';
     }
 

@@ -292,32 +292,35 @@ class LLMAgentNode extends WindowedNode {
 
         // Create an array to store the options
         let options = [
-            new Option('OpenAI', 'OpenAi', false, true),
-            new Option('Red Pajama 3B f32', 'RedPajama-INCITE-Chat-3B-v1-q4f32_0', false, false),
-            new Option('Vicuna 7B f32', 'vicuna-v1-7b-q4f32_0', false, false),
-            new Option('Llama 2 7B f32', 'Llama-2-7b-chat-hf-q4f32_1', false, false),
-            //new Option('Llama 2 13B f32', 'Llama-2-13b-chat-hf-q4f32_1', false, false),
-            new Option('Llama 2 70B f16', 'Llama-2-70b-chat-hf-q4f16_1', false, false),
-            //new Option('WizardCoder 15B f32', '"WizardCoder-15B-V1.0-q4f32_1', false, false),
-            new Option('gpt-3.5-turbo', 'gpt-3.5-turbo', false, false),
-            //new Option('gpt-3.5-turbo-16k', 'gpt-3.5-turbo-16k', false, false),
-            //new Option('gpt-3.5-turbo-0613', 'gpt-3.5-turbo-0613', false, false),
-            new Option('gpt-3.5-16k-0613', 'gpt-3.5-turbo-16k-0613', false, false),
-            new Option('gpt-4', 'gpt-4', false, false),
-            new Option('gpt-4-0613', 'gpt-4-0613', false, false),
-            new Option('gpt-4-vision', 'gpt-4-vision-preview', false, false),
-            new Option('gpt-3.5-1106', 'gpt-3.5-turbo-1106', false, false),
-            new Option('gpt-4-1106', 'gpt-4-1106-preview', false, false)
+            new Option('Default', 'Default', false, true),
+            new Option('Red Pajama 3B f32', 'webllm:RedPajama-INCITE-Chat-3B-v1-q4f32_0', false, false),
+            new Option('Vicuna 7B f32', 'webllm:vicuna-v1-7b-q4f32_0', false, false),
+            new Option('Llama 2 7B f32', 'webllm:Llama-2-7b-chat-hf-q4f32_1', false, false),
+            //new Option('Llama 2 13B f32', 'webllm:Llama-2-13b-chat-hf-q4f32_1', false, false),
+            new Option('Llama 2 70B f16', 'webllm:Llama-2-70b-chat-hf-q4f16_1', false, false),
+            //new Option('WizardCoder 15B f32', 'webllm:WizardCoder-15B-V1.0-q4f32_1', false, false),
+            new Option('GPT-3.5-turbo', 'openai:gpt-3.5-turbo', false, false),
+            //new Option('GPT-3.5-turbo-16k', 'openai:gpt-3.5-turbo-16k', false, false),
+            //new Option('GPT-3.5-turbo-0613', 'openai:gpt-3.5-turbo-0613', false, false),
+            new Option('GPT-3.5-16k-0613', 'openai:gpt-3.5-turbo-16k-0613', false, false),
+            new Option('GPT-4', 'openai:gpt-4', false, false),
+            new Option('GPT-4-0613', 'openai:gpt-4-0613', false, false),
+            new Option('GPT-4-vision', 'openai:gpt-4-vision-preview', false, false),
+            new Option('GPT-3.5-1106', 'openai:gpt-3.5-turbo-1106', false, false),
+            new Option('GPT-4-1106', 'openai:gpt-4-1106-preview', false, false)
         ];
 
         // Add options to the select
         options.forEach((option, index) => {
+            if(option.value.startsWith("openai:")) option.className = "openai-model-option"
             LocalLLMSelect.add(option, index);
         });
 
+
         // Initial setup based on checkbox state
         options.forEach((option) => {
-            if (option.value === 'OpenAi' || option.value.startsWith('gpt-')) {
+            console.log("Choosing to show or not ",  option.value, " -> ",  (option.value === 'Default' || option.value.startsWith('openai:')))
+            if (option.value === 'Default' || !option.value.startsWith('webllm:')) {
                 option.hidden = false;  // Always show
             } else {
                 option.hidden = !localLLMCheckbox.checked;  // Show or hide based on checkbox initial state
@@ -721,7 +724,7 @@ class LLMAgentNode extends WindowedNode {
 
             for (let i = 0; i < options.length; i++) {
                 let option = options[i];
-                if (option.value === 'OpenAi' || option.value.startsWith('gpt-')) {
+                if (option.value === 'Default' || !option.value.startsWith('webllm:')) {
                     option.hidden = false;  // Always show
                 } else {
                     option.hidden = !this.checked;  // Show or hide based on checkbox
@@ -732,7 +735,7 @@ class LLMAgentNode extends WindowedNode {
             const customOptions = document.querySelectorAll('.options-replacer div');
             customOptions.forEach((customOption) => {
                 const value = customOption.getAttribute('data-value');
-                if (value === 'OpenAi' || value.startsWith('gpt-')) {
+                if (value === 'Default' || !option.value.startsWith('webllm:')) {
                     customOption.style.display = 'block';  // Always show
                 } else {
                     customOption.style.display = this.checked ? 'block' : 'none';  // Show or hide based on checkbox
@@ -893,7 +896,7 @@ class LLMAgentNode extends WindowedNode {
         function determineModel(LocalLLMValue, hasImageNodes) {
             if (hasImageNodes) {
                 return 'gpt-4-vision-preview'; // Switch to vision model if image nodes are present
-            } else if (LocalLLMValue === 'OpenAi') {
+            } else if (LocalLLMValue === 'Default') {
                 const globalModelSelect = document.getElementById('model-select');
                 return globalModelSelect.value; // Use global model selection
             } else {

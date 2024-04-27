@@ -518,8 +518,6 @@ input[type="text"i]:hover {
     background-color: #1e1e22; /* Slightly lighter background on hover */
 }
 
-}
-
         .submenu-btn {
             display: flex;
             align-content: flex-start;
@@ -2535,6 +2533,7 @@ div.language-md {
     margin-bottom: 5px;
 }
 
+
 /* Code editor */
 .editorWrapperDiv {
     flex-grow: 1;
@@ -2612,3 +2611,11 @@ svg.file-icon {
     margin-left: 3px;
 }
 
+        .openai-model-option {
+            background-image: url(/images/openai.png);
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position-x: 10px;
+            background-position-y: 5px;
+            padding-left: 30px !important;
+        }

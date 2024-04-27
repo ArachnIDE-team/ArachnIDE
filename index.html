@@ -309,12 +309,12 @@
                             <button id="downloadAiButton" class="key-button" title="Install Local AI Models into Browser Cache">INSTALL</button>
                             <div class="inline-container" title="Select Local Model">
                                 <select id="LocalLLMselect" class="model-dropdown custom-select">
-                                    <option value="RedPajama-INCITE-Chat-3B-v1-q4f32_0" selected>Red Pajama 3B f32</option>
-                                    <option value="vicuna-v1-7b-q4f32_0">Vicuna 7B f32</option>
-                                    <option value="Llama-2-7b-chat-hf-q4f32_1">Llama 2 7B f32</option>
-                                    <!--<option value="Llama-2-13b-chat-hf-q4f32_1">Llama 2 13B f32</option>-->
-                                    <option value="Llama-2-70b-chat-hf-q4f16_1">Llama 2 70B f16</option>
-                                    <!-- <option value="WizardCoder-15B-V1.0-q4f32_1">WizardCoder 15B f32</option>-->
+                                    <option value="RedPajama-INCITE-Chat-3B-v1-q4f32_0" selected>&#9889; Red Pajama 3B f32</option>
+                                    <option value="vicuna-v1-7b-q4f32_0">&#9889; Vicuna 7B f32</option>
+                                    <option value="Llama-2-7b-chat-hf-q4f32_1">&#9889; Llama 2 7B f32</option>
+                                    <!--<option value="Llama-2-13b-chat-hf-q4f32_1">&#9889; Llama 2 13B f32</option>-->
+                                    <option value="Llama-2-70b-chat-hf-q4f16_1">&#9889; Llama 2 70B f16</option>
+                                    <!-- <option value="WizardCoder-15B-V1.0-q4f32_1">&#9889; WizardCoder 15B f32</option>-->
                                 </select>
                             </div>
                             <div class="inline-container">
@@ -345,6 +345,31 @@
                                     <input type="password" class="input-key" id="OpenAI-api-key-input">
                                 </div>
                                 <div>
+                                    <label for="HuggingFace-api-key-input">Hugging Face API Key:</label>
+                                    <!-- storage name: huggingfaceApiKey-->
+                                    <input type="password" class="input-key" id="HuggingFace-api-key-input">
+                                </div>
+                                <div>
+                                    <label for="Anthropic-api-key-input">Anthropic API Key:</label>
+                                    <!-- storage name: anthropicApiKey-->
+                                    <input type="password" class="input-key" id="Anthropic-api-key-input">
+                                </div>
+                                <div>
+                                    <label for="GoogleGemini-api-key-input">Google Gemini API Key:</label>
+                                    <!-- storage name: googleApiKey-->
+                                    <input type="password" class="input-key" id="GoogleGemini-api-key-input">
+                                </div>
+                                <div>
+                                    <label for="Mistral-api-key-input">Mistral AI API Key:</label>
+                                    <!-- storage name: mistralApiKey-->
+                                    <input type="password" class="input-key" id="Mistral-api-key-input">
+                                </div>
+                                <div>
+                                    <label for="Cohere-api-key-input">Cohere API Key:</label>
+                                    <!-- storage name: cohereApiKey-->
+                                    <input type="password" class="input-key" id="Cohere-api-key-input">
+                                </div>
+                                <div>
                                     <label for="Google-search-api-key-input">Google Search API Key:</label>
                                     <!-- storage name: googleSearchApiKey-->
                                     <input type="password" class="input-key"  id="Google-search-api-key-input">
@@ -373,15 +398,15 @@
                             <label for="model-select" style="margin-right: 10px;">Select Model:</label>
                             <div class="dropdown-container">
                                 <select id="model-select" class="model-selector custom-select" onchange="checkOtherModel(this)">
-                                    <option value="gpt-4">gpt-4</option>
-                                    <option value="gpt-3.5-turbo-1106">gpt-3.5-1106</option>
-                                    <option value="gpt-4-1106-preview">gpt-4-1106</option>
-                                    <option value="gpt-4-0613">gpt-4-0613</option>
-                                    <option value="gpt-4-vision-preview">gpt-4-vision</option>
-                                    <option value="gpt-3.5-turbo-16k-0613">gpt-3.5-16k-0613</option>
-                                    <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                                    <option value="gpt-3.5-turbo-16k">gpt-3.5-16k</option>
-                                    <option value="gpt-3.5-turbo-0613">gpt-3.5-0613</option>
+                                    <option value="openai:gpt-4" class="openai-model-option"> GPT-4</option>
+                                    <option value="openai:gpt-3.5-turbo-1106" class="openai-model-option">GPT-3.5-1106</option>
+                                    <option value="openai:gpt-4-1106-preview" class="openai-model-option">GPT-4-1106</option>
+                                    <option value="openai:gpt-4-0613" class="openai-model-option">GPT-4-0613</option>
+                                    <option value="openai:gpt-4-vision-preview" class="openai-model-option">GPT-4-vision</option>
+                                    <option value="openai:gpt-3.5-turbo-16k-0613" class="openai-model-option">GPT-3.5-16k-0613</option>
+                                    <option value="openai:gpt-3.5-turbo" class="openai-model-option">GPT-3.5-turbo</option>
+                                    <option value="openai:gpt-3.5-turbo-16k" class="openai-model-option">GPT-3.5-16k</option>
+                                    <option value="openai:gpt-3.5-turbo-0613" class="openai-model-option">GPT-3.5-0613</option>
                                     <!-- <option value="other">Other...</option> -->
                                 </select>
                                 <input id="model-input" class="model-input" style="display: none;" placeholder="Enter model name">
