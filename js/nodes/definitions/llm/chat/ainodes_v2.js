@@ -53,7 +53,13 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
     console.log("Messages sent to API:", messages);
     console.log("Token count for messages:", getTokenCount(messages));
 
-    const API_KEY = document.getElementById("OpenAI-api-key-input").value;
+    let API_KEY;
+    if(selectedModel.startsWith("openai:")){
+        API_KEY = document.getElementById("OpenAI-api-key-input").value;
+    } else if(selectedModel.startsWith("huggingface:")) {
+        API_KEY = document.getElementById("HuggingFace-api-key-input").value;
+    }
+    // const API_KEY = document.getElementById("OpenAI-api-key-input").value;
 
     // const API_KEY = document.getElementById("HuggingFace-api-key-input").value;
     // const API_KEY = document.getElementById("Anthropic-api-key-input").value;
@@ -69,7 +75,15 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
         return;
     }
 
-    const API_URL = "https://api.openai.com/v1/chat/completions";
+    let API_URL;
+
+    if(selectedModel.startsWith("openai:")){
+        API_URL = "https://api.openai.com/v1/chat/completions";
+        selectedModel = selectedModel.substr("openai:".length)
+    } else if(selectedModel.startsWith("huggingface:")) {
+        selectedModel = selectedModel.substr("huggingface:".length)
+        API_URL = "https://api-inference.huggingface.co/models/" + selectedModel;
+    }
 
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
@@ -86,7 +100,7 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
     const globalModelInput = document.getElementById('model-input');
 
     const defaultModel = modelSelect.value === 'other' ? globalModelInput.value : modelSelect.value;
-    const modelToUse = selectedModel && selectedModel.startsWith('gpt') ? selectedModel : defaultModel;
+    const modelToUse = selectedModel && !selectedModel.startsWith('webllm:') ? selectedModel : defaultModel;
 
 
     const requestOptions = {

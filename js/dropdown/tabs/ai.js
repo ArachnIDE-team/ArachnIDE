@@ -33,7 +33,9 @@ class AITab {
 
         // Create the dropdown options container
         let optionsReplacer = document.createElement('div');
-        optionsReplacer.className = 'options-replacer';
+        optionsReplacer.className = 'options-replacer custom-scrollbar scrollable-content';
+        optionsReplacer.style.height = "200px";
+        optionsReplacer.style.overflowY = "scroll";
 
         // Append the options container to the main dropdown container
         selectReplacer.appendChild(optionsReplacer);

@@ -2619,3 +2619,11 @@ svg.file-icon {
             background-position-y: 5px;
             padding-left: 30px !important;
         }
+        .huggingface-model-option {
+            background-image: url(/images/huggingface.png);
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position-x: 10px;
+            background-position-y: 5px;
+            padding-left: 30px !important;
+        }

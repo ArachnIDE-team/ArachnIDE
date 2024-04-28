@@ -307,19 +307,23 @@ class LLMAgentNode extends WindowedNode {
             new Option('GPT-4-0613', 'openai:gpt-4-0613', false, false),
             new Option('GPT-4-vision', 'openai:gpt-4-vision-preview', false, false),
             new Option('GPT-3.5-1106', 'openai:gpt-3.5-turbo-1106', false, false),
-            new Option('GPT-4-1106', 'openai:gpt-4-1106-preview', false, false)
+            new Option('GPT-4-1106', 'openai:gpt-4-1106-preview', false, false),
+            new Option('BigScience Bloom', 'huggingface:bigscience/bloom', false, false),
+            new Option('Meta Llama 3 8B', 'huggingface:meta-llama/Meta-Llama-3-8B', false, false),
+            new Option('Mistral 7B Instruct v0.2', 'huggingface:mistralai/Mistral-7B-Instruct-v0.2', false, false)
         ];
 
         // Add options to the select
         options.forEach((option, index) => {
             if(option.value.startsWith("openai:")) option.className = "openai-model-option"
+            if(option.value.startsWith("huggingface:")) option.className = "huggingface-model-option"
             LocalLLMSelect.add(option, index);
         });
 
 
         // Initial setup based on checkbox state
         options.forEach((option) => {
-            console.log("Choosing to show or not ",  option.value, " -> ",  (option.value === 'Default' || option.value.startsWith('openai:')))
+            // console.log("Choosing to show or not ",  option.value, " -> ",  (option.value === 'Default' || option.value.startsWith('openai:')))
             if (option.value === 'Default' || !option.value.startsWith('webllm:')) {
                 option.hidden = false;  // Always show
             } else {
@@ -415,6 +419,8 @@ class LLMAgentNode extends WindowedNode {
 
         this.haltResponse = () => this._aiNodeHaltResponse();
         // console.log( "this.index:", this.index);
+
+        this._setupOptionReplacementScrollbar();
 
         super.afterInit();
     }
@@ -847,6 +853,14 @@ class LLMAgentNode extends WindowedNode {
                 this.savedCustomInstructions = customInstructionsTextarea.value;
             });
         }
+    }
+
+    _setupOptionReplacementScrollbar() {
+        let optionsReplacer = this.content.querySelector('.options-replacer');
+        optionsReplacer.classList.add("custom-scrollbar");
+        optionsReplacer.classList.add("scrollable-content");
+        optionsReplacer.style.height = "200px";
+        optionsReplacer.style.overflowY = "scroll";
     }
 
     onResize(newWidth, newHeight) {

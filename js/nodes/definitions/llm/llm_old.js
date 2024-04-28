@@ -317,7 +317,7 @@ class LLMOldNode extends WindowedNode {
 
         // Initial setup based on checkbox state
         options.forEach((option) => {
-            console.log("Choosing to show or not ",  option.value, " -> ",  (option.value === 'Default' || option.value.startsWith('openai:')))
+            // console.log("Choosing to show or not ",  option.value, " -> ",  (option.value === 'Default' || option.value.startsWith('openai:')))
             if (option.value === 'Default' || !option.value.startsWith('webllm:')) {
                 option.hidden = false;  // Always show
             } else {
@@ -436,6 +436,8 @@ class LLMOldNode extends WindowedNode {
 
 
         this.haltResponse = () => this._aiNodeHaltResponse();
+
+        this._setupOptionReplacementScrollbar();
 
         super.afterInit();
     }
@@ -889,6 +891,14 @@ class LLMOldNode extends WindowedNode {
                 this.savedCustomInstructions = customInstructionsTextarea.value;
             });
         }
+    }
+
+    _setupOptionReplacementScrollbar() {
+        let optionsReplacer = this.content.querySelector('.options-replacer');
+        optionsReplacer.classList.add("custom-scrollbar");
+        optionsReplacer.classList.add("scrollable-content");
+        optionsReplacer.style.height = "200px";
+        optionsReplacer.style.overflowY = "scroll";
     }
 
     onResize(newWidth, newHeight) {
