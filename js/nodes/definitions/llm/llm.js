@@ -133,7 +133,7 @@ class LLMNode extends LLMAgentNode {
         let aiResponseDiv = document.createElement("div");
         aiResponseDiv.id = `LLMnoderesponseDiv-${index}`;  // Assign unique id to each aiResponseDiv
         aiResponseDiv.classList.add('custom-scrollbar', 'ai-response-div');
-        aiResponseDiv.setAttribute("style", "background: linear-gradient(to bottom, rgba(34, 34, 38, 0), #222226); color: inherit; border: none; border-color: #8882; width: 100%; max-height: 80%; height: 80%; overflow-y: auto; overflow-x: hidden; resize: none; word-wrap: break-word; user-select: none; line-height: 1.75;");
+        aiResponseDiv.setAttribute("style", "background: linear-gradient(to bottom, rgba(34, 34, 38, 0), #222226); color: inherit; border: none; border-color: #8882; width: 100%; max-height: 100%; height: 100%; flex-grow: 1; overflow-y: auto; overflow-x: hidden; resize: none; word-wrap: break-word; user-select: none; line-height: 1.75;");
 
         // Create the user prompt textarea
         let promptTextArea = document.createElement("textarea");

@@ -1700,6 +1700,11 @@ input[type=range] {
     pointer-events: none; /* Disables pointer events */
 }
 
+.ainodewrapperDiv {
+    display: flex;
+    flex-direction: column;
+}
+
 .color-picker-container {
     display: flex;
     justify-content: space-around;
@@ -1953,7 +1958,7 @@ textarea[id^='custom-instructions-textarea-'] {
     border: inset;
     border-color: #8882;
     width: 100%;
-    height: 70px;
+    height: 100%;
     overflow-y: hidden;
     padding: 10px;
     box-sizing: border-box;
@@ -2619,8 +2624,43 @@ svg.file-icon {
             background-position-y: 5px;
             padding-left: 30px !important;
         }
+
         .huggingface-model-option {
             background-image: url(/images/huggingface.png);
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position-x: 10px;
+            background-position-y: 5px;
+            padding-left: 30px !important;
+        }
+
+        .anthropic-model-option {
+            background-image: url(/images/anthropic.png);
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position-x: 10px;
+            background-position-y: 5px;
+            padding-left: 30px !important;
+        }
+
+        .google-model-option {
+            background-image: url(/images/gemini.svg);
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position-x: 10px;
+            background-position-y: 5px;
+            padding-left: 30px !important;
+        }
+        .mistral-model-option {
+            background-image: url(/images/mistral.png);
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position-x: 10px;
+            background-position-y: 5px;
+            padding-left: 30px !important;
+        }
+        .cohere-model-option {
+            background-image: url(/images/cohere.png);
             background-size: 16px;
             background-repeat: no-repeat;
             background-position-x: 10px;

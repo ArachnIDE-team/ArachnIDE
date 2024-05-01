@@ -8,36 +8,6 @@ async function appendWithDelay(content, node, delay) {
     });
 }
 
-async function handleStreamingForLLMnode(response, node) {
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder("utf-8");
-    let buffer = "";
-    let fullResponse = "";
-
-    while (true) {
-        const { value, done } = await reader.read();
-        if (done || !node.shouldContinue) break;
-
-        buffer += decoder.decode(value, { stream: true });
-
-        let contentMatch;
-        while ((contentMatch = buffer.match(/"content":"((?:[^\\"]|\\.)*)"/)) !== null) {
-            const content = JSON.parse('"' + contentMatch[1] + '"');
-            if (!node.shouldContinue) break;
-
-            if (content.trim() !== "[DONE]") {
-                await appendWithDelay(content, node, 30);
-            }
-            fullResponse += content; // append content to fullResponse
-            buffer = buffer.slice(contentMatch.index + contentMatch[0].length);
-        }
-    }
-    return fullResponse; // return the entire response
-}
-
-
-let previousContent = "";
-
 async function callchatLLMnode(messages, node, stream = false, selectedModel = null) {
     // Reset shouldContinue
     node.shouldContinue = true;
@@ -53,76 +23,26 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
     console.log("Messages sent to API:", messages);
     console.log("Token count for messages:", getTokenCount(messages));
 
-    let API_KEY;
-    if(selectedModel.startsWith("openai:")){
-        API_KEY = document.getElementById("OpenAI-api-key-input").value;
-    } else if(selectedModel.startsWith("huggingface:")) {
-        API_KEY = document.getElementById("HuggingFace-api-key-input").value;
-    }
-    // const API_KEY = document.getElementById("OpenAI-api-key-input").value;
+    const temperature = parseFloat(document.getElementById(`node-temperature-${node.index}`).value);
+    const maxTokens = parseInt(document.getElementById(`node-max-tokens-${node.index}`).value);
 
-    // const API_KEY = document.getElementById("HuggingFace-api-key-input").value;
-    // const API_KEY = document.getElementById("Anthropic-api-key-input").value;
-    // const API_KEY = document.getElementById("GoogleGemini-api-key-input").value;
-    // const API_KEY = document.getElementById("Mistral-api-key-input").value;
-    // const API_KEY = document.getElementById("Cohere-api-key-input").value;
-
-    if (!API_KEY) {
-        if (haltCheckbox) {
-            haltCheckbox.checked = true;
-        }
-        alert("Please enter your API key");
-        return;
-    }
-
-    let API_URL;
-
-    if(selectedModel.startsWith("openai:")){
-        API_URL = "https://api.openai.com/v1/chat/completions";
-        selectedModel = selectedModel.substr("openai:".length)
-    } else if(selectedModel.startsWith("huggingface:")) {
-        selectedModel = selectedModel.substr("huggingface:".length)
-        API_URL = "https://api-inference.huggingface.co/models/" + selectedModel;
-    }
-
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-    headers.append("Authorization", `Bearer ${API_KEY}`);
-
-    // Create a new AbortController each time the function is called
-    node.controller = new AbortController();
-    let signal = node.controller.signal;
-
-    // Add the signal to your fetch request options
-    const temperature = document.getElementById(`node-temperature-${node.index}`).value;
-    const max_tokens = document.getElementById(`node-max-tokens-${node.index}`).value;
     const modelSelect = document.getElementById('model-select');
     const globalModelInput = document.getElementById('model-input');
-
     const defaultModel = modelSelect.value === 'other' ? globalModelInput.value : modelSelect.value;
     const modelToUse = selectedModel && !selectedModel.startsWith('webllm:') ? selectedModel : defaultModel;
 
-
-    const requestOptions = {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify({
-            model: modelToUse,
-            messages: messages,
-            max_tokens: parseInt(max_tokens),
-            temperature: parseFloat(temperature),
-            stream: stream,
-        }),
-        signal: signal,
-    };
-
-   // console.log("Request Options: ", JSON.stringify(requestOptions, null, 2));
+    // Create a new AbortController each time the function is called
+    node.controller = new AbortController();
+    // Add the signal to your fetch request options
+    let signal = node.controller.signal;
+    let providerWrapper = ModelWrapper.getWrapper(modelToUse);
+    let fullResponse;
 
     try {
-        const response = await fetch(API_URL, requestOptions);
+        const response = await providerWrapper.sendChat(messages, temperature, maxTokens, signal, stream);
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Error calling ChatGPT API:", errorData);
+            console.error("Error calling " + providerWrapper.selectedOption + " API:", errorData);
             //node.aiResponseTextArea.value += "\nAn error occurred while processing your request.";
 
             if (haltCheckbox) {
@@ -138,15 +58,12 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
             return;
         }
 
-        if (stream) {
-            fullResponse = await handleStreamingForLLMnode(response, node);
+        if (providerWrapper.supportsStreaming() && stream) {
+            fullResponse = await providerWrapper.handleStreamingForLLMNode(response, node);
             //console.log("Full API Response:", fullResponse);
             return fullResponse
         } else {
-            const data = await response.json();
-            fullResponse = `${data.choices[0].message.content.trim()}`;
-            node.aiResponseTextArea.innerText += fullResponse;
-            node.aiResponseTextArea.dispatchEvent(new Event("input"));
+            fullResponse = await providerWrapper.handleResponseForLLMNode(response, node);
         }
 
     } catch (error) {
@@ -157,7 +74,7 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
             }
             console.log('Fetch request was aborted');
         } else {
-            console.error("Error calling ChatGPT API:", error);
+            console.error("Error calling " + providerWrapper.selectedOption + " API:", error);
             if (haltCheckbox) {
                 haltCheckbox.checked = true;
             }
@@ -174,10 +91,8 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
         <use xlink:href="#refresh-icon"></use>
     </svg>`;
     }
+    return fullResponse;
 }
-
-
-
 
 
 // Update handleUserPrompt, handleMarkdown, and renderCodeBlock to make the created divs draggable
@@ -320,59 +235,10 @@ class ResponseHandler {
             // Find the last occurrence of the prompt identifier in the trimmed content
             let lastPromptIndex = trimmedNewContent.lastIndexOf(`${PROMPT_IDENTIFIER}`);
             if (lastPromptIndex !== -1) {
-                let promptContent = trimmedNewContent.substring(lastPromptIndex + PROMPT_IDENTIFIER.length).trim();
-                let segments = promptContent.split('```');
-                for (let i = 0; i < segments.length; i++) {
-                    let segment = segments[i].trim();
-                    if (segment) {
-                        if (i % 2 === 0) {
-                            this.handleUserPrompt(segment); // Even segments are regular text
-                        } else {
-                            this.renderCodeBlock(segment, false, true); // Odd segments are code blocks within user prompts
-                        }
-                    }
-                }
-                newContent = '';
+                this.handlePrompt(trimmedNewContent, lastPromptIndex);
             } else {
-                if (this.inCodeBlock) {
-                    this.codeBlockContent += newContent;
-                    let endOfCodeBlockIndex = this.codeBlockContent.indexOf('```');
-                    if (endOfCodeBlockIndex !== -1) {
-                        let codeContent = this.codeBlockContent.substring(0, endOfCodeBlockIndex);
-                        this.renderCodeBlock(codeContent, true);
-
-                        this.codeBlockContent = '';
-                        this.codeBlockStartIndex = -1;
-                        this.inCodeBlock = false;
-
-                        newContent = this.codeBlockContent.substring(endOfCodeBlockIndex + 3);
-                    } else {
-                        let endOfLanguageStringIndex = this.codeBlockContent.indexOf('\n');
-                        if (endOfLanguageStringIndex !== -1) {
-                            let languageString = this.codeBlockContent.substring(0, endOfLanguageStringIndex).trim();
-                            if (languageString.length > 0) {
-                                this.currentLanguage = languageString;
-                            }
-                        }
-                        this.renderCodeBlock(this.codeBlockContent);
-                        newContent = '';
-                    }
-                }
-
-
-                if (newContent.length > 0) {
-                    let startOfCodeBlockIndex = trimmedNewContent.indexOf('```');
-                    if (startOfCodeBlockIndex !== -1) {
-                        let markdown = newContent.substring(0, startOfCodeBlockIndex);
-                        this.handleMarkdown(markdown);
-
-                        this.inCodeBlock = true;
-                        this.codeBlockStartIndex = this.previousContent.length + startOfCodeBlockIndex;
-                        this.codeBlockContent = trimmedNewContent.substring(startOfCodeBlockIndex + 3);
-                    } else if (!trimmedNewContent.startsWith('```') && !trimmedNewContent.endsWith('```')) {
-                        this.handleMarkdown(newContent);
-                    }
-                }
+                // Only handles correctly streams. For complete answer we did rewrite the "else" part (lastPromptIndex === -1)
+                this.handleAnswer(newContent, trimmedNewContent);
             }
 
             this.previousContent = content;
@@ -381,6 +247,99 @@ class ResponseHandler {
         } catch (error) {
             console.error('Error while processing markdown:', error);
         }
+    }
+
+    handleAnswer(newContent, trimmedNewContent) {
+        let splitContent = newContent.split('\n');
+        // if streaming, the answer will never contain both the code block start and the code block end (```)
+        let stream = splitContent.length < 3;
+        if (this.inCodeBlock && stream) {
+            this.codeBlockContent += newContent;
+            let endOfCodeBlockIndex = this.codeBlockContent.indexOf('```');
+            if (endOfCodeBlockIndex !== -1) {
+                let codeContent = this.codeBlockContent.substring(0, endOfCodeBlockIndex);
+                this.renderCodeBlock(codeContent, true);
+
+                this.codeBlockContent = '';
+                this.codeBlockStartIndex = -1;
+                this.inCodeBlock = false;
+
+                newContent = this.codeBlockContent.substring(endOfCodeBlockIndex + 3);
+            } else {
+                let endOfLanguageStringIndex = this.codeBlockContent.indexOf('\n');
+                if (endOfLanguageStringIndex !== -1) {
+                    let languageString = this.codeBlockContent.substring(0, endOfLanguageStringIndex).trim();
+                    if (languageString.length > 0) {
+                        this.currentLanguage = languageString;
+                    }
+                }
+                this.renderCodeBlock(this.codeBlockContent);
+                newContent = '';
+            }
+        } else if(!stream){
+            console.log("Handling complete answer (not chunked nor streamed):", newContent)
+            // Case for non-stream response
+            // We might find multiple code blocks in the answer.
+            let indexCursor = 0;
+            for(let lineContent of splitContent) {
+                let codeBlockIndex = lineContent.indexOf('```');
+                if(this.inCodeBlock) {
+                    if (codeBlockIndex !== -1){
+                        let codeContent = this.codeBlockContent;//.substring(indexCursor, endOfCodeBlockIndex);
+                        this.renderCodeBlock(codeContent, true);
+                        this.codeBlockContent = '';
+                        this.codeBlockStartIndex = -1;
+                        this.inCodeBlock = false;
+                    } else {
+                        this.codeBlockContent += lineContent + "\n";
+                    }
+                } else if(codeBlockIndex !== -1) {
+                    let startOfCodeBlockIndex = codeBlockIndex;
+                    this.inCodeBlock = true;
+                    this.codeBlockStartIndex = this.previousContent.length + indexCursor + startOfCodeBlockIndex;
+                    this.codeBlockContent = lineContent.substring(startOfCodeBlockIndex + 3);
+                    if (this.codeBlockContent.length > 0) {
+                        this.currentLanguage = this.codeBlockContent;
+                        this.codeBlockContent += "\n";
+                    }
+                    indexCursor = startOfCodeBlockIndex + 3;
+                } else {
+                    this.handleMarkdown(lineContent);
+                }
+            }
+            newContent = '';
+        }
+
+
+        if (newContent.length > 0) {
+            let startOfCodeBlockIndex = trimmedNewContent.indexOf('```');
+            if (startOfCodeBlockIndex !== -1) {
+                let markdown = newContent.substring(0, startOfCodeBlockIndex);
+                this.handleMarkdown(markdown);
+
+                this.inCodeBlock = true;
+                this.codeBlockStartIndex = this.previousContent.length + startOfCodeBlockIndex;
+                this.codeBlockContent = trimmedNewContent.substring(startOfCodeBlockIndex + 3);
+            } else if (!trimmedNewContent.startsWith('```') && !trimmedNewContent.endsWith('```')) {
+                this.handleMarkdown(newContent);
+            }
+        }
+    }
+
+    handlePrompt(trimmedNewContent, lastPromptIndex) {
+        let promptContent = trimmedNewContent.substring(lastPromptIndex + PROMPT_IDENTIFIER.length).trim();
+        let segments = promptContent.split('```');
+        for (let i = 0; i < segments.length; i++) {
+            let segment = segments[i].trim();
+            if (segment) {
+                if (i % 2 === 0) {
+                    this.handleUserPrompt(segment); // Even segments are regular text
+                } else {
+                    this.renderCodeBlock(segment, false, true); // Odd segments are code blocks within user prompts
+                }
+            }
+        }
+        // newContent = '';
     }
 
     handleUserPrompt(promptContent) {

@@ -1,6 +1,8 @@
 
 class AITab {
+
     constructor() {
+        document.addEventListener('DOMContentLoaded', this.setupModelSelectOptions.bind(this));
         document.addEventListener('DOMContentLoaded', this.updateCustomOptions.bind(this));
 
         document.getElementById('model-temperature').addEventListener('input', this.updateLabel.bind(this));
@@ -19,9 +21,17 @@ class AITab {
             document.getElementById('node-slider-label').innerText = 'Top ' + this.value + '\nnodes';
         }); // Element bound
     }
+    setupModelSelectOptions() {
+        let modelSelect = document.querySelector('select.custom-select.model-selector#model-select')
+        globalModelOptions.forEach((option, index) => {
+            modelSelect.add(option, index);
+        });
+    }
 
     // TO-DO: Review
     setupCustomDropdown(select, aiNode = false) {
+
+
         // Create the main custom dropdown container
         let selectReplacer = document.createElement('div');
         selectReplacer.className = 'select-replacer closed'; // add 'closed' class by default
@@ -322,19 +332,19 @@ class AITab {
 
         document.getElementById('Wolfram-api-key-input').value = '';
     }
-
+    // TO-DO: Review
     autoGrow(event) {
         const textarea = event.target;
         // Temporarily make the height 'auto' so the scrollHeight is not affected by the current height
-        textarea.style.height = 'auto';
-        let maxHeight = 200;
-        if (textarea.scrollHeight < maxHeight) {
-            textarea.style.height = textarea.scrollHeight + 'px';
-            textarea.style.overflowY = 'hidden';
-        } else {
-            textarea.style.height = maxHeight + 'px';
-            textarea.style.overflowY = 'auto';
-        }
+        // textarea.style.height = 'auto';
+        // let maxHeight = 200;
+        // if (textarea.scrollHeight < maxHeight) {
+        //     textarea.style.height = textarea.scrollHeight + 'px';
+        //     textarea.style.overflowY = 'hidden';
+        // } else {
+        //     textarea.style.height = maxHeight + 'px';
+        //     textarea.style.overflowY = 'auto';
+        // }
     }
 
 }

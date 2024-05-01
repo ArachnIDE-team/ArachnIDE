@@ -87,4 +87,22 @@ let frontendTerminal = createJavascriptTerminalNode("Frontend terminal");
 
 let backendTerminal = createNodeJSTerminalNode("Backend terminal");
 
+window.llmNode = createLLMNode("LLM for testing purposes")
+// // Let's use a mutation observer to see what's going on
+// const targetNode = llmNode.localLLMSelect;
+// // Options for the observer (which mutations to observe)
+// const config = { attributes: false, childList: true, subtree: true };
+// const callback = (mutationList, observer) => {
+//     for (const mutation of mutationList) {
+//         if (mutation.type === "childList") {
+//             console.log("A child node has been added or removed.");
+//         }
+//     }
+// };
+// // Create an observer instance linked to the callback function
+// const observer = new MutationObserver(callback);
+// // Start observing the target node for configured mutations
+// observer.observe(targetNode, config);
+llmNode.promptTextArea.value = "Write two different JS code snippets, in two separate fenced codeblocks. Write a small explanation before each code fence."
+
 dropdown.menuButton.dispatchEvent(new MouseEvent("click"));

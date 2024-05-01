@@ -103,7 +103,7 @@ class LLMOldNode extends WindowedNode {
         let aiResponseDiv = document.createElement("div");
         aiResponseDiv.id = `LLMnoderesponseDiv-${index}`;  // Assign unique id to each aiResponseDiv
         aiResponseDiv.classList.add('custom-scrollbar', 'ai-response-div');
-        aiResponseDiv.setAttribute("style", "background: linear-gradient(to bottom, rgba(34, 34, 38, 0), #222226); color: inherit; border: none; border-color: #8882; width: 100%; max-height: 80%; height: 80%; overflow-y: auto; overflow-x: hidden; resize: none; word-wrap: break-word; user-select: none; line-height: 1.75;");
+        aiResponseDiv.setAttribute("style", "background: linear-gradient(to bottom, rgba(34, 34, 38, 0), #222226); color: inherit; border: none; border-color: #8882; width: 100%; max-height: 100%; height: 100%; flex-grow: 1; overflow-y: auto; overflow-x: hidden; resize: none; word-wrap: break-word; user-select: none; line-height: 1.75;");
 
         // Create the user prompt textarea
         let promptTextArea = document.createElement("textarea");
@@ -288,32 +288,11 @@ class LLMOldNode extends WindowedNode {
 
         let localLLMCheckbox = document.getElementById("localLLM");
 
-        // Create an array to store the options
-        let options = [
-            new Option('Default', 'Default', false, true),
-            new Option('Red Pajama 3B f32', 'webllm:RedPajama-INCITE-Chat-3B-v1-q4f32_0', false, false),
-            new Option('Vicuna 7B f32', 'webllm:vicuna-v1-7b-q4f32_0', false, false),
-            new Option('Llama 2 7B f32', 'webllm:Llama-2-7b-chat-hf-q4f32_1', false, false),
-            //new Option('Llama 2 13B f32', 'webllm:Llama-2-13b-chat-hf-q4f32_1', false, false),
-            new Option('Llama 2 70B f16', 'webllm:Llama-2-70b-chat-hf-q4f16_1', false, false),
-            //new Option('WizardCoder 15B f32', 'webllm:WizardCoder-15B-V1.0-q4f32_1', false, false),
-            new Option('GPT-3.5-turbo', 'openai:gpt-3.5-turbo', false, false),
-            //new Option('GPT-3.5-turbo-16k', 'openai:gpt-3.5-turbo-16k', false, false),
-            //new Option('GPT-3.5-turbo-0613', 'openai:gpt-3.5-turbo-0613', false, false),
-            new Option('GPT-3.5-16k-0613', 'openai:gpt-3.5-turbo-16k-0613', false, false),
-            new Option('GPT-4', 'openai:gpt-4', false, false),
-            new Option('GPT-4-0613', 'openai:gpt-4-0613', false, false),
-            new Option('GPT-4-vision', 'openai:gpt-4-vision-preview', false, false),
-            new Option('GPT-3.5-1106', 'openai:gpt-3.5-turbo-1106', false, false),
-            new Option('GPT-4-1106', 'openai:gpt-4-1106-preview', false, false)
-        ];
-
-        // Add options to the select
+        let options = [...localModelOptions]; // copy to avoid changing the original array
         options.forEach((option, index) => {
-            if(option.value.startsWith("openai:")) option.className = "openai-model-option"
+            if(index === 0) option.selected = true;
             LocalLLMSelect.add(option, index);
         });
-
 
         // Initial setup based on checkbox state
         options.forEach((option) => {
@@ -758,7 +737,7 @@ class LLMOldNode extends WindowedNode {
             const customOptions = document.querySelectorAll('.options-replacer div');
             customOptions.forEach((customOption) => {
                 const value = customOption.getAttribute('data-value');
-                if (value === 'Default' || !option.value.startsWith('webllm:')) {
+                if (value === 'Default' || !value.startsWith('webllm:')) {
                     customOption.style.display = 'block';  // Always show
                 } else {
                     customOption.style.display = this.checked ? 'block' : 'none';  // Show or hide based on checkbox
@@ -909,7 +888,7 @@ class LLMOldNode extends WindowedNode {
         // If aiNodeWrapperDiv exists, set its dimensions
         if (aiNodeWrapperDiv) {
             aiNodeWrapperDiv.style.width = `${newWidth}px`;
-            aiNodeWrapperDiv.style.height = `${newHeight}px`;
+            aiNodeWrapperDiv.style.height = `${newHeight - 30}px`;
         }
     }
 
@@ -1252,7 +1231,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
         const haltCheckbox = this.haltCheckbox;
 
         // Local LLM call
-        if (document.getElementById("localLLM").checked && selectedModel !== 'OpenAi') {
+        if (document.getElementById("localLLM").checked && selectedModel !== 'Default') {
             window.generateLocalLLMResponse(this, messages)
                 .then(async (fullMessage) => {
                     this.aiResponding = false;

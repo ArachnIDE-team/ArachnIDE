@@ -2,11 +2,12 @@ import { spawn } from 'child_process';
 
 // Define your servers with their start commands
 const servers = [
-    { dir: './webscrape', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
     { dir: './wikisearch', cmd: 'python', args: ['novelty.py'] },
+    { dir: './llmutils', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
     { dir: './wolfram-alpha', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
-    { dir: './filemanager', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
     { dir: './nodejs', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
+    { dir: './webscrape', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
+    { dir: './filemanager', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
 ];
 
 // Start each server

@@ -398,19 +398,6 @@
                             <label for="model-select" style="margin-right: 10px;">Select Model:</label>
                             <div class="dropdown-container">
                                 <select id="model-select" class="model-selector custom-select" onchange="checkOtherModel(this)">
-                                    <option value="openai:gpt-4" class="openai-model-option"> GPT-4</option>
-                                    <option value="openai:gpt-3.5-turbo-1106" class="openai-model-option">GPT-3.5-1106</option>
-                                    <option value="openai:gpt-4-1106-preview" class="openai-model-option">GPT-4-1106</option>
-                                    <option value="openai:gpt-4-0613" class="openai-model-option">GPT-4-0613</option>
-                                    <option value="openai:gpt-4-vision-preview" class="openai-model-option">GPT-4-vision</option>
-                                    <option value="openai:gpt-3.5-turbo-16k-0613" class="openai-model-option">GPT-3.5-16k-0613</option>
-                                    <option value="openai:gpt-3.5-turbo" class="openai-model-option">GPT-3.5-turbo</option>
-                                    <option value="openai:gpt-3.5-turbo-16k" class="openai-model-option">GPT-3.5-16k</option>
-                                    <option value="openai:gpt-3.5-turbo-0613" class="openai-model-option">GPT-3.5-0613</option>
-
-                                    <option value="huggingface:bigscience/bloom" class="huggingface-model-option">BigScience Bloom</option>
-                                    <option value="huggingface:meta-llama/Meta-Llama-3-8B" class="huggingface-model-option">Meta Llama 3 8B</option>
-                                    <option value="huggingface:mistralai/Mistral-7B-Instruct-v0.2" class="huggingface-model-option">Mistral 7B Instruct v0.2</option>
                                     <!-- <option value="other">Other...</option> -->
                                 </select>
                                 <input id="model-input" class="model-input" style="display: none;" placeholder="Enter model name">
@@ -908,6 +895,20 @@
     <script src="js/filesystem/filemanagerapi.js"></script>
     <script src="js/nodejs/nodejsreplapi.js"></script>
     <script src="js/filesystem/browserified_path.js"></script>
+
+    <!-- Import before AI tab, contains options-->
+    <script src="js/ai/models.js"></script>
+    <!-- test FE Vanilla JS Tokenizers: would have been cool, unfortunately it doesent let you login to HF,
+     so it give error when trying to import a private Tokenizer (see https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/93)
+     Update: it's the intended behavior: read first warning: https://huggingface.co/docs/transformers.js/guides/private -->
+<!--    <script type="module">-->
+<!--        import { AutoTokenizer, env  } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';-->
+<!--        window.AutoTokenizer = AutoTokenizer;-->
+<!--        window.hfENV = env;-->
+<!--        env.allowRemoteModels = true;-->
+<!--    </script>-->
+    <!-- TO-DO: as BE service (better python - flask) -->
+    <!-- Done as Node.JS-->
 
     <script src="js/dropdown/diagramfile.js"></script>
     <script src="js/dropdown/tabs/notes.js"></script>
