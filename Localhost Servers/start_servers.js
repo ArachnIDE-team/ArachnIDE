@@ -3,7 +3,7 @@ import { spawn } from 'child_process';
 // Define your servers with their start commands
 const servers = [
     { dir: './wikisearch', cmd: 'python', args: ['novelty.py'] },
-    { dir: './llmutils', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
+    { dir: './llmutils', cmd: 'python', args: ['index.py'] },
     { dir: './wolfram-alpha', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
     { dir: './nodejs', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },
     { dir: './webscrape', cmd: 'npm', args: ['install', '&&', 'npm', 'start'] },

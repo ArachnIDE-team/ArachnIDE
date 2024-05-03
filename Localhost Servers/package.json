@@ -11,5 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "pdf-parse": "^1.1.1"
+  },
+  "engines": {
+    "python": ">=3.6"
   }
 }

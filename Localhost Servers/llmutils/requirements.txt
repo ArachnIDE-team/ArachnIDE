@@ -1,0 +1,7 @@
+flask
+flask_cors
+transformers
+tiktoken
+cohere
+google-cloud-aiplatform
+mistral-common
