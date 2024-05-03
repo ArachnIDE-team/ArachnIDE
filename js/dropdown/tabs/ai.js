@@ -61,6 +61,7 @@ class AITab {
 
         this.addEventListenersToCustomDropdown(select, aiNode);
 
+        return container;
     }
 
     // TO-DO: Review

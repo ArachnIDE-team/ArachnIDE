@@ -140,6 +140,12 @@ class LLMNode extends LLMAgentNode {
         promptTextArea.id = `nodeprompt-${index}`;
         promptTextArea.classList.add('custom-scrollbar', 'custom-textarea'); // Add the class here
 
+
+        let tokenCounterDiv = document.createElement("div");
+        tokenCounterDiv.id = `tokencounter-${index}`;
+        tokenCounterDiv.className = "token-counter-overlay";
+        tokenCounterDiv.innerHTML = "&#128207; Tokens";
+
         // Create the send button
         let sendButton = document.createElement("button");
         sendButton.type = "submit";
@@ -226,6 +232,7 @@ class LLMNode extends LLMAgentNode {
         // Append statusIconsContainer to the promptDiv instead of wrapperDiv
         promptDiv.appendChild(statusIconsContainer);
         promptDiv.appendChild(promptTextArea);
+        promptDiv.appendChild(tokenCounterDiv);
         promptDiv.appendChild(buttonDiv);
 
         // Wrap elements in a div
@@ -373,17 +380,6 @@ class LLMNode extends LLMAgentNode {
         // Logic for dynamic model switching based on connected nodes
         const hasImageNodes = allConnectedNodes.some(node => node.isImageNode);
         selectedModel = determineModel(LocalLLMSelectValue, hasImageNodes);
-
-        function determineModel(LocalLLMValue, hasImageNodes) {
-            if (hasImageNodes) {
-                return 'gpt-4-vision-preview'; // Switch to vision model if image nodes are present
-            } else if (LocalLLMValue === 'Default') {
-                const globalModelSelect = document.getElementById('model-select');
-                return globalModelSelect.value; // Use global model selection
-            } else {
-                return LocalLLMValue; // Use the local model selection
-            }
-        }
 
         const isVisionModel = selectedModel.includes('gpt-4-vision');
         const isAssistant = selectedModel.includes('1106');
@@ -677,6 +673,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
                     if (this.shouldContinue && this.shouldAppendQuestion && hasConnectedAiNode && !this.aiResponseHalted) {
                         await aiNodeMessageLoop.questionConnectedAiNodes(fullMessage);
                     }
+                    this._updateModelInfoAndCount();
                 })
                 .catch((error) => {
                     if (haltCheckbox) {
@@ -684,10 +681,11 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
                     }
                     console.error(`An error occurred while getting response: ${error}`);
                     aiErrorIcon.style.display = 'block';
+                    this._updateModelInfoAndCount();
                 });
         } else {
             // AI call
-            callchatLLMnode(messages, this, true, selectedModel)
+            callchatLLMnode(messages, this, this.streamCheckbox.checked, selectedModel)
                 .finally(async () => {
                     console.log("callchatLLMnode.finally, this:", this)
                     this.aiResponding = false;
@@ -703,6 +701,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
 
                         await aiNodeMessageLoop.questionConnectedAiNodes(textToSend);
                     }
+                    this._updateModelInfoAndCount();
                 })
                 .catch((error) => {
                     console.log("callchatLLMnode.catch, this:", this)
@@ -711,6 +710,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
                     }
                     console.error(`An error occurred while getting response: ${error}\n${error.stack}`);
                     aiErrorIcon.style.display = 'block';
+                    this._updateModelInfoAndCount();
                 });
         }
     }

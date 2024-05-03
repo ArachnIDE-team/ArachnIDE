@@ -2616,54 +2616,74 @@ svg.file-icon {
     margin-left: 3px;
 }
 
-        .openai-model-option {
-            background-image: url(/images/openai.png);
-            background-size: 16px;
-            background-repeat: no-repeat;
-            background-position-x: 10px;
-            background-position-y: 5px;
-            padding-left: 30px !important;
-        }
+.token-counter-overlay{
+    position: absolute;
+    right: 35px;
+    bottom: 5px;
+    font-variant: small-caps;
+    font-size: 14px;
+    font-weight: 900;
+}
 
-        .huggingface-model-option {
-            background-image: url(/images/huggingface.png);
-            background-size: 16px;
-            background-repeat: no-repeat;
-            background-position-x: 10px;
-            background-position-y: 5px;
-            padding-left: 30px !important;
-        }
+.stream-checkbox-container{
+    margin-top: 35px;
+}
 
-        .anthropic-model-option {
-            background-image: url(/images/anthropic.png);
-            background-size: 16px;
-            background-repeat: no-repeat;
-            background-position-x: 10px;
-            background-position-y: 5px;
-            padding-left: 30px !important;
-        }
+.stream-checkbox-container > input[type="checkbox"]:disabled + label {
+    color: #5e5e5e;
+    text-decoration: line-through;
+}
 
-        .google-model-option {
-            background-image: url(/images/gemini.svg);
-            background-size: 16px;
-            background-repeat: no-repeat;
-            background-position-x: 10px;
-            background-position-y: 5px;
-            padding-left: 30px !important;
-        }
-        .mistral-model-option {
-            background-image: url(/images/mistral.png);
-            background-size: 16px;
-            background-repeat: no-repeat;
-            background-position-x: 10px;
-            background-position-y: 5px;
-            padding-left: 30px !important;
-        }
-        .cohere-model-option {
-            background-image: url(/images/cohere.png);
-            background-size: 16px;
-            background-repeat: no-repeat;
-            background-position-x: 10px;
-            background-position-y: 5px;
-            padding-left: 30px !important;
-        }
+.openai-model-option {
+    background-image: url(/images/openai.png);
+    background-size: 16px;
+    background-repeat: no-repeat;
+    background-position-x: 10px;
+    background-position-y: 5px;
+    padding-left: 30px !important;
+}
+
+.huggingface-model-option {
+    background-image: url(/images/huggingface.png);
+    background-size: 16px;
+    background-repeat: no-repeat;
+    background-position-x: 10px;
+    background-position-y: 5px;
+    padding-left: 30px !important;
+}
+
+.anthropic-model-option {
+    background-image: url(/images/anthropic.png);
+    background-size: 16px;
+    background-repeat: no-repeat;
+    background-position-x: 10px;
+    background-position-y: 5px;
+    padding-left: 30px !important;
+}
+
+.google-model-option {
+    background-image: url(/images/gemini.svg);
+    background-size: 16px;
+    background-repeat: no-repeat;
+    background-position-x: 10px;
+    background-position-y: 5px;
+    padding-left: 30px !important;
+}
+
+.mistral-model-option {
+    background-image: url(/images/mistral.png);
+    background-size: 16px;
+    background-repeat: no-repeat;
+    background-position-x: 10px;
+    background-position-y: 5px;
+    padding-left: 30px !important;
+}
+
+.cohere-model-option {
+    background-image: url(/images/cohere.png);
+    background-size: 16px;
+    background-repeat: no-repeat;
+    background-position-x: 10px;
+    background-position-y: 5px;
+    padding-left: 30px !important;
+}

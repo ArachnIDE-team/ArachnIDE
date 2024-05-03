@@ -8,6 +8,25 @@ async function appendWithDelay(content, node, delay) {
     });
 }
 
+
+function determineModel(LocalLLMValue, hasImageNodes) {
+    if (hasImageNodes) {
+        return 'gpt-4-vision-preview'; // Switch to vision model if image nodes are present
+    } else if (LocalLLMValue === 'Default') {
+        const globalModelSelect = document.getElementById('model-select');
+        return globalModelSelect.value; // Use global model selection
+    } else {
+        return LocalLLMValue; // Use the local model selection
+    }
+}
+
+function getModelToUse(selectedModel) {
+    const modelSelect = document.getElementById('model-select');
+    const globalModelInput = document.getElementById('model-input');
+    const defaultModel = modelSelect.value === 'other' ? globalModelInput.value : modelSelect.value;
+    return  selectedModel && !selectedModel.startsWith('webllm:') ? selectedModel : defaultModel;;
+}
+
 async function callchatLLMnode(messages, node, stream = false, selectedModel = null) {
     // Reset shouldContinue
     node.shouldContinue = true;
@@ -25,11 +44,7 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
 
     const temperature = parseFloat(document.getElementById(`node-temperature-${node.index}`).value);
     const maxTokens = parseInt(document.getElementById(`node-max-tokens-${node.index}`).value);
-
-    const modelSelect = document.getElementById('model-select');
-    const globalModelInput = document.getElementById('model-input');
-    const defaultModel = modelSelect.value === 'other' ? globalModelInput.value : modelSelect.value;
-    const modelToUse = selectedModel && !selectedModel.startsWith('webllm:') ? selectedModel : defaultModel;
+    const modelToUse = getModelToUse(selectedModel);
 
     // Create a new AbortController each time the function is called
     node.controller = new AbortController();
@@ -58,7 +73,7 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
             return;
         }
 
-        if (providerWrapper.supportsStreaming() && stream) {
+        if (stream) {
             fullResponse = await providerWrapper.handleStreamingForLLMNode(response, node);
             //console.log("Full API Response:", fullResponse);
             return fullResponse
@@ -154,14 +169,17 @@ class ResponseHandler {
             const systemPromptDiv = child.querySelector('.system-prompt');
             if (userPromptDiv) {
                 // Initialize the user prompt div found within the child
-                saveObj.push({role: "user", message: userPromptDiv.innerText})
+                // saveObj.push({role: "user", message: userPromptDiv.innerText})
+                saveObj.push({role: "user", content: userPromptDiv.innerText})
             } else if(systemPromptDiv){
-                saveObj.push({role: "system", message: systemPromptDiv.innerText})
+                // saveObj.push({role: "system", message: systemPromptDiv.innerText})
+                saveObj.push({role: "system", content: systemPromptDiv.innerText})
             } else if (child.classList.contains('response-wrapper')) {
                 // For AI responses, find the .ai-response div within the wrapper
                 const responseDiv = child.querySelector('.ai-response');
                 if (responseDiv) {
-                    saveObj.push({role: "assistant", message: responseDiv.innerText})
+                    // saveObj.push({role: "assistant", message: responseDiv.innerText})
+                    saveObj.push({role: "assistant", content: responseDiv.innerText})
                 }
             } else if (child.classList.contains('code-block-container')) {
                 // For code blocks, pass the container div
@@ -277,7 +295,7 @@ class ResponseHandler {
                 newContent = '';
             }
         } else if(!stream){
-            console.log("Handling complete answer (not chunked nor streamed):", newContent)
+            // console.log("Handling complete answer (not chunked nor streamed):", newContent)
             // Case for non-stream response
             // We might find multiple code blocks in the answer.
             let indexCursor = 0;

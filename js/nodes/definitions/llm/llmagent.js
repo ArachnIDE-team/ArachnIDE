@@ -58,8 +58,8 @@ class LLMAgentNode extends WindowedNode {
                     responseHandler.currentLanguage = message.language;
                     responseHandler.renderCodeBlock("\n" + message.code, true);
                 }
-
             }
+            this._updateModelInfoAndCount();
         }.bind(this)
         if(this.initialized){
             setChat(value);
@@ -113,6 +113,12 @@ class LLMAgentNode extends WindowedNode {
         let promptTextArea = document.createElement("textarea");
         promptTextArea.id = `nodeprompt-${index}`;
         promptTextArea.classList.add('custom-scrollbar', 'custom-textarea'); // Add the class here
+
+        let tokenCounterDiv = document.createElement("div");
+        tokenCounterDiv.id = `tokencounter-${index}`;
+        tokenCounterDiv.className = "token-counter-overlay";
+        tokenCounterDiv.innerHTML = "&#128207; Tokens";
+
 
         // Create the send button
         let sendButton = document.createElement("button");
@@ -200,6 +206,7 @@ class LLMAgentNode extends WindowedNode {
         // Append statusIconsContainer to the promptDiv instead of wrapperDiv
         promptDiv.appendChild(statusIconsContainer);
         promptDiv.appendChild(promptTextArea);
+        promptDiv.appendChild(tokenCounterDiv);
         promptDiv.appendChild(buttonDiv);
 
         // Wrap elements in a div
@@ -348,6 +355,7 @@ class LLMAgentNode extends WindowedNode {
         }
         // console.log("INDEX: ", index, "this.index:", this.index);
 
+        this.countTokenTimeout = -1;
         this.afterInit();
     }
 
@@ -361,11 +369,14 @@ class LLMAgentNode extends WindowedNode {
 
         this.promptTextArea = this.content.querySelector('[id^="nodeprompt-"]');
 
+        this.tokenCounterDiv = this.content.querySelector('[id^="tokencounter-"]');
+
         this.sendButton = this.content.querySelector('[id^="prompt-form-"]');
 
         this.regenerateButton = this.content.querySelector('#prompt-form');
 
         this.localLLMSelect = this.content.querySelector(`[id^="dynamicLocalLLMselect-"]`);
+
 
         // Setup event listeners
         this._setupAiResponseTextAreaListener();
@@ -375,8 +386,12 @@ class LLMAgentNode extends WindowedNode {
         this._setupAiNodeRegenerateButtonListeners();
         this._setupAiNodeSettingsButtonListeners();
         this._setupAiNodeLocalLLMDropdownListeners();
+        this._setupAiNodeLocalLLMSelectListeners();
         this._setupAiNodeSliderListeners()
         this._setupAiNodeCustomInstructionsListeners()
+
+
+        this.streamCheckbox = this.content.querySelector(`[id^="streamLLM-"]`);
 
         // Functions
 
@@ -394,7 +409,7 @@ class LLMAgentNode extends WindowedNode {
         // console.log( "this.index:", this.index);
 
         this._setupOptionReplacementScrollbar();
-
+        this._updateModelInfoAndCount(2000);
         super.afterInit();
     }
 
@@ -563,7 +578,50 @@ class LLMAgentNode extends WindowedNode {
             }
         });
 
+        promptTextArea.addEventListener('input', (e) => {
+            this._updateModelInfoAndCount();
+        });
+
         // ... other event listeners for promptTextArea ...
+    }
+
+    _updateModelInfoAndCount(delay=500){
+        let performUpdate = () => {
+            // console.log("Message token count start")
+            this.tokenCounterDiv.innerHTML = "&#128207; Tokens";
+            let LocalLLMSelect = document.getElementById(this.LocalLLMSelectID);
+            const LocalLLMSelectValue = LocalLLMSelect.value;
+            const modelToUse = getModelToUse(determineModel(LocalLLMSelectValue));
+            let modelWrapper = ModelWrapper.getWrapper(modelToUse);
+            if(modelWrapper.supportsStreaming()) {
+                this.streamCheckbox.removeAttribute("disabled");
+                this.streamCheckbox.checked = true;
+            } else {
+                this.streamCheckbox.setAttribute("disabled", "");
+                this.streamCheckbox.checked = false;
+            }
+            let messages = this.chat;
+            messages.push({role: "user", content: this.promptTextArea.value})
+            modelWrapper.getTokenCount(messages).then((result) => {
+                const { count, approximation, model_info } = result;
+                this.tokenCounterDiv.innerText = (approximation ? "≈" : "") + count + " Tokens"
+                if(model_info !== null) {
+                    this.content.querySelector("div.select-replacer").title = modelToUse.substring(modelWrapper.constructor.PREFIX.length) + " (" + modelWrapper.constructor.PREFIX.replace(":", "") + ")\n" +
+                        "Input cost: $" + (model_info.input_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
+                        "Output cost: $" + (model_info.output_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
+                        "Max tokens: " + Math.max(model_info.max_input_tokens, model_info.max_input_tokens ) + " Tok";
+                    // Update also token slider and context slider
+                } else {
+                    this.content.querySelector("div.select-replacer").removeAttribute("title")
+                }
+                console.log("Message token count: ", count, " for messages: ", messages)
+            });
+            this.countTokenTimeout = -1;
+        }
+        if(this.countTokenTimeout !== -1) {
+            clearTimeout(this.countTokenTimeout); // restart timeout
+        }
+        this.countTokenTimeout = setTimeout(performUpdate, delay);
     }
 
     _setupAiNodeSendButtonListeners() {
@@ -720,9 +778,30 @@ class LLMAgentNode extends WindowedNode {
                     customOption.style.display = this.checked ? 'block' : 'none';  // Show or hide based on checkbox
                 }
             });
+            this._updateModelInfoAndCount();
         });
 
-        dropdown.aiTab.setupCustomDropdown(selectElement, true);
+        let selectContainer = dropdown.aiTab.setupCustomDropdown(selectElement, true);
+
+        let streamCheckboxDiv = document.createElement('div');
+        streamCheckboxDiv.className = 'stream-checkbox-container';
+        let streamCheckbox = document.createElement('input');
+        streamCheckbox.type = "checkbox"
+        streamCheckbox.id = "streamLLM-" + this.index;
+        streamCheckbox.setAttribute("disabled","")
+        let streamCheckboxLabel = document.createElement('label')
+        streamCheckboxLabel.innerText = "Stream";
+        streamCheckboxLabel.setAttribute("for",  "streamLLM-" + this.index);
+        streamCheckboxDiv.append(streamCheckbox, streamCheckboxLabel)
+        selectContainer.append(streamCheckboxDiv);
+
+    }
+
+    _setupAiNodeLocalLLMSelectListeners() {
+        let selectElement = this.localLLMSelect;
+        selectElement.addEventListener('change', () => {
+            this._updateModelInfoAndCount();
+        });
     }
 
     _setupAiNodeSliderListeners() {
@@ -880,17 +959,6 @@ class LLMAgentNode extends WindowedNode {
         // Logic for dynamic model switching based on connected nodes
         selectedModel = determineModel(LocalLLMSelectValue, false);
 
-        function determineModel(LocalLLMValue, hasImageNodes) {
-            if (hasImageNodes) {
-                return 'gpt-4-vision-preview'; // Switch to vision model if image nodes are present
-            } else if (LocalLLMValue === 'Default') {
-                const globalModelSelect = document.getElementById('model-select');
-                return globalModelSelect.value; // Use global model selection
-            } else {
-                return LocalLLMValue; // Use the local model selection
-            }
-        }
-
         const isVisionModel = selectedModel.includes('gpt-4-vision');
         const isAssistant = selectedModel.includes('1106');
         console.log('Selected Model:', selectedModel, "Vision", isVisionModel, "Assistant", isAssistant);
@@ -967,7 +1035,7 @@ class LLMAgentNode extends WindowedNode {
                 });
         } else {
             // AI call
-            callchatLLMnode(messages, this, true, selectedModel)
+            callchatLLMnode(messages, this, this.streamCheckbox.checked, selectedModel)
                 .finally(async () => {
                     this.aiResponding = false;
                     aiLoadingIcon.style.display = 'none';

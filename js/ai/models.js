@@ -21,9 +21,9 @@ window.modelOptions = () => [
     new Option('GPT-4-vision', 'openai:gpt-4-vision-preview', false, false),
     new Option('GPT-3.5-1106', 'openai:gpt-3.5-turbo-1106', false, false),
     new Option('GPT-4-1106', 'openai:gpt-4-1106-preview', false, false),
-    new Option('BigScience Bloom', 'huggingface:bigscience/bloom', false, false),
 
     // HuggingFace
+    new Option('BigScience Bloom', 'huggingface:bigscience/bloom', false, false),
     new Option('Meta Llama 3 8B', 'huggingface:meta-llama/Meta-Llama-3-8B', false, false),
     new Option('Meta Llama 3 8B', 'huggingface:meta-llama/Meta-Llama-3-8B-Instruct', false, false),
     new Option('Meta Code Llama 34B', 'huggingface:codellama/CodeLlama-34b-Instruct-hf', false, false),
@@ -99,6 +99,7 @@ class ModelWrapper {
     // Encapsulates the complexity of message/chat/instruction handling, as well as providing the right keys etc...
     constructor(selectedOption) {
         this.selectedOption = selectedOption;
+        this.failedAttempts = 0;
     }
 
     getAPIKey(){
@@ -113,6 +114,52 @@ class ModelWrapper {
         return {};
     }
 
+    async getTokenCount(messages){
+        let text = "";
+        for(let message of messages) {
+            text += (message.content || message.message || message.code) + "\n";
+        }
+        let response = await fetch("http://localhost:1000/count-tokens",{
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                model: this.constructor.PREFIX + this.selectedOption,
+                text
+            })
+        })
+        if(!response.ok && this.failedAttempts === 0) {
+            this.failedAttempts = 1;
+            return await new Promise((resolve, reject) =>{
+                this.setAPIKeyAndRetry(() => {
+                    this.getTokenCount(messages).then((result) => {
+                        resolve(result);
+                    });
+                })
+            })
+        }
+        this.failedAttempts = 0;
+        // const { count, approximation, model_info } = (await response.json());
+        // return  (approximation ? "≈" : "") + count;
+        return (await response.json());
+    }
+
+    setAPIKeyAndRetry(callback){
+        let provider = this.constructor.PREFIX.replace(":", "")
+        let key = this.getAPIKey();
+        fetch("http://localhost:1000/set-api-key", {
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                provider,
+                key
+            })
+        }).then(callback)
+    }
+
     static getWrapper(selectedOption){
         for(let modelWrapper of modelWrappers) {
             if(selectedOption.startsWith(modelWrapper.PREFIX)) {
@@ -125,6 +172,7 @@ class ModelWrapper {
     supportsStreaming(){
         return false;
     }
+
     async handleStreamingForLLMNode(response, node) {
         throw new Error("Streaming not supported")
     }
@@ -284,7 +332,6 @@ class HuggingFaceModelWrapper extends ModelWrapper {
     }
 }
 
-// CORS errors, review maybe add proxy
 class AnthropicModelWrapper extends ModelWrapper {
     static PREFIX = "anthropic:"
     static CLASSNAME = "anthropic-model-option"
@@ -298,15 +345,12 @@ class AnthropicModelWrapper extends ModelWrapper {
     }
 
     getAPIEndpoint(){
-        return "https://api.anthropic.com/v1/messages"
+        return "http://localhost:1000/anthropic-proxy"
     }
 
     async sendChat(messages, temperature, maxTokens, abortSignal, stream){
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
-        headers.append("anthropic-version", "2023-06-01");
-        headers.append("anthropic-beta", "messages-2023-12-15");
-        headers.append("x-api-key", this.getAPIKey());
 
         messages = messages.filter((message) => message.role !== "system")
 
@@ -322,7 +366,6 @@ class AnthropicModelWrapper extends ModelWrapper {
             }),
             // signal: abortSignal,
         };
-
         return await fetch(this.getAPIEndpoint(), requestOptions);
     }
 
@@ -490,9 +533,26 @@ class MistralModelWrapper extends ModelWrapper {
         return await fetch(this.getAPIEndpoint(), requestOptions);
     }
 
+    async getTokenCount(messages){
+        let response = await fetch("http://localhost:1000/count-tokens",{
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                model: this.constructor.PREFIX + this.selectedOption,
+                messages
+            })
+        })
+
+        // const { count, approximation } = (await response.json());
+        // return  (approximation ? "≈" : "") + count;
+        return (await response.json());
+
+    }
+
     supportsStreaming() {
-        return false;
-        // return true;
+        return true;
     }
 
     async handleStreamingForLLMNode(response, node) {
@@ -500,6 +560,7 @@ class MistralModelWrapper extends ModelWrapper {
         const decoder = new TextDecoder("utf-8");
         let buffer = "";
         let fullResponse = "";
+        let contentAccumulator = "";
 
         while (true) {
             const { value, done } = await reader.read();
@@ -508,14 +569,27 @@ class MistralModelWrapper extends ModelWrapper {
             buffer += decoder.decode(value, { stream: true });
 
             let contentMatch;
-            while ((contentMatch = buffer.match(/"content":"((?:[^\\"]|\\.)*)"/)) !== null) {
-                const content = JSON.parse('"' + contentMatch[1] + '"');
+            while ((contentMatch = buffer.match(/^data: [^\n]+\n\n/)) !== null) {
+                let unparsed = contentMatch[0].substr("data: ".length);
+
                 if (!node.shouldContinue) break;
 
-                if (content.trim() !== "[DONE]") {
-                    await appendWithDelay(content, node, 30);
+                if (unparsed !== "[DONE]\n\n") {
+                    const content = JSON.parse(unparsed)
+                    if(content.choices[0].finish_reason === null) {
+                        contentAccumulator += content.choices[0].delta.content;
+                        if(!contentAccumulator.includes("`") || contentAccumulator.includes("```")
+                            || contentAccumulator.lastIndexOf("\n") > contentAccumulator.lastIndexOf("`")) {
+                            await appendWithDelay(contentAccumulator, node, 30);
+                            fullResponse += contentAccumulator; // append content to fullResponse
+                            contentAccumulator = "";
+                        }
+                    }
+                } else if (contentAccumulator.length > 0){
+                    await appendWithDelay(contentAccumulator, node, 30);
+                    fullResponse += contentAccumulator; // append content to fullResponse
+                    contentAccumulator = "";
                 }
-                fullResponse += content; // append content to fullResponse
                 buffer = buffer.slice(contentMatch.index + contentMatch[0].length);
             }
         }
@@ -523,15 +597,14 @@ class MistralModelWrapper extends ModelWrapper {
     }
 
     async handleResponseForLLMNode(response, node) {
-        const data = await response.text();
-        let fullResponse = `${data.content[0].text.trim()}`;
+        const data = await response.json();
+        let fullResponse = `${data.choices[0].message.content.trim()}`;
         node.aiResponseTextArea.value += fullResponse;
         node.aiResponseTextArea.dispatchEvent(new Event("input"));
         return fullResponse;
     }
 }
 
-// Test and fix
 class CohereModelWrapper extends ModelWrapper {
     static PREFIX = "cohere:"
     static CLASSNAME = "cohere-model-option"
@@ -558,15 +631,24 @@ class CohereModelWrapper extends ModelWrapper {
         messages = messages.map((message) => {
             if(message.role === "assistant") message.role = "CHATBOT"
             message.role = message.role.toUpperCase();
+            message.message = message.content;
+            delete message.content;
             return message;
         })
-
+        let message;
+        if(messages[messages.length - 1].role === "USER") {
+            message = messages[messages.length - 1].message;
+            messages.splice(messages.length - 1);
+        } else {
+            message = "";
+        }
         const requestOptions = {
             method: "POST",
             headers,
             body: JSON.stringify({
                 model: this.selectedOption,
-                messages,
+                chat_history: messages,
+                message,
                 max_tokens: maxTokens,
                 temperature,
                 stream,
@@ -578,8 +660,7 @@ class CohereModelWrapper extends ModelWrapper {
     }
 
     supportsStreaming() {
-        return false;
-        // return true;
+        return true;
     }
 
     async handleStreamingForLLMNode(response, node) {
@@ -595,14 +676,17 @@ class CohereModelWrapper extends ModelWrapper {
             buffer += decoder.decode(value, { stream: true });
 
             let contentMatch;
-            while ((contentMatch = buffer.match(/"content":"((?:[^\\"]|\\.)*)"/)) !== null) {
-                const content = JSON.parse('"' + contentMatch[1] + '"');
+            while ((contentMatch = buffer.match(/[^\n]+\n/)) !== null) {
+                let unparsed = contentMatch[0].substr(0,  contentMatch[0].length - 1)
+                const content = JSON.parse(unparsed);
+
                 if (!node.shouldContinue) break;
 
-                if (content.trim() !== "[DONE]") {
-                    await appendWithDelay(content, node, 30);
+                if (!content.is_finished && content.text) {
+                    await appendWithDelay(content.text, node, 30);
+                    fullResponse += content.text; // append content to fullResponse
                 }
-                fullResponse += content; // append content to fullResponse
+
                 buffer = buffer.slice(contentMatch.index + contentMatch[0].length);
             }
         }
@@ -610,8 +694,8 @@ class CohereModelWrapper extends ModelWrapper {
     }
 
     async handleResponseForLLMNode(response, node) {
-        const data = await response.text();
-        let fullResponse = `${data.content[0].text.trim()}`;
+        const data = await response.json();
+        let fullResponse = `${data.text.trim()}`;
         node.aiResponseTextArea.value += fullResponse;
         node.aiResponseTextArea.dispatchEvent(new Event("input"));
         return fullResponse;

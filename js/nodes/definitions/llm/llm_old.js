@@ -56,6 +56,7 @@ class LLMOldNode extends WindowedNode {
                 }
 
             }
+            this._updateModelInfoAndCount();
         }.bind(this)
         if(this.initialized){
             setChat(value);
@@ -109,6 +110,12 @@ class LLMOldNode extends WindowedNode {
         let promptTextArea = document.createElement("textarea");
         promptTextArea.id = `nodeprompt-${index}`;
         promptTextArea.classList.add('custom-scrollbar', 'custom-textarea'); // Add the class here
+
+
+        let tokenCounterDiv = document.createElement("div");
+        tokenCounterDiv.id = `tokencounter-${index}`;
+        tokenCounterDiv.className = "token-counter-overlay";
+        tokenCounterDiv.innerHTML = "&#128207; Tokens";
 
         // Create the send button
         let sendButton = document.createElement("button");
@@ -196,6 +203,7 @@ class LLMOldNode extends WindowedNode {
         // Append statusIconsContainer to the promptDiv instead of wrapperDiv
         promptDiv.appendChild(statusIconsContainer);
         promptDiv.appendChild(promptTextArea);
+        promptDiv.appendChild(tokenCounterDiv);
         promptDiv.appendChild(buttonDiv);
 
         // Wrap elements in a div
@@ -382,6 +390,8 @@ class LLMOldNode extends WindowedNode {
 
         this.promptTextArea = this.content.querySelector('[id^="nodeprompt-"]');
 
+        this.tokenCounterDiv = this.content.querySelector('[id^="tokencounter-"]');
+
         this.sendButton = this.content.querySelector('[id^="prompt-form-"]');
 
         this.haltCheckbox = this.content.querySelector('input[id^="halt-questions-checkbox"]');
@@ -398,6 +408,7 @@ class LLMOldNode extends WindowedNode {
         this._setupAiNodeRegenerateButtonListeners();
         this._setupAiNodeSettingsButtonListeners();
         this._setupAiNodeLocalLLMDropdownListeners();
+        this._setupAiNodeLocalLLMSelectListeners();
         this._setupAiNodeSliderListeners()
         this._setupAiNodeCheckBoxArrayListeners()
         this._setupAiNodeCustomInstructionsListeners()
@@ -417,6 +428,8 @@ class LLMOldNode extends WindowedNode {
         this.haltResponse = () => this._aiNodeHaltResponse();
 
         this._setupOptionReplacementScrollbar();
+
+        this._updateModelInfoAndCount(2000);
 
         super.afterInit();
     }
@@ -586,7 +599,50 @@ class LLMOldNode extends WindowedNode {
             }
         });
 
+        promptTextArea.addEventListener('input', (e) => {
+            this._updateModelInfoAndCount();
+        });
+
         // ... other event listeners for promptTextArea ...
+    }
+
+    _updateModelInfoAndCount(delay=500){
+        let performUpdate = () => {
+            // console.log("Message token count start")
+            this.tokenCounterDiv.innerHTML = "&#128207; Tokens";
+            let LocalLLMSelect = document.getElementById(this.LocalLLMSelectID);
+            const LocalLLMSelectValue = LocalLLMSelect.value;
+            const modelToUse = getModelToUse(determineModel(LocalLLMSelectValue));
+            let modelWrapper = ModelWrapper.getWrapper(modelToUse);
+            if(modelWrapper.supportsStreaming()) {
+                this.streamCheckbox.removeAttribute("disabled");
+                this.streamCheckbox.checked = true;
+            } else {
+                this.streamCheckbox.setAttribute("disabled", "");
+                this.streamCheckbox.checked = false;
+            }
+            let messages = this.chat;
+            messages.push({role: "user", content: this.promptTextArea.value})
+            modelWrapper.getTokenCount(messages).then((result) => {
+                const { count, approximation, model_info } = result;
+                this.tokenCounterDiv.innerText = (approximation ? "≈" : "") + count + " Tokens"
+                if(model_info !== null) {
+                    this.content.querySelector("div.select-replacer").title = modelToUse.substring(modelWrapper.constructor.PREFIX.length) + " (" + modelWrapper.constructor.PREFIX.replace(":", "") + ")\n" +
+                        "Input cost: $" + (model_info.input_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
+                        "Output cost: $" + (model_info.output_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
+                        "Max tokens: " + Math.max(model_info.max_input_tokens, model_info.max_input_tokens ) + " Tok";
+                    // Update also token slider and context slider
+                } else {
+                    this.content.querySelector("div.select-replacer").removeAttribute("title")
+                }
+                console.log("Message token count: ", count, " for messages: ", messages)
+            });
+            this.countTokenTimeout = -1;
+        }
+        if(this.countTokenTimeout !== -1) {
+            clearTimeout(this.countTokenTimeout); // restart timeout
+        }
+        this.countTokenTimeout = setTimeout(performUpdate, delay);
     }
 
     _setupAiNodeSendButtonListeners() {
@@ -743,9 +799,17 @@ class LLMOldNode extends WindowedNode {
                     customOption.style.display = this.checked ? 'block' : 'none';  // Show or hide based on checkbox
                 }
             });
+            this._updateModelInfoAndCount();
         });
 
         dropdown.aiTab.setupCustomDropdown(selectElement, true);
+    }
+
+    _setupAiNodeLocalLLMSelectListeners() {
+        let selectElement = this.localLLMSelect;
+        selectElement.addEventListener('change', () => {
+            this._updateModelInfoAndCount();
+        });
     }
 
     _setupAiNodeSliderListeners() {
@@ -1242,6 +1306,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
                     if (this.shouldContinue && this.shouldAppendQuestion && hasConnectedAiNode && !this.aiResponseHalted) {
                         await aiNodeMessageLoop.questionConnectedAiNodes(fullMessage);
                     }
+                    this._updateModelInfoAndCount();
                 })
                 .catch((error) => {
                     if (haltCheckbox) {
@@ -1249,10 +1314,11 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
                     }
                     console.error(`An error occurred while getting response: ${error}`);
                     aiErrorIcon.style.display = 'block';
+                    this._updateModelInfoAndCount();
                 });
         } else {
             // AI call
-            callchatLLMnode(messages, this, true, selectedModel)
+            callchatLLMnode(messages, this, this.streamCheckbox.checked, selectedModel)
                 .finally(async () => {
                     this.aiResponding = false;
                     aiLoadingIcon.style.display = 'none';
@@ -1267,6 +1333,8 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
 
                         await aiNodeMessageLoop.questionConnectedAiNodes(textToSend);
                     }
+                    this._updateModelInfoAndCount();
+
                 })
                 .catch((error) => {
                     if (haltCheckbox) {
@@ -1274,6 +1342,8 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
                     }
                     console.error(`An error occurred while getting response: ${error}`);
                     aiErrorIcon.style.display = 'block';
+                    this._updateModelInfoAndCount();
+
                 });
         }
     }
