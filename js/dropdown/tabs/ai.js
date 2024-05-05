@@ -12,7 +12,7 @@ class AITab {
         document.getElementById('OpenAI-api-key-input').value = localStorage.getItem('openaiApiKey') || '';
         document.getElementById('HuggingFace-api-key-input').value = localStorage.getItem('huggingfaceApiKey') || '';
         document.getElementById('Anthropic-api-key-input').value = localStorage.getItem('anthropicApiKey') || '';
-        document.getElementById('GoogleGemini-api-key-input').value = localStorage.getItem('googleApiKey') || '';
+        // document.getElementById('GoogleGemini-api-key-input').value = localStorage.getItem('googleApiKey') || '';
         document.getElementById('GoogleGemini-project-id-input').value = localStorage.getItem('googleProjectID') || '';
         document.getElementById('Mistral-api-key-input').value = localStorage.getItem('mistralApiKey') || '';
         document.getElementById('Cohere-api-key-input').value = localStorage.getItem('cohereApiKey') || '';
@@ -230,7 +230,7 @@ class AITab {
         localStorage.setItem('openaiApiKey', document.getElementById('OpenAI-api-key-input').value);
         localStorage.setItem('huggingfaceApiKey', document.getElementById('HuggingFace-api-key-input').value);
         localStorage.setItem('anthropicApiKey', document.getElementById('Anthropic-api-key-input').value);
-        localStorage.setItem('googleApiKey', document.getElementById('GoogleGemini-api-key-input').value);
+        // localStorage.setItem('googleApiKey', document.getElementById('GoogleGemini-api-key-input').value);
         localStorage.setItem('googleProjectID', document.getElementById('GoogleGemini-project-id-input').value);
         localStorage.setItem('mistralApiKey', document.getElementById('Mistral-api-key-input').value);
         localStorage.setItem('cohereApiKey', document.getElementById('Cohere-api-key-input').value);
@@ -248,7 +248,7 @@ class AITab {
             openaiApiKey: document.getElementById('OpenAI-api-key-input').value || '',
             huggingfaceApiKey: document.getElementById('HuggingFace-api-key-input').value || '',
             anthropicApiKey: document.getElementById('Anthropic-api-key-input').value || '',
-            googleApiKey: document.getElementById('GoogleGemini-api-key-input').value || '',
+            // googleApiKey: document.getElementById('GoogleGemini-api-key-input').value || '',
             googleProjectID: document.getElementById('GoogleGemini-project-id-input').value || '',
             mistralApiKey: document.getElementById('Mistral-api-key-input').value || '',
             cohereApiKey: document.getElementById('Cohere-api-key-input').value || '',
@@ -294,7 +294,7 @@ class AITab {
                 document.getElementById('OpenAI-api-key-input').value = keys.openaiApiKey || '';
                 document.getElementById('HuggingFace-api-key-input').value = keys.huggingfaceApiKey || '';
                 document.getElementById('Anthropic-api-key-input').value = keys.anthropicApiKey || '';
-                document.getElementById('GoogleGemini-api-key-input').value = keys.googleApiKey || '';
+                // document.getElementById('GoogleGemini-api-key-input').value = keys.googleApiKey || '';
                 document.getElementById('GoogleGemini-project-id-input').value = keys.googleProjectID || '';
                 document.getElementById('Mistral-api-key-input').value = keys.mistralApiKey || '';
                 document.getElementById('Cohere-api-key-input').value = keys.cohereApiKey || '';
@@ -331,7 +331,7 @@ class AITab {
 
         document.getElementById('HuggingFace-api-key-input').value = '';
         document.getElementById('Anthropic-api-key-input').value = '';
-        document.getElementById('GoogleGemini-api-key-input').value = '';
+        // document.getElementById('GoogleGemini-api-key-input').value = '';
         document.getElementById('GoogleGemini-project-id-input').value = '';
         document.getElementById('Mistral-api-key-input').value = '';
         document.getElementById('Cohere-api-key-input').value = '';

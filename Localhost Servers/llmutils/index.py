@@ -10,17 +10,25 @@ from mistral_common.tokens.instruct.normalize import ChatCompletionRequest
 from mistral_common.protocol.instruct.messages import (
     AssistantMessage,
     UserMessage,
-
 )
+
+import requests
+
 import vertexai
 from vertexai.generative_models import GenerativeModel
-
 
 app = Flask(__name__)
 CORS(app)
 
+# Load credentials from a secure location (e.g., encrypted file)
+# credentials = Credentials.from_service_account_file("../../client_secret.json")
+# Build Vertex AI service object using the loaded credentials
+# service = build("aiplatform", "v1", credentials=credentials)
 
-import requests
+newpath = os.path.join(os.path.dirname(__file__), "..\\..\\", "client_secret.json")
+newpath = os.path.normpath(newpath)
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = newpath
+
 
 @app.route('/anthropic-proxy', methods=['POST'])
 def anthropic_proxy():
@@ -44,6 +52,23 @@ def anthropic_proxy():
     try:
         response = requests.post(endpoint, json=payload, headers=headers)
         return jsonify(response.json()), response.status_code
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route('/gemini-proxy', methods=['POST'])
+def gemini_proxy():
+    data = request.json
+    project_id = data.get('projectID')
+    location = data.get('location')
+    messages = data.get('messages')
+    model_name = data.get('model')
+    max_tokens = data.get('max_tokens')
+    temperature = data.get('temperature')
+    vertexai.init(project=project_id, location=location)
+    model = GenerativeModel(model_name=model_name)
+    try:
+        response = model.generate_content(messages)
+        return convert_gemini_response(response)
     except Exception as e:
         return jsonify({'error': str(e)})
 
@@ -116,9 +141,9 @@ def count_tokens():
         project_id = data.get('projectID')
         location = data.get('location')
         vertexai.init(project=project_id, location=location)
-        # Load the model
         model = GenerativeModel(model_name=model[len('google:'):])
-        return jsonify({"count": model.count_tokens(text), "approximation": False, "model_info": model_info})
+        count_tokens = model.count_tokens(text)
+        return jsonify({"count": count_tokens.total_tokens, "approximation": False, "model_info": model_info})
     elif model.startswith('mistral:'):
         ## Cant use already encoded tokens (we need to pass messages instead)
         # v1: open-mistral-7b, open-mixtral-8x7b, mistral-embed
@@ -179,6 +204,13 @@ def get_mistral_messages(messages):
         elif message.get("role") == "assistant":
             result.append(AssistantMessage(content=message.get("content")))
     return result
+
+def convert_gemini_response(response):
+    chat = []
+    for candidate in response.candidates:
+        response_part = candidate.content.parts[0]
+        chat.append(response_part.text)
+    return json.dumps(chat)
 
 # new Option('Anthropic Claude instant 1.2', 'anthropic:claude-instant-1.2', false, false),
 # new Option('Anthropic Claude 2.0', 'anthropic:claude-2.0', false, false),

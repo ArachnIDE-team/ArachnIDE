@@ -46,6 +46,13 @@
     <!-- Pyodide -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.23.0/full/pyodide.js"></script>
 
+<!--    Google pretends you login even for API access-->
+<!--    <script src="https://apis.google.com/js/platform.js" async defer></script>-->
+<!--    Imagine asking the user to change the following HTML to include their project ID.-->
+<!--    LOL... -->
+<!--    <meta name="google-signin-client_id" content="XXX.apps.googleusercontent.com">-->
+
+
 </head>
 
 <body id="body">
@@ -354,13 +361,22 @@
                                     <!-- storage name: anthropicApiKey-->
                                     <input type="password" class="input-key" id="Anthropic-api-key-input">
                                 </div>
+<!--                                <div>-->
+<!--                                    <label for="GoogleGemini-api-key-input">Google Gemini API Key:</label>-->
+<!--                                    &lt;!&ndash; storage name: googleApiKey&ndash;&gt;-->
+<!--                                    <input type="password" class="input-key" id="GoogleGemini-api-key-input">-->
+<!--                                </div>-->
+<!--                                <div class="g-signin2" data-onsuccess="onSignIn"></div>-->
                                 <div>
-                                    <label for="GoogleGemini-api-key-input">Google Gemini API Key:</label>
-                                    <!-- storage name: googleApiKey-->
-                                    <input type="password" class="input-key" id="GoogleGemini-api-key-input">
-                                </div>
-                                <div>
-                                    <label for="GoogleGemini-project-id-input">Google Gemini Project ID:</label>
+                                    <label for="GoogleGemini-project-id-input" title="Google Gemini API Access Instructions:
+ 1) Create a Project
+ 2) Create a Service Account for that project
+ 3) Enable Vertex AI for the Service Account
+ 4) Add AI Platform Admin Role to service account
+ 5) Download the user json file, place it in the root directory and name it 'client_secret.json' (already in .gitignore file)
+You dont need any API Key nor any OAuth 2.0 Client IDs, just a Service Account with the right permissions.
+PS: Google policy is to pretend User's log in and IAM service adoption, this workaround prevents your credentials to be leaked, i personally do
+not agree on the policy but this way, we all get the free bonus for Gemini. If you want to talk about it write me a PM, maybe we can fit it.">Google Gemini Project ID	&#9888;:</label>
                                     <!-- storage name: googleProjectID-->
                                     <input type="password" class="input-key" id="GoogleGemini-project-id-input">
                                 </div>

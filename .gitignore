@@ -10,3 +10,4 @@ workspaces.json
 .chrysalIDE*/
 .neurIDE*/
 samples
+client_secret*.json

@@ -371,34 +371,10 @@ class AnthropicModelWrapper extends ModelWrapper {
 
     supportsStreaming() {
         return false;
-        // return true;
     }
 
     async handleStreamingForLLMNode(response, node) {
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let buffer = "";
-        let fullResponse = "";
-
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done || !node.shouldContinue) break;
-
-            buffer += decoder.decode(value, { stream: true });
-
-            let contentMatch;
-            while ((contentMatch = buffer.match(/"content":"((?:[^\\"]|\\.)*)"/)) !== null) {
-                const content = JSON.parse('"' + contentMatch[1] + '"');
-                if (!node.shouldContinue) break;
-
-                if (content.trim() !== "[DONE]") {
-                    await appendWithDelay(content, node, 30);
-                }
-                fullResponse += content; // append content to fullResponse
-                buffer = buffer.slice(contentMatch.index + contentMatch[0].length);
-            }
-        }
-        return fullResponse; // return the entire response
+        throw new Error("Streaming not supported")
     }
 
     async handleResponseForLLMNode(response, node) {
@@ -419,9 +395,10 @@ class GoogleModelWrapper extends ModelWrapper {
         super(selectedOption.substr(GoogleModelWrapper.PREFIX.length))
     }
 
-    getAPIKey(){
-        return document.getElementById("GoogleGemini-api-key-input").value;
-    }
+    // getAPIKey(){
+    //     return document.getElementById("GoogleGemini-api-key-input").value;
+    // }
+
     getProjectID(){
         return document.getElementById("GoogleGemini-project-id-input").value;
     }
@@ -430,7 +407,8 @@ class GoogleModelWrapper extends ModelWrapper {
     }
 
     getAPIEndpoint(){
-        return `https://${this.getLocation()}-aiplatform.googleapis.com/v1/projects/${this.getProjectID()}/locations/us-central1/publishers/google/models/gemini-1.0-pro:streamGenerateContent`
+        return "http://localhost:1000/gemini-proxy"
+        // return `https://${this.getLocation()}-aiplatform.googleapis.com/v1/projects/${this.getProjectID()}/locations/${this.getLocation()}/publishers/google/models/${this.selectedOption}:streamGenerateContent`
     }
 
     async getTokenCount(messages){
@@ -465,25 +443,25 @@ class GoogleModelWrapper extends ModelWrapper {
         // return  (approximation ? "≈" : "") + count;
         return (await response.json());
     }
+
     async sendChat(messages, temperature, maxTokens, abortSignal, stream){
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
         headers.append("Authorization", `Bearer ${this.getAPIKey()}`);
 
-
-        messages = messages.filter((message) => message.role !== "system")
+        messages = messages.map((message) => message.content)
 
         const requestOptions = {
             method: "POST",
             headers,
             body: JSON.stringify({
                 model: this.selectedOption,
+                location: this.getLocation(),
+                projectID: this.getProjectID(),
                 messages,
                 max_tokens: maxTokens,
-                // temperature,
-                // stream,
+                temperature
             }),
-            // signal: abortSignal,
         };
 
         return await fetch(this.getAPIEndpoint(), requestOptions);
@@ -491,39 +469,16 @@ class GoogleModelWrapper extends ModelWrapper {
 
     supportsStreaming() {
         return false;
-        // return true;
     }
 
     async handleStreamingForLLMNode(response, node) {
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let buffer = "";
-        let fullResponse = "";
-
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done || !node.shouldContinue) break;
-
-            buffer += decoder.decode(value, { stream: true });
-
-            let contentMatch;
-            while ((contentMatch = buffer.match(/"content":"((?:[^\\"]|\\.)*)"/)) !== null) {
-                const content = JSON.parse('"' + contentMatch[1] + '"');
-                if (!node.shouldContinue) break;
-
-                if (content.trim() !== "[DONE]") {
-                    await appendWithDelay(content, node, 30);
-                }
-                fullResponse += content; // append content to fullResponse
-                buffer = buffer.slice(contentMatch.index + contentMatch[0].length);
-            }
-        }
-        return fullResponse; // return the entire response
+        throw new Error("Streaming not supported")
     }
 
+    // TO-DO: Review proxy
     async handleResponseForLLMNode(response, node) {
         const data = await response.json();
-        let fullResponse = `${data.content[0].text.trim()}`;
+        let fullResponse = data[0];
         node.aiResponseTextArea.value += fullResponse;
         node.aiResponseTextArea.dispatchEvent(new Event("input"));
         return fullResponse;
