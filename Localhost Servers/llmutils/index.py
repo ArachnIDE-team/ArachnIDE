@@ -167,9 +167,15 @@ def set_api_key():
 
 def get_mistral_messages(messages):
     result = []
-    for message in messages:
-        if message.get("role") == "user":# and message.get("content") != ""
+
+    for idx, message in enumerate(messages):
+        if message.get("role") == "system":
             result.append(UserMessage(content=message.get("content")))
+        if message.get("role") == "user":# and message.get("content") != ""
+            if result[idx - 1].role == 'user':
+                result[idx - 1].content += message.get("content")
+            else:
+                result.append(UserMessage(content=message.get("content")))
         elif message.get("role") == "assistant":
             result.append(AssistantMessage(content=message.get("content")))
     return result

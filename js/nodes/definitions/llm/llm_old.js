@@ -413,6 +413,8 @@ class LLMOldNode extends WindowedNode {
         this._setupAiNodeCheckBoxArrayListeners()
         this._setupAiNodeCustomInstructionsListeners()
 
+        this.streamCheckbox = this.content.querySelector(`[id^="streamLLM-"]`);
+
         // Functions
 
         this.controller = new AbortController();
@@ -621,21 +623,23 @@ class LLMOldNode extends WindowedNode {
                 this.streamCheckbox.setAttribute("disabled", "");
                 this.streamCheckbox.checked = false;
             }
-            let messages = this.chat;
-            messages.push({role: "user", content: this.promptTextArea.value})
-            modelWrapper.getTokenCount(messages).then((result) => {
-                const { count, approximation, model_info } = result;
-                this.tokenCounterDiv.innerText = (approximation ? "≈" : "") + count + " Tokens"
-                if(model_info !== null) {
-                    this.content.querySelector("div.select-replacer").title = modelToUse.substring(modelWrapper.constructor.PREFIX.length) + " (" + modelWrapper.constructor.PREFIX.replace(":", "") + ")\n" +
-                        "Input cost: $" + (model_info.input_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
-                        "Output cost: $" + (model_info.output_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
-                        "Max tokens: " + Math.max(model_info.max_input_tokens, model_info.max_input_tokens ) + " Tok";
-                    // Update also token slider and context slider
-                } else {
-                    this.content.querySelector("div.select-replacer").removeAttribute("title")
-                }
-                console.log("Message token count: ", count, " for messages: ", messages)
+            // let messages = this.chat;
+            // messages.push({role: "user", content: this.promptTextArea.value})
+            this.getMessages().then((messages) => {
+                modelWrapper.getTokenCount(messages).then((result) => {
+                    const { count, approximation, model_info } = result;
+                    this.tokenCounterDiv.innerText = (approximation ? "≈" : "") + count + " Tokens"
+                    if(model_info !== null) {
+                        this.content.querySelector("div.select-replacer").title = modelToUse.substring(modelWrapper.constructor.PREFIX.length) + " (" + modelWrapper.constructor.PREFIX.replace(":", "") + ")\n" +
+                            "Input cost: $" + (model_info.input_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
+                            "Output cost: $" + (model_info.output_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
+                            "Max tokens: " + Math.max(model_info.max_input_tokens, model_info.max_input_tokens ) + " Tok";
+                        // Update also token slider and context slider
+                    } else {
+                        this.content.querySelector("div.select-replacer").removeAttribute("title")
+                    }
+                    console.log("Message token count: ", count, " for messages: ", messages)
+                });
             });
             this.countTokenTimeout = -1;
         }
@@ -802,7 +806,19 @@ class LLMOldNode extends WindowedNode {
             this._updateModelInfoAndCount();
         });
 
-        dropdown.aiTab.setupCustomDropdown(selectElement, true);
+        let selectContainer = dropdown.aiTab.setupCustomDropdown(selectElement, true);
+
+        let streamCheckboxDiv = document.createElement('div');
+        streamCheckboxDiv.className = 'stream-checkbox-container';
+        let streamCheckbox = document.createElement('input');
+        streamCheckbox.type = "checkbox"
+        streamCheckbox.id = "streamLLM-" + this.index;
+        streamCheckbox.setAttribute("disabled","")
+        let streamCheckboxLabel = document.createElement('label')
+        streamCheckboxLabel.innerText = "Stream";
+        streamCheckboxLabel.setAttribute("for",  "streamLLM-" + this.index);
+        streamCheckboxDiv.append(streamCheckbox, streamCheckboxLabel)
+        selectContainer.append(streamCheckboxDiv);
     }
 
     _setupAiNodeLocalLLMSelectListeners() {
@@ -956,12 +972,52 @@ class LLMOldNode extends WindowedNode {
         }
     }
 
+    // Re-evaluate the state of connected AI nodes
+    updateConnectedAiNodeState() {
+        let allConnectedNodes = this.getAllConnectedNodes();
+        return allConnectedNodes.some(n => n instanceof LLMOldNode);
+    }
+
+    getAllConnectedNodes() {
+        // Checks if all connected nodes should be sent or just nodes up to the first found ai node in each branch. connected nodes (default)
+        const useAllConnectedNodes = document.getElementById('use-all-connected-ai-nodes').checked;
+        return useAllConnectedNodes ? getAllConnectedNodes(this) : getAllConnectedNodes(this, true);
+    }
+
     async sendLLMNodeMessage( message = null) {
         if (this.aiResponding) {
             console.log('AI is currently responding. Please wait for the current response to complete before sending a new message.');
             return;
         }
 
+        let LocalLLMSelect = document.getElementById(this.LocalLLMSelectID);
+        const LocalLLMSelectValue = LocalLLMSelect.value;
+        let selectedModel;
+
+        // Logic for dynamic model switching based on connected nodes
+        let allConnectedNodes = this.getAllConnectedNodes();
+        const hasImageNodes = allConnectedNodes.some(node => node instanceof ImageNode);
+        selectedModel = determineModel(LocalLLMSelectValue, hasImageNodes);
+        const isVisionModel = selectedModel.endsWith('-vision');
+        const isAssistant = selectedModel.includes('1106');
+        console.log('Selected Model:', selectedModel, "Vision", isVisionModel, "Assistant", isAssistant);
+
+        let messages = await this.getMessages(message, isVisionModel);
+
+
+        // Append the user prompt to the AI response area with a distinguishing mark and end tag
+        this.aiResponseTextArea.value += `\n\n${PROMPT_IDENTIFIER} ${this.latestUserMessage}\n`;
+        // Trigger the input event programmatically
+        this.aiResponseTextArea.dispatchEvent(new Event('input'));
+
+        // Clear the prompt textarea
+        this.promptTextArea.value = '';
+        this.promptTextArea.dispatchEvent(new Event('input'));
+
+        if(messages !== null) this.callLLM(selectedModel, messages);
+    }
+
+    async getMessages(message, isVisionModel) {
         const nodeIndex = this.index;
 
         const maxTokensSlider = this.content.querySelector('#node-max-tokens-' + this.index);
@@ -969,20 +1025,15 @@ class LLMOldNode extends WindowedNode {
         let contextSize = 0;
 
         // Checks if all connected nodes should be sent or just nodes up to the first found ai node in each branch. connected nodes (default)
-        const useAllConnectedNodes = document.getElementById('use-all-connected-ai-nodes').checked;
-
-        // Choose the function based on checkbox state
-        let allConnectedNodes = useAllConnectedNodes ? getAllConnectedNodes(this) : getAllConnectedNodes(this, true);
+        let allConnectedNodes = this.getAllConnectedNodes();
 
         // Determine if there are any connected AI nodes
-        let hasConnectedAiNode = allConnectedNodes.some(n => n.isLLMNode);
+        let hasConnectedAiNode = this.updateConnectedAiNodeState();
 
 
         //Use Prompt area if message is not passed.
         this.latestUserMessage = message ? message : this.promptTextArea.value;
-        // Clear the prompt textarea
-        this.promptTextArea.value = '';
-        this.promptTextArea.dispatchEvent(new Event('input'));
+
 
         //Initialize messages array.
         let nodeTitle = this.getTitle();
@@ -996,28 +1047,6 @@ class LLMOldNode extends WindowedNode {
             },
         ];
 
-        let LocalLLMSelect = document.getElementById(this.LocalLLMSelectID);
-        const LocalLLMSelectValue = LocalLLMSelect.value;
-        let selectedModel;
-
-        // Logic for dynamic model switching based on connected nodes
-        const hasImageNodes = allConnectedNodes.some(node => node.isImageNode);
-        selectedModel = determineModel(LocalLLMSelectValue, hasImageNodes);
-
-        function determineModel(LocalLLMValue, hasImageNodes) {
-            if (hasImageNodes) {
-                return 'gpt-4-vision-preview'; // Switch to vision model if image nodes are present
-            } else if (LocalLLMValue === 'Default') {
-                const globalModelSelect = document.getElementById('model-select');
-                return globalModelSelect.value; // Use global model selection
-            } else {
-                return LocalLLMValue; // Use the local model selection
-            }
-        }
-
-        const isVisionModel = selectedModel.includes('gpt-4-vision');
-        const isAssistant = selectedModel.includes('1106');
-        console.log('Selected Model:', selectedModel, "Vision", isVisionModel, "Assistant", isAssistant);
         // Fetch the content from the custom instructions textarea using the nodeIndex
         const customInstructionsTextarea = document.getElementById(`custom-instructions-textarea-${nodeIndex}`);
         const customInstructions = customInstructionsTextarea ? customInstructionsTextarea.value.trim() : "";
@@ -1101,7 +1130,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
         // Use the node-specific recent context when calling constructSearchQuery
         const searchQuery = await constructSearchQuery(this.latestUserMessage, truncatedRecentContext, this);
         if (searchQuery === null) {
-            return; // Return early if a link node was created directly
+            return null; // Return early if a link node was created directly
         }
 
         let searchResultsData = null;
@@ -1187,7 +1216,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
         allConnectedNodesData.forEach(info => {
             if (info.data && info.data.replace) {
                 let tempInfoList = info.isLLM ? llmNodeInfo : textNodeInfo;
-                [remainingTokens, totalTokenCount, messageTrimmed] = LLMOldNode._updateInfoList(
+                [remainingTokens, totalTokenCount, messageTrimmed] = LLMNode._updateInfoList(
                     info, tempInfoList, remainingTokens, totalTokenCount, maxContextSize
                 );
             }
@@ -1228,10 +1257,10 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
         let lastPromptsAndResponses;
         lastPromptsAndResponses = getLastPromptsAndResponses(20, contextSize, this.id);
 
-        // Append the user prompt to the AI response area with a distinguishing mark and end tag
-        this.aiResponseTextArea.value += `\n\n${PROMPT_IDENTIFIER} ${this.latestUserMessage}\n`;
-        // Trigger the input event programmatically
-        this.aiResponseTextArea.dispatchEvent(new Event('input'));
+        // // Append the user prompt to the AI response area with a distinguishing mark and end tag
+        // this.aiResponseTextArea.value += `\n\n${PROMPT_IDENTIFIER} ${this.latestUserMessage}\n`;
+        // // Trigger the input event programmatically
+        // this.aiResponseTextArea.dispatchEvent(new Event('input'));
 
         let wolframData;
         if (document.getElementById(`enable-wolfram-alpha-checkbox-${nodeIndex}`).checked) {
@@ -1240,7 +1269,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
         }
 
         if (wolframData) {
-            const { wolframAlphaTextResult } = wolframData;
+            const {wolframAlphaTextResult} = wolframData;
             createWolframNode("", wolframData);
 
             const wolframAlphaMessage = {
@@ -1268,31 +1297,26 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
             role: "user",
             content: this.latestUserMessage
         });
+        return messages;
+    }
 
-
+    callLLM(selectedModel, messages) {
+        const allConnectedNodes = this.getAllConnectedNodes();
+        let hasConnectedAiNode = this.updateConnectedAiNodeState();
         this.aiResponding = true;
         this.userHasScrolled = false;
+        const clickQueues = {};  // Contains a click queue for each AI node
+        // Initiates helper functions for aiNode Message loop.
+        const aiNodeMessageLoop = new AiNodeMessageLoop(this, allConnectedNodes, clickQueues);
+        const haltCheckbox = this.haltCheckbox;
 
         // Get the loading and error icons
-        let aiLoadingIcon = document.getElementById(`aiLoadingIcon-${nodeIndex}`);
-        let aiErrorIcon = document.getElementById(`aiErrorIcon-${nodeIndex}`);
+        let aiLoadingIcon = document.getElementById(`aiLoadingIcon-${this.index}`);
+        let aiErrorIcon = document.getElementById(`aiErrorIcon-${this.index}`);
 
         // Hide the error icon and show the loading icon
         aiErrorIcon.style.display = 'none'; // Hide error icon
         aiLoadingIcon.style.display = 'block'; // Show loading icon
-
-
-        // Re-evaluate the state of connected AI nodes
-        function updateConnectedAiNodeState() {
-            let allConnectedNodes = useAllConnectedNodes ? getAllConnectedNodes(this) : getAllConnectedNodes(this, true);
-            return allConnectedNodes.some(n => n.isLLMNode);
-        }
-
-        const clickQueues = {};  // Contains a click queue for each AI node
-        // Initiates helper functions for aiNode Message loop.
-        const aiNodeMessageLoop = new AiNodeMessageLoop(this, allConnectedNodes, clickQueues);
-
-        const haltCheckbox = this.haltCheckbox;
 
         // Local LLM call
         if (document.getElementById("localLLM").checked && selectedModel !== 'Default') {
@@ -1301,7 +1325,7 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
                     this.aiResponding = false;
                     aiLoadingIcon.style.display = 'none';
 
-                    hasConnectedAiNode = updateConnectedAiNodeState(); // Update state right before the call
+                    hasConnectedAiNode = this.updateConnectedAiNodeState(); // Update state right before the call
 
                     if (this.shouldContinue && this.shouldAppendQuestion && hasConnectedAiNode && !this.aiResponseHalted) {
                         await aiNodeMessageLoop.questionConnectedAiNodes(fullMessage);
@@ -1320,10 +1344,11 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
             // AI call
             callchatLLMnode(messages, this, this.streamCheckbox.checked, selectedModel)
                 .finally(async () => {
+                    console.log("callchatLLMnode.finally, this:", this)
                     this.aiResponding = false;
                     aiLoadingIcon.style.display = 'none';
 
-                    hasConnectedAiNode = updateConnectedAiNodeState(); // Update state right before the call
+                    hasConnectedAiNode = this.updateConnectedAiNodeState.bind(this)(); // Update state right before the call
 
                     if (this.shouldContinue && this.shouldAppendQuestion && hasConnectedAiNode && !this.aiResponseHalted) {
                         const aiResponseText = this.aiResponseTextArea.value;
@@ -1334,16 +1359,15 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
                         await aiNodeMessageLoop.questionConnectedAiNodes(textToSend);
                     }
                     this._updateModelInfoAndCount();
-
                 })
                 .catch((error) => {
+                    console.log("callchatLLMnode.catch, this:", this)
                     if (haltCheckbox) {
                         haltCheckbox.checked = true;
                     }
-                    console.error(`An error occurred while getting response: ${error}`);
+                    console.error(`An error occurred while getting response: ${error}\n${error.stack}`);
                     aiErrorIcon.style.display = 'block';
                     this._updateModelInfoAndCount();
-
                 });
         }
     }

@@ -390,7 +390,6 @@ class LLMAgentNode extends WindowedNode {
         this._setupAiNodeSliderListeners()
         this._setupAiNodeCustomInstructionsListeners()
 
-
         this.streamCheckbox = this.content.querySelector(`[id^="streamLLM-"]`);
 
         // Functions
@@ -600,21 +599,25 @@ class LLMAgentNode extends WindowedNode {
                 this.streamCheckbox.setAttribute("disabled", "");
                 this.streamCheckbox.checked = false;
             }
-            let messages = this.chat;
-            messages.push({role: "user", content: this.promptTextArea.value})
-            modelWrapper.getTokenCount(messages).then((result) => {
-                const { count, approximation, model_info } = result;
-                this.tokenCounterDiv.innerText = (approximation ? "≈" : "") + count + " Tokens"
-                if(model_info !== null) {
-                    this.content.querySelector("div.select-replacer").title = modelToUse.substring(modelWrapper.constructor.PREFIX.length) + " (" + modelWrapper.constructor.PREFIX.replace(":", "") + ")\n" +
-                        "Input cost: $" + (model_info.input_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
-                        "Output cost: $" + (model_info.output_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
-                        "Max tokens: " + Math.max(model_info.max_input_tokens, model_info.max_input_tokens ) + " Tok";
-                    // Update also token slider and context slider
-                } else {
-                    this.content.querySelector("div.select-replacer").removeAttribute("title")
-                }
-                console.log("Message token count: ", count, " for messages: ", messages)
+            // let messages = this.chat;
+            // messages.push({role: "user", content: this.promptTextArea.value})
+           this.getMessages().then((messages) => {
+               modelWrapper.getTokenCount(messages).then((result) => {
+                   const { count, approximation, model_info } = result;
+                   this.tokenCounterDiv.innerText = (approximation ? "≈" : "") + count + " Tokens"
+                   if(model_info !== null) {
+                       this.content.querySelector("div.select-replacer").title = modelToUse.substring(modelWrapper.constructor.PREFIX.length) + " (" + modelWrapper.constructor.PREFIX.replace(":", "") + ")\n" +
+                           "Input cost: $" + (model_info.input_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
+                           "Output cost: $" + (model_info.output_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
+                           "Max tokens: " + Math.max(model_info.max_input_tokens, model_info.max_output_tokens ) + " Tok";
+                       // Update also token slider and context slider
+                       this._updateMaxTokensSliderMax(Math.max(model_info.max_input_tokens, model_info.max_output_tokens ))
+                   } else {
+                       this.content.querySelector("div.select-replacer").removeAttribute("title")
+                       this._updateMaxTokensSliderMax(16000)
+                   }
+                   console.log("Message token count: ", count, " for messages: ", messages)
+               });
             });
             this.countTokenTimeout = -1;
         }
@@ -622,6 +625,14 @@ class LLMAgentNode extends WindowedNode {
             clearTimeout(this.countTokenTimeout); // restart timeout
         }
         this.countTokenTimeout = setTimeout(performUpdate, delay);
+    }
+
+    _updateMaxTokensSliderMax(max){
+        const maxTokensSlider = this.content.querySelector('#node-max-tokens-' + this.index);
+        const maxContextSizeSlider = this.content.querySelector('#node-max-context-' + this.index);
+        maxTokensSlider.setAttribute("max", "" + max);
+        maxTokensSlider.dispatchEvent(new Event('input'));
+        maxContextSizeSlider.dispatchEvent(new Event('input'));
     }
 
     _setupAiNodeSendButtonListeners() {
@@ -794,7 +805,6 @@ class LLMAgentNode extends WindowedNode {
         streamCheckboxLabel.setAttribute("for",  "streamLLM-" + this.index);
         streamCheckboxDiv.append(streamCheckbox, streamCheckboxLabel)
         selectContainer.append(streamCheckboxDiv);
-
     }
 
     _setupAiNodeLocalLLMSelectListeners() {
@@ -927,41 +937,66 @@ class LLMAgentNode extends WindowedNode {
         }
     }
 
+    // Re-evaluate the state of connected AI nodes
+    updateConnectedAiNodeState() {
+        let allConnectedNodes = this.getAllConnectedNodes();
+        return allConnectedNodes.some(n => n instanceof LLMAgentNode);
+    }
+
+    getAllConnectedNodes() {
+        // Checks if all connected nodes should be sent or just nodes up to the first found ai node in each branch. connected nodes (default)
+        const useAllConnectedNodes = document.getElementById('use-all-connected-ai-nodes').checked;
+        return useAllConnectedNodes ? getAllConnectedNodes(this) : getAllConnectedNodes(this, true);
+    }
+
+    // From LLMNode extends LLMAgentNode
     async sendLLMNodeMessage( message = null) {
         if (this.aiResponding) {
             console.log('AI is currently responding. Please wait for the current response to complete before sending a new message.');
             return;
         }
 
-        const nodeIndex = this.index;
-
-        const maxTokensSlider = this.content.querySelector('#node-max-tokens-' + this.index);
-        //Initalize count for message trimming
-        let contextSize = 0;
-
-        //Use Prompt area if message is not passed.
-        this.latestUserMessage = message ? message : this.promptTextArea.value;
-        // Clear the prompt textarea
-        this.promptTextArea.value = '';
-        this.promptTextArea.dispatchEvent(new Event('input'));
-
-        //Initialize messages array.
-        let nodeTitle = this.getTitle();
-        let aiIdentity = nodeTitle ? `${nodeTitle} (Ai)` : "Ai";
-
-
-        let messages = [];
-
         let LocalLLMSelect = document.getElementById(this.LocalLLMSelectID);
         const LocalLLMSelectValue = LocalLLMSelect.value;
         let selectedModel;
 
         // Logic for dynamic model switching based on connected nodes
-        selectedModel = determineModel(LocalLLMSelectValue, false);
-
-        const isVisionModel = selectedModel.includes('gpt-4-vision');
+        let allConnectedNodes = this.getAllConnectedNodes();
+        const hasImageNodes = allConnectedNodes.some(node => node instanceof ImageNode);
+        selectedModel = determineModel(LocalLLMSelectValue, hasImageNodes);
+        const isVisionModel = selectedModel.endsWith('-vision');
         const isAssistant = selectedModel.includes('1106');
         console.log('Selected Model:', selectedModel, "Vision", isVisionModel, "Assistant", isAssistant);
+
+        let messages = await this.getMessages(message, isVisionModel);
+
+
+        // Append the user prompt to the AI response area with a distinguishing mark and end tag
+        this.aiResponseTextArea.value += `\n\n${PROMPT_IDENTIFIER} ${this.latestUserMessage}\n`;
+        // Trigger the input event programmatically
+        this.aiResponseTextArea.dispatchEvent(new Event('input'));
+
+        // Clear the prompt textarea
+        this.promptTextArea.value = '';
+        this.promptTextArea.dispatchEvent(new Event('input'));
+
+        if(messages !== null) this.callLLM(selectedModel, messages);
+    }
+
+    async getMessages(message, isVisionModel) {
+        const nodeIndex = this.index;
+
+        const maxTokensSlider = this.content.querySelector('#node-max-tokens-' + this.index);
+
+        //Initialize count for message trimming
+        let contextSize = 0;
+
+        //Use Prompt area if message is not passed.
+        this.latestUserMessage = message ? message : this.promptTextArea.value;
+
+
+        let messages = [];
+
         // Fetch the content from the custom instructions textarea using the nodeIndex
         const customInstructionsTextarea = document.getElementById(`custom-instructions-textarea-${nodeIndex}`);
         const customInstructions = customInstructionsTextarea ? customInstructionsTextarea.value.trim() : "";
@@ -977,8 +1012,6 @@ class LLMAgentNode extends WindowedNode {
         let totalTokenCount = getTokenCount(messages);
         let remainingTokens = Math.max(0, maxTokensSlider.value - totalTokenCount);
         const maxContextSize = this.savedMaxContextSize;
-        // const maxContextSize = document.getElementById(`node-max-context-${nodeIndex}`).value;
-
 
         totalTokenCount = getTokenCount(messages);
         remainingTokens = Math.max(0, maxTokensSlider.value - totalTokenCount);
@@ -1008,19 +1041,26 @@ class LLMAgentNode extends WindowedNode {
             role: "user",
             content: this.latestUserMessage
         });
+        return messages;
+    }
 
-
+    callLLM(selectedModel, messages) {
+        const allConnectedNodes = this.getAllConnectedNodes();
+        let hasConnectedAiNode = this.updateConnectedAiNodeState();
         this.aiResponding = true;
         this.userHasScrolled = false;
+        const clickQueues = {};  // Contains a click queue for each AI node
+        // Initiates helper functions for aiNode Message loop.
+        const aiNodeMessageLoop = new AiNodeMessageLoop(this, allConnectedNodes, clickQueues);
+        const haltCheckbox = this.haltCheckbox;
 
         // Get the loading and error icons
-        let aiLoadingIcon = document.getElementById(`aiLoadingIcon-${nodeIndex}`);
-        let aiErrorIcon = document.getElementById(`aiErrorIcon-${nodeIndex}`);
+        let aiLoadingIcon = document.getElementById(`aiLoadingIcon-${this.index}`);
+        let aiErrorIcon = document.getElementById(`aiErrorIcon-${this.index}`);
 
         // Hide the error icon and show the loading icon
         aiErrorIcon.style.display = 'none'; // Hide error icon
         aiLoadingIcon.style.display = 'block'; // Show loading icon
-
 
         // Local LLM call
         if (document.getElementById("localLLM").checked && selectedModel !== 'Default') {
@@ -1028,21 +1068,50 @@ class LLMAgentNode extends WindowedNode {
                 .then(async (fullMessage) => {
                     this.aiResponding = false;
                     aiLoadingIcon.style.display = 'none';
+
+                    hasConnectedAiNode = this.updateConnectedAiNodeState(); // Update state right before the call
+
+                    if (this.shouldContinue && this.shouldAppendQuestion && hasConnectedAiNode && !this.aiResponseHalted) {
+                        await aiNodeMessageLoop.questionConnectedAiNodes(fullMessage);
+                    }
+                    this._updateModelInfoAndCount();
                 })
                 .catch((error) => {
+                    if (haltCheckbox) {
+                        haltCheckbox.checked = true;
+                    }
                     console.error(`An error occurred while getting response: ${error}`);
                     aiErrorIcon.style.display = 'block';
+                    this._updateModelInfoAndCount();
                 });
         } else {
             // AI call
             callchatLLMnode(messages, this, this.streamCheckbox.checked, selectedModel)
                 .finally(async () => {
+                    console.log("callchatLLMnode.finally, this:", this)
                     this.aiResponding = false;
                     aiLoadingIcon.style.display = 'none';
+
+                    hasConnectedAiNode = this.updateConnectedAiNodeState.bind(this)(); // Update state right before the call
+
+                    if (this.shouldContinue && this.shouldAppendQuestion && hasConnectedAiNode && !this.aiResponseHalted) {
+                        const aiResponseText = this.aiResponseTextArea.value;
+//                    const quotedTexts = await getQuotedText(aiResponseText);
+
+                        let textToSend = await getLastLineFromTextArea(this.aiResponseTextArea);
+
+                        await aiNodeMessageLoop.questionConnectedAiNodes(textToSend);
+                    }
+                    this._updateModelInfoAndCount();
                 })
                 .catch((error) => {
-                    console.error(`An error occurred while getting response: ${error}`);
+                    console.log("callchatLLMnode.catch, this:", this)
+                    if (haltCheckbox) {
+                        haltCheckbox.checked = true;
+                    }
+                    console.error(`An error occurred while getting response: ${error}\n${error.stack}`);
                     aiErrorIcon.style.display = 'block';
+                    this._updateModelInfoAndCount();
                 });
         }
     }
