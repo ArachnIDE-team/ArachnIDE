@@ -422,11 +422,49 @@ class GoogleModelWrapper extends ModelWrapper {
     getAPIKey(){
         return document.getElementById("GoogleGemini-api-key-input").value;
     }
-
-    getAPIEndpoint(){
-        return "https://us-central1-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/us-central1/publishers/google/models/gemini-1.0-pro:streamGenerateContent"
+    getProjectID(){
+        return document.getElementById("GoogleGemini-project-id-input").value;
+    }
+    getLocation(){
+        return "us-central1";
     }
 
+    getAPIEndpoint(){
+        return `https://${this.getLocation()}-aiplatform.googleapis.com/v1/projects/${this.getProjectID()}/locations/us-central1/publishers/google/models/gemini-1.0-pro:streamGenerateContent`
+    }
+
+    async getTokenCount(messages){
+        let text = "";
+        for(let message of messages) {
+            text += (message.content || message.message || message.code) + "\n";
+        }
+        let response = await fetch("http://localhost:1000/count-tokens",{
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                model: this.constructor.PREFIX + this.selectedOption,
+                location: this.getLocation(),
+                projectID: this.getProjectID(),
+                text
+            })
+        })
+        if(!response.ok && this.failedAttempts === 0) {
+            this.failedAttempts = 1;
+            return await new Promise((resolve, reject) =>{
+                this.setAPIKeyAndRetry(() => {
+                    this.getTokenCount(messages).then((result) => {
+                        resolve(result);
+                    });
+                })
+            })
+        }
+        this.failedAttempts = 0;
+        // const { count, approximation, model_info } = (await response.json());
+        // return  (approximation ? "≈" : "") + count;
+        return (await response.json());
+    }
     async sendChat(messages, temperature, maxTokens, abortSignal, stream){
         const headers = new Headers();
         headers.append("Content-Type", "application/json");

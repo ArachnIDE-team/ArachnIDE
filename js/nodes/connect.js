@@ -93,7 +93,7 @@ function getNodeData(node) {
     const titleElement = node.titleInput;
     const title = titleElement ? titleElement.value : "No title found";
     const createdAt = node.createdAt;
-    const isLLM = node.isLLM;  // Assuming you have this flag set on the node object.
+    const isLLM = node instanceof LLMAgentNode || node instanceof LLMOldNode;  // Assuming you have this flag set on the node object.
 
     if (!createdAt) {
         console.warn(`getNodeData: Creation time for node ${node.uuid} is not defined.`);
@@ -107,9 +107,9 @@ function getNodeData(node) {
         return nodeInfo;
     }
 
-    // Check if the node contains an iframe editor
-    let iframeElement = document.querySelector(`iframe[identifier='editor-${node.uuid}']`);
-    if (iframeElement) {
+    // Check if the node is an iframe Web editor (js + css + html)
+    if (node instanceof WebEditorNode) {
+        let iframeElement = document.querySelector(`iframe[identifier='editor-${node.uuid}']`);
         // Handle iframe editor content
         let iframeWindow = iframeElement.contentWindow;
         let htmlContent = iframeWindow.htmlEditor.getValue();
@@ -122,6 +122,12 @@ function getNodeData(node) {
             `Text Content: \n\\\`\\\`\\\`html\n${htmlContent}\n\\\`\\\`\\\`\n` +
             `\\\`\\\`\\\`css\n${cssContent}\n\\\`\\\`\\\`\n` +
             `\\\`\\\`\\\`javascript\n${jsContent}\n\\\`\\\`\\\`\n ${nodeTag}`;
+        return nodeInfo;
+    } else if(node instanceof CodeNode) {
+        const nodeInfo =
+            `${nodeTag} ${title}\n` +
+            `Text Content: \n\\\`\\\`\\\`${node.settings.language}\n${node.code}\n\\\`\\\`\\\`\n` +
+            `${nodeTag}`;
         return nodeInfo;
     } else {
         // Handle regular text content
@@ -183,7 +189,7 @@ function getAllConnectedNodesData(node, filterAfterLLM = false) {
 
     traverseConnectedNodes(node, currentNode => {
         let currentNodeData = getNodeData(currentNode);
-        allConnectedNodesData.push({ data: currentNodeData, isLLM: currentNode.isLLM });
+        allConnectedNodesData.push({ data: currentNodeData, isLLM: currentNode instanceof LLMAgentNode || currentNode instanceof LLMOldNode });
     }, filterAfterLLM);
 
     return allConnectedNodesData;

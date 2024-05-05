@@ -87,6 +87,7 @@ let frontendTerminal = createJavascriptTerminalNode("Frontend terminal");
 
 let backendTerminal = createNodeJSTerminalNode("Backend terminal");
 
+// window.llmNode = createLLMOldNode("Old LLM for testing purposes")
 window.llmNode = createLLMNode("LLM for testing purposes")
 // // Let's use a mutation observer to see what's going on
 // const targetNode = llmNode.localLLMSelect;
