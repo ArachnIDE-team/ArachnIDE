@@ -1,6 +1,6 @@
 # Python Wiki Server
 Overview
-This is a Python server which interacts with Wikipedia'scale API to fetch summaries and categories of articles related to a keyword. This server is meant to be run locally and serves as a helper for the ChrysalIDE application.
+This is a Python server which interacts with Wikipedia'scale API to fetch summaries and categories of articles related to a keyword. This server is meant to be run locally and serves as a helper for the ArachnIDE application.
 
 # Getting Started
 Requirements

@@ -177,7 +177,7 @@ async function chrysalideExploreSequence() {
         await performSequence(animations);  // Utilize performSequence to await each call in const animations.
         console.log("Sequence completed!");
     } catch (error) {
-        console.error("An error occurred during the ChrysalIDE exploration sequence:", error);
+        console.error("An error occurred during the ArachnIDE exploration sequence:", error);
     }
 }
 
@@ -354,8 +354,8 @@ function constructPromptWithFunctions(functions, forVision = false) {
 }
 
 function functionBasePrompt() {
-    return `/* ChrysalIDE API Documentation
-You write code that is executed within the fractal mind mapping interface, ChrysalIDE.
+    return `/* ArachnIDE API Documentation
+You write code that is executed within the fractal mind mapping interface, ArachnIDE.
 
 REMEMBER, creativity, format, substance, etc... As you are a transformer architecture, each token generation is a chance to grow computational context. UTILIZE available JAVASCRIPT FUNCTIONALITY*/`;
 }
@@ -363,7 +363,7 @@ REMEMBER, creativity, format, substance, etc... As you are a transformer archite
 function neuralApiPrompt() {
     let prompt = functionBasePrompt();
     prompt += constructPromptWithFunctions(functionObjects, false);
-    prompt += `\n/* The creation of text notes and prompts to the zettelkasten can be called BOTH inside and/or outside of ChrysalIDE's async function performSequence(animations)
+    prompt += `\n/* The creation of text notes and prompts to the zettelkasten can be called BOTH inside and/or outside of ArachnIDE's async function performSequence(animations)
 For example, you can either use promptZettelkasten within a performSequence such that there are no animations during the response, or call promptZettelkasten outside of a performSequence such that the Ai response and movements coordinate.
 The setting of coords, movement, zoomToTitle, etc. are ALWAYS CALLED within performSequence */`;
     return prompt;
@@ -373,7 +373,7 @@ function visionPrompt() {
     let prompt = functionBasePrompt();
     prompt += constructPromptWithFunctions(functionObjects, true);
     prompt += `\n/* Vision Specific Guidelines */\n
-You TAKE ACTION based off the provided SCREENSHOTS of ChrysalIDE's interface.`;
+You TAKE ACTION based off the provided SCREENSHOTS of ArachnIDE's interface.`;
     return prompt;
 }
 

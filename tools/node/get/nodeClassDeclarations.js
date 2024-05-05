@@ -84,7 +84,7 @@ class NodeClassDeclarations extends ToolNode {
                })
             }
             console.log(classMap)
-            let moduleNode = new ModuleNode({name: "ChrysalIDE Class Declarations", fsTree: {fsTree: classMap, root: ""}});
+            let moduleNode = new ModuleNode({name: "ArachnIDE Class Declarations", fsTree: {fsTree: classMap, root: ""}});
             let distance = moduleNode.pos.minus(this.pos).scale(2);
             moduleNode.pos = moduleNode.pos.minus(distance)
             connectDistance(this, moduleNode);

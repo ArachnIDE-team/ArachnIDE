@@ -83,7 +83,7 @@ Bundling: Code nodes will bundle codeblocks in any connected nodes.`
 const instructionsMessage = () => ({
     role: "system",
     content: `The How-to checkbox is on. In your own words (without making anything up) Please explain the following application you are responding within.
-ChrysalIDE, fractal mind map:
+ArachnIDE, fractal mind map:
 Users can scroll through a visualization of the Mandelbrot set, create nodes, talk to an ai (you), and the following...
 ${nodeTag} Essential Controls
 - Drag to move; Scroll to zoom; Alt + Scroll to rotate; Ctrl + Click or Ctrl + Drag to select and resize multiple nodes.
@@ -127,7 +127,7 @@ Make sure to exclusivly reference the above described controls. Try not to make 
 // const instructionsMessage = () => ({
 //     role: "system",
 //     content: `The How-to checkbox is on. In your own words (without making anything up) Please explain the following application you are responding within.
-// ChrysalIDE, fractal mind map:
+// ArachnIDE, fractal mind map:
 // Users can scroll through a visualization of the Mandelbrot set, create nodes, talk to an ai (you), and the following...
 // ${tagValues.nodeTag} Essential Controls
 // - Drag to move; Scroll to zoom; Alt + Scroll to rotate; Ctrl + Click or Ctrl + Drag to select and resize multiple nodes.

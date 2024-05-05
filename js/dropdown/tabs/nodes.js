@@ -49,8 +49,8 @@ class NodesTab {
             return array;
         }
 
-        getFSTree("H:/projects/ChrysalIDE/js",["**/**.js"],[] ).then((chrysalIDEJSSourceTree) => {
-            let fileList = getFilesFromFSTree(chrysalIDEJSSourceTree.fsTree, "H:/projects/ChrysalIDE/js")
+        getFSTree("H:/projects/ArachnIDE/js",["**/**.js"],[] ).then((chrysalIDEJSSourceTree) => {
+            let fileList = getFilesFromFSTree(chrysalIDEJSSourceTree.fsTree, "H:/projects/ArachnIDE/js")
             this.getFilesContent(fileList).then((fileObject) => {
                 let classDeclarations = [];
 
@@ -89,7 +89,7 @@ class NodesTab {
 
                 this.updateTreeContainer(classMap);
                 // let moduleNode = new ModuleNode({
-                //     name: "ChrysalIDE Class Declarations",
+                //     name: "ArachnIDE Class Declarations",
                 //     fsTree: {fsTree: classMap, root: ""}
                 // });
             });
@@ -97,7 +97,7 @@ class NodesTab {
     }
 
     updateTreeContainer(classMap){
-        this.moduleNode = new ModulePanel({name: "ChrysalIDE Class Declarations"})
+        this.moduleNode = new ModulePanel({name: "ArachnIDE Class Declarations"})
         this.nodeTreeContainer.append(this.moduleNode.container)
         this.moduleNode.reloadModule(() => {
             let length = Object.keys(dropdown.nodesTab.moduleNode.content.fileSystemTree.content.liElementsById).length

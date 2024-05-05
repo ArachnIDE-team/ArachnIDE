@@ -540,4 +540,4 @@ class Node {
 }
 
 globalThis.Node = Node;// override Node
-globalThis.ChrysalIDE = {Node};// override Node
+globalThis.ArachnIDE = {Node};// override Node

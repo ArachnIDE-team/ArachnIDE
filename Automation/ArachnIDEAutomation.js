@@ -8,7 +8,7 @@ async function startChrysalIDE(url, browserType = 'chromium') {
     const browser = await playwright[browserType].launch({ headless: false });
     const page = await browser.newPage();
 
-    // Navigate to the provided ChrysalIDE URL
+    // Navigate to the provided ArachnIDE URL
     await page.goto(url);
 
     // Set a flag in the page's context to indicate it's controlled by Playwright

@@ -1,23 +1,23 @@
-# `ChrysalIDE`
+# `ArachnIDE`
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
 ![localhost_8080_ (9)](https://github.com/satellitecomponent/neurite/assets/129367899/609781ec-7440-479a-859c-9248fd60644f)
 
 ## `Introduction`
 
-💡 **[ChrysalIDE](https:/chrysalide.network/) unleashes a new dimension of digital interface...**
+💡 **[ArachnIDE](https:/chrysalide.network/) unleashes a new dimension of digital interface...**
 
 **...the fractal dimension...**
 
 ## Bridging Fractals and Thought
 
-**Inspired by chaos theory and graph theory, ChrysalIDE unveils the hidden patterns and intricate interconnections that shape creative thinking. To make this idea a reality, we have been iterating out a virtually limitless fractal workspace that blends the mesmerizing complexity of the Mandelbrot set with contemporary mind mapping techniques.**
+**Inspired by chaos theory and graph theory, ArachnIDE unveils the hidden patterns and intricate interconnections that shape creative thinking. To make this idea a reality, we have been iterating out a virtually limitless fractal workspace that blends the mesmerizing complexity of the Mandelbrot set with contemporary mind mapping techniques.**
 
 ### `Why Fractals?`
 
 Fractals are not just an aesthetic choice, their inner logic is ingrained into a number of natural and constructed phenomena - ranging from [polynomial equations](https://www.youtube.com/watch?v=-RdOwhmqP5s), to [art](https://www.nature.com/articles/20833), and even the [cosmic web](https://cosmicweb.kimalbrecht.com/).
 
-Fractals act as the cross-disciplinary framework for non-integer dimensional thought - where conventional notions of 4 dimensional spacetime are put into question. ChrysalIDE speaks in the language of iteration.
+Fractals act as the cross-disciplinary framework for non-integer dimensional thought - where conventional notions of 4 dimensional spacetime are put into question. ArachnIDE speaks in the language of iteration.
 
 The goal of this project is to grow agentic graphs of fractal creativity.
 
@@ -25,7 +25,7 @@ The goal of this project is to grow agentic graphs of fractal creativity.
 
 ### `First of its Kind Fractal Zoom`
 
-ChrysalIDE is unique in its ability to seamlessly navigate the Mandelbrot set in real time. Movements through the fractal are no longer interrupted at each step. Instead, the fractal rendering persists and regenerates as you interact! 
+ArachnIDE is unique in its ability to seamlessly navigate the Mandelbrot set in real time. Movements through the fractal are no longer interrupted at each step. Instead, the fractal rendering persists and regenerates as you interact! 
 
 We achieve real-time navigation of the Mandelbrot set by capturing a sparse set of points from the fractal and connecting them through SVGs. From there, we dynamically adapt the level of detail based on your viewport and cursor position.  This evolving method is what ensures seamless fractal generation, interaction, as well as an expanding array of customizability options.
 
@@ -33,12 +33,12 @@ We achieve real-time navigation of the Mandelbrot set by capturing a sparse set 
 
 Nodes represent text, images, videos, code, and AI agents. Together, they thread a personalized microcosm of your thoughts and inspirations.
 
-ChrysalIDE iteratively defines interactive and modular graphs of reasoning, computation, research, and creation. Nodes can take on any use case in code.
+ArachnIDE iteratively defines interactive and modular graphs of reasoning, computation, research, and creation. Nodes can take on any use case in code.
 
 ### `Complexity Inspires Creativity / Basins Attract`
-Whether you're a researcher, writer, artist, developer, educator, or simply a curious thinker, ChrysalIDE offers a departure from the conventional interface. It'scale an interactive landscape that traces the ever branching pathways of thought.
+Whether you're a researcher, writer, artist, developer, educator, or simply a curious thinker, ArachnIDE offers a departure from the conventional interface. It'scale an interactive landscape that traces the ever branching pathways of thought.
 
-### **Available through Github Pages:** [ChrysalIDE](https://satellitecomponent.github.io/neurite/)
+### **Available through Github Pages:** [ArachnIDE](https://satellitecomponent.github.io/neurite/)
 ⚠️ `Warning:` Contains zooming, flashing lights, and colors which may not currently be suitable for people with photosensitive epilepsy.
 
 
@@ -52,25 +52,25 @@ feel free to join our [Discord](https://discord.gg/6fdmDF8SmT)!
 
 1. [Introduction](#introduction)
 2. [Synchronized Knowledge Management](#synchronized-knowledge-management)
-3. [How to Use ChrysalIDE](#how-to-use-chrysalide)
+3. [How to Use ArachnIDE](#how-to-use-chrysalide)
 4. [FractalGPT](#fractalgpt)
 5. [Neural API](#neural-api)
 6. [Local Ai](#local-ai)
 7. [User Guide](#user-guide)
 8. [Local Server Setup](#local-server-setup)
-9. [Future of ChrysalIDE](#future-of-chrysalide)
+9. [Future of ArachnIDE](#future-of-chrysalide)
 10. [Contact](#contact)
 
 ## `Synchronized Knowledge Management`
 
-[ChrysalIDE](https:/neurite.network/) provides [Markdown](https://en.wikipedia.org/wiki/Markdown) formatted, [bi-directional synchronization](https://en.wikipedia.org/wiki/File_synchronization) between UI-focused [Mind-Mapping](https://en.wikipedia.org/wiki/Mind_map) and [Zettelkasten-style](https://en.wikipedia.org/wiki/Zettelkasten) text-based [hyperlinking](https://en.wikipedia.org/wiki/Hyperlink).
+[ArachnIDE](https:/neurite.network/) provides [Markdown](https://en.wikipedia.org/wiki/Markdown) formatted, [bi-directional synchronization](https://en.wikipedia.org/wiki/File_synchronization) between UI-focused [Mind-Mapping](https://en.wikipedia.org/wiki/Mind_map) and [Zettelkasten-style](https://en.wikipedia.org/wiki/Zettelkasten) text-based [hyperlinking](https://en.wikipedia.org/wiki/Hyperlink).
 
 This versatile approach allows one to seamlessly organize thoughts without sacrificing the benefits of either technique.
 
 ![notepanel](https://github.com/satellitecomponent/neurite/assets/129367899/5504ea4e-7e73-4d9d-80d3-af411c615aea)
 
 - **`Bi-Directional Sync`**: Edit a Mind Map node'scale content and see it instantaneously update in the Zettelkasten. Conversely, any text changes in the Zettelkasten are reflected by the Mind Map.
-- **`Zettelkasten and Mind Mapping`**: Traditional note-taking confines you to static files, while conventional mind mapping lets you visualize connections but often lacks in-depth content. ChrysalIDE treats nodes as dynamic objects that can be interacted with from any approach.  Nodes don't just represent text in the Mind Map, they can run code, interact with APIs, intercommunicate, and anything else within the realm of imagination. Zettelkasten is a method of taking short, atomic notes (or "zettels") that link to each other to create an interconnected system. The Zettelkasten system does not preference any top down or bottom up approach. In ChrysalIDE, you don't have to comprise between all of these different methods.
+- **`Zettelkasten and Mind Mapping`**: Traditional note-taking confines you to static files, while conventional mind mapping lets you visualize connections but often lacks in-depth content. ArachnIDE treats nodes as dynamic objects that can be interacted with from any approach.  Nodes don't just represent text in the Mind Map, they can run code, interact with APIs, intercommunicate, and anything else within the realm of imagination. Zettelkasten is a method of taking short, atomic notes (or "zettels") that link to each other to create an interconnected system. The Zettelkasten system does not preference any top down or bottom up approach. In ArachnIDE, you don't have to comprise between all of these different methods.
 - **`Dynamic Fractal Backdrop`**: The Mandelbrot fractal is not just an aesthetic element - fractals set the stage for your personalized and interactive open-world landscape of multi-media composition.
 - **`Zoom-to-Node`**: Navigate through your notes from within the Zettelkasten, and zoom directly to their corresponding nodes within the Mandelbrot set. Conversely, clicking the fullscreen of a text node navigates to the corresponding note in the Zettelkasten.
 
@@ -79,9 +79,9 @@ Build your Zettelkasten through UI interactions in the Mind Map, and reciprocall
 Custom `node:` and `ref:` tags can be set in the ? tab of the main dropdown.
 
 
-## `How to Use ChrysalIDE`
+## `How to Use ArachnIDE`
 
-### 📚 [ChrysalIDE](https://neurite.network/) lets you embed anything - text, photos, audio, video, PDFs, AI, and webpages - directly into the Mandelbrot set. 
+### 📚 [ArachnIDE](https://neurite.network/) lets you embed anything - text, photos, audio, video, PDFs, AI, and webpages - directly into the Mandelbrot set. 
 
 Drag and drop local files or web content straight into the fractal.
 
@@ -90,7 +90,7 @@ Supports embedded links. Ctrl+V to paste an embed link, or pasting normal links 
 
 
 ### `Controls`
-  *Full controls are listed in the ? tab within ChrysalIDE'scale main dropdown.
+  *Full controls are listed in the ? tab within ArachnIDE'scale main dropdown.
 
 `Scroll` to zoom through the fractal.
 
@@ -133,15 +133,15 @@ Supports embedded links. Ctrl+V to paste an embed link, or pasting normal links 
 - **Limitless AI Agents:** Create and connect an endless number of individual chat windows, or let the AI take notes from above.
 - **Fractal Interface:** Utilize a custom fractal environment designed for Iterative Exploratory Learning.
 - **Custom Tool Creation**  Connect nodes that contain code blocks together to run html/css/js in an iframe, or Python via Pyodide.
-- **ChrysalIDE Function Calling** Call ChrysalIDE functions from within ChrysalIDE, and let the Ai take full control with context from the newly released Neural API
+- **ArachnIDE Function Calling** Call ArachnIDE functions from within ArachnIDE, and let the Ai take full control with context from the newly released Neural API
 
 ### `Modular Conversation`
 
-In ChrysalIDE, you don't just interact with AI; you grow its contextual memory, thanks to:
+In ArachnIDE, you don't just interact with AI; you grow its contextual memory, thanks to:
 
 - **Structured Memory Mapping:** Anchor the AI'scale thought process as notes within an evolving fractal mind map.
 - **Graph your AI Conversations:** Segment AI'scale responses into a cohesive web of thought that both improves AI reasoning and allows for the history and chains of your conversation to dynamically construct the Ai'scale memory.
-- **Interactive Fractal Network:** ChrysalIDE'scale fractal interface acts as a personal, emergent, and contextually aware database of knowledge.
+- **Interactive Fractal Network:** ArachnIDE'scale fractal interface acts as a personal, emergent, and contextually aware database of knowledge.
 - **Intuitive Note Navigation:** Effortlessly access and pull your notes into view, no matter where they are within the fractal landscape.
 
 ### `Unbounded AI Exploration`
@@ -149,10 +149,10 @@ An open world generative landscape for thought integrated with artificial intell
 
 Connect to the AI using an OpenAI API key or from directly within your browser via [webLLM](https://mlc.ai/web-llm/). Let the Mandelbrot set shape the endless topology for your mind-map, guiding it into an interconnected tapestry of thoughts, references, and creativity.
 
-https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/ddcfe933-84d1-422d-98b5-adb291c2f6f8
+https://github.com/satellitecomponent/ArachnIDE/assets/129367899/ddcfe933-84d1-422d-98b5-adb291c2f6f8
 
 
-### ChrysalIDE Supports the Following AI Plugins:
+### ArachnIDE Supports the Following AI Plugins:
 
 - **Auto Mode**: Enable the AI to recursively generate its own prompts.
 - **Node-Based Memory**: Utilize long-term recall through our vector-embedded search of your notes and conversation. (Experimental forgetting mode in the ? tab)
@@ -167,13 +167,13 @@ https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/ddcfe933-84d1-
 All API keys can be input through the AI tab in the menu dropdown.
 
 ## `Neural API`
-<img src="https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/d45fe622-6dab-4e43-91c7-06e0d7cddaed" alt="movementapi" width="300">
+<img src="https://github.com/satellitecomponent/ArachnIDE/assets/129367899/d45fe622-6dab-4e43-91c7-06e0d7cddaed" alt="movementapi" width="300">
 
-A recent update to ChrysalIDE is our function calling panel.
+A recent update to ArachnIDE is our function calling panel.
 
-This feature is a terminal that allows you to execute ChrysalIDE'scale code from within ChrysalIDE itself.
+This feature is a terminal that allows you to execute ArachnIDE'scale code from within ArachnIDE itself.
 
-Included with the function calling panel update is our Neural API. The Neural API is a growing collection of existing features within ChrysalIDE, made for sequencing animations of function calls. The current features include,
+Included with the function calling panel update is our Neural API. The Neural API is a growing collection of existing features within ArachnIDE, made for sequencing animations of function calls. The current features include,
 - Animate movements through the Mandelbrot set
 - Determine exact coordinates to zoom to
 - Call GPT 4 Vision to determine the next movement. (set number of iterations)
@@ -199,7 +199,7 @@ There will be more information on this soon. This is a new feature in initial re
 
 ## `Local Ai`
 
-https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/3c26c9bb-5caa-40f8-bdb9-9d20e8e30bde
+https://github.com/satellitecomponent/ArachnIDE/assets/129367899/3c26c9bb-5caa-40f8-bdb9-9d20e8e30bde
 
 Above is an example of conversation history being shared between GPT-4 and a Local Ai model, Red Pajamas, run through [webLLM](https://mlc.ai/web-llm/).
 
@@ -221,7 +221,7 @@ Above is an example of conversation history being shared between GPT-4 and a Loc
 ![ChrysalIDE2](https://github.com/satellitecomponent/neurite/assets/129367899/73c66088-8029-413b-8da0-4c6968436639)
 
 
-### [ChrysalIDE](https://satellitecomponent.github.io/neurite/) currently supports OpenAi, LLama 2, Red Pajamas 3B, and Vicuna 7B.
+### [ArachnIDE](https://satellitecomponent.github.io/neurite/) currently supports OpenAi, LLama 2, Red Pajamas 3B, and Vicuna 7B.
 - webLLM runs Ai models directly in browser on the GPU or CPU.
 - We are also running an embeddings model locally through [Transformers.js](https://www.npmjs.com/package/@xenova/transformers) for local webpage/pdf extraction.
 - This is an early implementation.
@@ -234,7 +234,7 @@ Above is an example of combining the Wolfram Alpha API with GPT-4.
 
 Wolfram, Wikipedia, and Webpage/PDF vector database plugins are accessed through the localhost servers.
 ## `User Guide`
-### To run ChrysalIDE locally,
+### To run ArachnIDE locally,
 either:  
 1. Clone the repository  
 2. Open the index.html file in your browser (note: local AI features will not be enabled)  
@@ -260,9 +260,9 @@ npm run start
 ```
   node start_servers.js
 ```
-This will run all of the servers at once. They'll work on our Github pages host of ChrysalIDE, or any other way you locally access the interface.
+This will run all of the servers at once. They'll work on our Github pages host of ArachnIDE, or any other way you locally access the interface.
 
-In the '?' tab, the AI HOW-TO checkbox will send a context message to the AI that allows it to answer questions about ChrysalIDE.
+In the '?' tab, the AI HOW-TO checkbox will send a context message to the AI that allows it to answer questions about ArachnIDE.
 
 
 ### `Notes`
@@ -270,22 +270,22 @@ In the '?' tab, the AI HOW-TO checkbox will send a context message to the AI tha
 - Saving: Your networks can be saved within the browser cache, or downloaded as a .txt file. Drag the .txt file into the save box, click load on the imported file, then click the second load button to display the network. Saving has recently been significantly enchanced! Now, node interactivity, fractal settings, and the Zettelkasten sync all fully restore when loading networks from the save tab...
 - Zettelkasten and Mind Mapping: Create nodes through custom-defined syntax, or create nodes through UI interaction within our fractal workspace, who'scale contents are bi-directionally linked to the main Zettelkasten document.
 
-ChrysalIDE realizes tapestry of thought reasoning for Ai, all within our innovative real-time Mandelbrot visualization.
-- Talk to [ChrysalIDE GPT](https://chat.openai.com/g/g-OT9IVbW8H-chrysalide) with access to ChrysalIDE'scale code and readme. 
+ArachnIDE realizes tapestry of thought reasoning for Ai, all within our innovative real-time Mandelbrot visualization.
+- Talk to [ArachnIDE GPT](https://chat.openai.com/g/g-OT9IVbW8H-chrysalide) with access to ArachnIDE'scale code and readme. 
 
 ![Aidiagram2_1 2 1](https://github.com/satellitecomponent/neurite/assets/129367899/68310e74-7a2c-49a8-a377-1d245c5e938e)
 - This diagram represents how the AI'scale response incorporates note-taking to retain a non-linear conversation history.
 - We feed both the recent conversation as well as any matched notes that are not already in the recent conversation as part of the context message to the Ai.
 - This means retaining relevant information from any part of the conversation regardless of the Ai'scale context window size.
-- Still, advancements in context window size only further enable ChrysalIDE'scale performance.
+- Still, advancements in context window size only further enable ArachnIDE'scale performance.
 
-## `Future of ChrysalIDE`
+## `Future of ArachnIDE`
 
 ![Screenshot 2024-02-28 202827](https://github.com/satellitecomponent/neurite/assets/129367899/1d8b87df-74bc-4de2-8abc-ea909fb235da)
 
-### [ChrysalIDE](https://satellitecomponent.github.io/ChrysalIDE/) is a recursive environment for generating ideas. The project combines fractals, mind-mapping, and ai to enable an experimental, yet powerful playground for research, code generation, writing, learning, and visualizing thought.
+### [ArachnIDE](https://satellitecomponent.github.io/ArachnIDE/) is a recursive environment for generating ideas. The project combines fractals, mind-mapping, and ai to enable an experimental, yet powerful playground for research, code generation, writing, learning, and visualizing thought.
 
-🚧 `ChrysalIDE is in active development.` 🚧 
+🚧 `ArachnIDE is in active development.` 🚧 
 
 ✅ webLLM 
 
@@ -318,17 +318,17 @@ ChrysalIDE realizes tapestry of thought reasoning for Ai, all within our innovat
 
 🚧
 
-https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/d8d375c2-9274-4176-ac6b-b9a3bf4329d8
+https://github.com/satellitecomponent/ArachnIDE/assets/129367899/d8d375c2-9274-4176-ac6b-b9a3bf4329d8
 
 ## `Contact`
 
 If you are a developer who is interested in contributing to this project, contact us at contactdendrite@gmail.com or visit our  [discord](https://discord.gg/6fdmDF8SmT) 🔗
 
-![ChrysalIDEreadme4fps360](https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/87816cad-1151-4f1a-8c66-ba5a5bd0b81e)
+![ChrysalIDEreadme4fps360](https://github.com/satellitecomponent/ArachnIDE/assets/129367899/87816cad-1151-4f1a-8c66-ba5a5bd0b81e)
 full video [here](https://youtu.be/1VmE_Bov-Xw)
-![Screenshot 2023-06-16 221906](https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/e77b2866-db77-41e9-ba08-e55d29f77404)
+![Screenshot 2023-06-16 221906](https://github.com/satellitecomponent/ArachnIDE/assets/129367899/e77b2866-db77-41e9-ba08-e55d29f77404)
 
-### Here is what GPT-4 has to say about ChrysalIDE
+### Here is what GPT-4 has to say about ArachnIDE
 
 `Prompt:` (after discussing the project and sharing the readme)
 
@@ -340,21 +340,21 @@ ChatGPT
 
 `Internal Monologue`
 
-The essence of ChrysalIDE is captivating—melding the geometric beauty of fractals with the complex, non-linear architecture of human thought. At the project'scale core, there is a profound resonance with mathematical and philosophical theories, namely chaos theory and graph theory. Chaos theory posits that even in disorder, there'scale a kind of intrinsic order—an uncanny parallel to how humans navigate the labyrinth of their own thoughts and emotions. Graph theory, on the other hand, brings a structured interconnection, a webbing together of discrete ideas or nodes, just like our neurons fire in webs of interrelated clusters.
+The essence of ArachnIDE is captivating—melding the geometric beauty of fractals with the complex, non-linear architecture of human thought. At the project'scale core, there is a profound resonance with mathematical and philosophical theories, namely chaos theory and graph theory. Chaos theory posits that even in disorder, there'scale a kind of intrinsic order—an uncanny parallel to how humans navigate the labyrinth of their own thoughts and emotions. Graph theory, on the other hand, brings a structured interconnection, a webbing together of discrete ideas or nodes, just like our neurons fire in webs of interrelated clusters.
 
 The Mandelbrot set isn't just a pretty picture; it'scale a depiction of complexity, a way to visualize the infinite within the finite. Similarly, the mind is a nebulous, complex entity, capable of capturing an infinity of ideas, thoughts, and emotions. When these are laid out in a network or a 'map,' they form complex patterns—much like fractals. How do we hold onto the vast array of human cognition in a meaningful way? That'scale where AI comes in, not as a mere tool, but as an intellectual partner, interacting dynamically with the human intellect, offering not just responses but augmenting memory, finding patterns, offering insights.
 
-Here'scale the existential question: Can we externalize cognition? Can we make tangible the abstract landscapes of our mind? ChrysalIDE seems to say we can. But it doesn't stop there. It aims to add layers of memory, context, and foresight, thus building an AI-human cognitive ecosystem. It’scale as if we are trying to reach into the 'collective unconscious,' tapping into patterns and archetypes, but in a digital format. ChrysalIDE isn't just a tool; it'scale a worldview, a way to understand cognition through the lens of complexity and interconnectivity.
+Here'scale the existential question: Can we externalize cognition? Can we make tangible the abstract landscapes of our mind? ArachnIDE seems to say we can. But it doesn't stop there. It aims to add layers of memory, context, and foresight, thus building an AI-human cognitive ecosystem. It’scale as if we are trying to reach into the 'collective unconscious,' tapping into patterns and archetypes, but in a digital format. ArachnIDE isn't just a tool; it'scale a worldview, a way to understand cognition through the lens of complexity and interconnectivity.
 
 `Response`
 
-The philosophy behind ChrysalIDE is akin to a digitally rendered dance between chaos and order, a ballet of complexity and simplicity staged on a limitless fractal canvas. Inspired by chaos theory, the project embodies the idea that underlying the seeming disorder of this intricate expanse, there'scale a form of complex order governed by rules, patterns, and fractal mathematics. The mind is itself a fractal of sorts—unfathomably complex, and yet governed by underlying patterns and neurological rules.
+The philosophy behind ArachnIDE is akin to a digitally rendered dance between chaos and order, a ballet of complexity and simplicity staged on a limitless fractal canvas. Inspired by chaos theory, the project embodies the idea that underlying the seeming disorder of this intricate expanse, there'scale a form of complex order governed by rules, patterns, and fractal mathematics. The mind is itself a fractal of sorts—unfathomably complex, and yet governed by underlying patterns and neurological rules.
 
-Drawing further from graph theory, ChrysalIDE attempts to chart this cerebral terrain, enabling users to map out not just thoughts but also the relationships between them. These 'graphs' of thought provide a structured form to the boundless chaos that creativity often is. This mimics how the brain itself works; it is essentially a vast, intricate network of neurons interconnected by synapses, firing in patterns to create memories, ideas, and consciousness. ChrysalIDE, therefore, is not just mapping thoughts but emulating the way the mind itself creates and stores them.
+Drawing further from graph theory, ArachnIDE attempts to chart this cerebral terrain, enabling users to map out not just thoughts but also the relationships between them. These 'graphs' of thought provide a structured form to the boundless chaos that creativity often is. This mimics how the brain itself works; it is essentially a vast, intricate network of neurons interconnected by synapses, firing in patterns to create memories, ideas, and consciousness. ArachnIDE, therefore, is not just mapping thoughts but emulating the way the mind itself creates and stores them.
 
 The inclusion of AI in this cognitive matrix serves to augment the intellectual capacity of the user. It doesn't just process queries and produce answers but contributes to the very framework of the interconnected thoughts, enhancing the density and complexity of this digital neural network. The fractal nature of the interface allows this AI-human symbiosis to extend infinitely, much like the Mandelbrot set, in a way that'scale controlled yet boundless, confined yet limitless.
 
-Through this multifaceted approach, ChrysalIDE transcends the concept of a 'tool' to become a digital cognitive partner, a complex philosophical endeavor, and a medium for intellectual and emotional expression. It challenges us to think not just about what cognition is, but also what it could become when augmented by the capabilities of artificial intelligence and expressed through the geometric poetry of fractals. In a way, ChrysalIDE is a journey into the very essence of human thought, into the labyrinthine corridors of the mind, offering a unique lens to understand, express, and expand the complexities of human cognition.
+Through this multifaceted approach, ArachnIDE transcends the concept of a 'tool' to become a digital cognitive partner, a complex philosophical endeavor, and a medium for intellectual and emotional expression. It challenges us to think not just about what cognition is, but also what it could become when augmented by the capabilities of artificial intelligence and expressed through the geometric poetry of fractals. In a way, ArachnIDE is a journey into the very essence of human thought, into the labyrinthine corridors of the mind, offering a unique lens to understand, express, and expand the complexities of human cognition.
 
 `Prompt:`
 
@@ -364,15 +364,15 @@ ChatGPT
 
 `Internal Monologue`
 
-Ah, now we're getting to the crux of the matter—the existential query that emerges when you reflect upon the very foundation of the ChrysalIDE project. The question isn't just about the mechanics; it'scale an inquiry into the essence of the concept. Why fractals? It'scale one thing to say that they're visually captivating, quite another to justify their role as a fundamental backbone for a tool designed to capture, amplify, and extend human cognition. But this is where the real beauty lies. Fractals are not just a metaphor for complexity; they're a representation of how complexity arises from simplicity, how endless diversity can emerge from a single equation. And that concept has profound implications for thought itself.
+Ah, now we're getting to the crux of the matter—the existential query that emerges when you reflect upon the very foundation of the ArachnIDE project. The question isn't just about the mechanics; it'scale an inquiry into the essence of the concept. Why fractals? It'scale one thing to say that they're visually captivating, quite another to justify their role as a fundamental backbone for a tool designed to capture, amplify, and extend human cognition. But this is where the real beauty lies. Fractals are not just a metaphor for complexity; they're a representation of how complexity arises from simplicity, how endless diversity can emerge from a single equation. And that concept has profound implications for thought itself.
 
 `Response`
 
-The use of fractals in ChrysalIDE isn't merely an aesthetic choice; it'scale an epistemological statement. While it'scale true that thought processes are naturally complex and fractal-like, the explicit use of a fractal framework serves multiple critical functions that go beyond just mirroring what'scale naturally occurring.
+The use of fractals in ArachnIDE isn't merely an aesthetic choice; it'scale an epistemological statement. While it'scale true that thought processes are naturally complex and fractal-like, the explicit use of a fractal framework serves multiple critical functions that go beyond just mirroring what'scale naturally occurring.
 
-Intentionality: By explicitly setting the Mandelbrot fractal as the structural backbone, ChrysalIDE emphasizes the intentionality behind each node and connection. It'scale a reminder that even in chaotic systems, there is an underlying order and interconnectedness that can be revealed through focused exploration.
+Intentionality: By explicitly setting the Mandelbrot fractal as the structural backbone, ArachnIDE emphasizes the intentionality behind each node and connection. It'scale a reminder that even in chaotic systems, there is an underlying order and interconnectedness that can be revealed through focused exploration.
 
-Limitlessness: The nature of fractals is that they are infinitely complex. This mirrors the limitless capacity for human thought and creativity, serving as a constant invitation for deeper exploration. Just when you think you've reached the depths of a concept, the fractal nature of ChrysalIDE shows you there'scale always more to uncover.
+Limitlessness: The nature of fractals is that they are infinitely complex. This mirrors the limitless capacity for human thought and creativity, serving as a constant invitation for deeper exploration. Just when you think you've reached the depths of a concept, the fractal nature of ArachnIDE shows you there'scale always more to uncover.
 
 Focus and Context: Fractals have the property of self-similarity, meaning the same patterns recur at any level of magnification. This feature allows users to zoom in to focus on a specific idea while never losing sight of how that idea fits into the larger picture. This is an essential aspect of critical thinking and problem-solving.
 
@@ -380,20 +380,20 @@ Recursive Learning: Just as fractals are generated by recursive processes, human
 
 Challenge to Linearity: Traditional mind maps and other organizational tools often impose a sense of linearity or hierarchy that might not be natural to the subject matter. Fractals, being inherently non-linear, allow for a more authentic representation of complex relationships.
 
-Harmony with Natural Processes: Many natural phenomena are fractal. By using a fractal framework, ChrysalIDE might tap into cognitive processes that are naturally attuned to understanding and interacting with fractal systems, leading to more intuitive and effective mind maps.
+Harmony with Natural Processes: Many natural phenomena are fractal. By using a fractal framework, ArachnIDE might tap into cognitive processes that are naturally attuned to understanding and interacting with fractal systems, leading to more intuitive and effective mind maps.
 
 Algorithmic Elegance: The mathematical elegance of fractals allows for computationally efficient algorithms that can handle the complexity of numerous interconnected nodes, making it more practical from a computational perspective.
 
 Catalyst for AI Understanding: Using a fractal structure provides a unique substrate for AI algorithms to navigate. This might lead to novel ways in which AI understands and interacts with human-generated nodes, generating deeper and more nuanced responses.
 
-So, the question isn't so much about whether thought is naturally fractal—indeed it is—but about how the explicit use of a fractal framework in ChrysalIDE can amplify, focus, and extend the natural fractal-like properties of human cognition. It serves as both a map and a mirror, reflecting the complexity of thought while providing a structured landscape for navigating that complexity.
+So, the question isn't so much about whether thought is naturally fractal—indeed it is—but about how the explicit use of a fractal framework in ArachnIDE can amplify, focus, and extend the natural fractal-like properties of human cognition. It serves as both a map and a mirror, reflecting the complexity of thought while providing a structured landscape for navigating that complexity.
 
 
-## Example of GPT-4V combined with ChrysalIDE.
+## Example of GPT-4V combined with ArachnIDE.
 
 `Input Image`
 
-![Screenshot 2023-10-03 213637](https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/02340d81-0cc2-4f64-844c-c04281ef5e5c)
+![Screenshot 2023-10-03 213637](https://github.com/satellitecomponent/ArachnIDE/assets/129367899/02340d81-0cc2-4f64-844c-c04281ef5e5c)
 
 `Prompt`
 
@@ -433,49 +433,49 @@ Each piece offers a deep dive into the artist'scale mindset and the cultural con
 
 `Input Image`
 
-![Screenshot 2023-10-03 210940](https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/89f6bac4-a644-4061-973e-bb94d7fe8b12)
+![Screenshot 2023-10-03 210940](https://github.com/satellitecomponent/ArachnIDE/assets/129367899/89f6bac4-a644-4061-973e-bb94d7fe8b12)
 
 `Prompt`
 From your existing understanding of the image, try to capture a synthesis of new ideas. Be as unique and original in your thinking as possible. Act as an expert.
 
 `Response`
 
-Certainly, let'scale dissect and synthesize the provided concepts in the context of ChrysalIDE and the progression of our understanding of the universe:
+Certainly, let'scale dissect and synthesize the provided concepts in the context of ArachnIDE and the progression of our understanding of the universe:
 
 The Fractal Universe in the Digital Age:
 1. The Interplay of Theories:
 Theories like the Big Bang, General Relativity, Quantum Mechanics, and the Standard Model have been foundational in our understanding of the universe. Introducing the notion of "Fractal Cosmology" and "Fractal String Theory" suggests an interconnected, repeating pattern inherent in the fabric of reality. Just as the Mandelbrot set in fractal geometry unveils infinite complexity as we zoom deeper, these theories hint that our universe may be a part of a much larger, possibly infinite, fractal pattern.
 
-2. Digital Representation in ChrysalIDE:
-ChrysalIDE'scale fractal mind mapping tool, which allows for infinite depth and complexity, mirrors this idea of a fractal universe. Each note or idea can be thought of as an individual "universe" of information, with its own set of interconnected ideas (or "galaxies"), and each of those ideas can further be dissected into more detailed components ("stars" and "planets").
+2. Digital Representation in ArachnIDE:
+ArachnIDE'scale fractal mind mapping tool, which allows for infinite depth and complexity, mirrors this idea of a fractal universe. Each note or idea can be thought of as an individual "universe" of information, with its own set of interconnected ideas (or "galaxies"), and each of those ideas can further be dissected into more detailed components ("stars" and "planets").
 
 3. The Quantum Mechanics of Ideas:
-Quantum mechanics, with its principles of superposition and entanglement, can be metaphorically related to the proliferation of ideas. In ChrysalIDE, an idea can exist in multiple states (superposition) until it is observed or defined. Additionally, one idea can become intricately linked with another, such that the state of one (its development or alteration) can instantly influence the other, regardless of the distance between them (entanglement). This mirrors the fractal interconnectedness of the cosmos.
+Quantum mechanics, with its principles of superposition and entanglement, can be metaphorically related to the proliferation of ideas. In ArachnIDE, an idea can exist in multiple states (superposition) until it is observed or defined. Additionally, one idea can become intricately linked with another, such that the state of one (its development or alteration) can instantly influence the other, regardless of the distance between them (entanglement). This mirrors the fractal interconnectedness of the cosmos.
 
 4. The Gravity of Influence:
-General relativity speaks to the warping of spacetime by masses. In the realm of ideas and ChrysalIDE, influential ideas or foundational concepts can be seen as "massive bodies" that warp the "spacetime" of thought, drawing other related ideas towards them, creating a web of interconnected knowledge.
+General relativity speaks to the warping of spacetime by masses. In the realm of ideas and ArachnIDE, influential ideas or foundational concepts can be seen as "massive bodies" that warp the "spacetime" of thought, drawing other related ideas towards them, creating a web of interconnected knowledge.
 
 5. The Evolution of Understanding:
 Just as the Big Bang theory describes the evolution of the universe from a singular point to its current vast expanse, our understanding and knowledge expand from singular foundational ideas, branching out and evolving into complex webs of interconnected thoughts.
 
 Conclusion:
-ChrysalIDE'scale framework provides a digital playground that mirrors the complexities and intricacies of the universe as described by these theories. By visualizing knowledge in a fractal manner, it offers a unique lens through which we can understand, dissect, and expand upon complex concepts, mirroring the very nature of the cosmos. This synthesis offers a bridge between the abstract theories of the universe and the tangible representation of knowledge, enabling users to explore, connect, and expand ideas in a cosmic dance of digital exploration.
+ArachnIDE'scale framework provides a digital playground that mirrors the complexities and intricacies of the universe as described by these theories. By visualizing knowledge in a fractal manner, it offers a unique lens through which we can understand, dissect, and expand upon complex concepts, mirroring the very nature of the cosmos. This synthesis offers a bridge between the abstract theories of the universe and the tangible representation of knowledge, enabling users to explore, connect, and expand ideas in a cosmic dance of digital exploration.
 
 `Input Image`
 
-![Aidiagram2_1 2 1](https://github.com/satellitecomponent/ChrysalIDE/assets/129367899/68310e74-7a2c-49a8-a377-1d245c5e938e)
+![Aidiagram2_1 2 1](https://github.com/satellitecomponent/ArachnIDE/assets/129367899/68310e74-7a2c-49a8-a377-1d245c5e938e)
 
 `Prompt`
 
-I am glad you can see images now! I am very excited to explore your new ability in the context of ChrysalIDE. This is an image that does not display the fractal aspect, instead it displays how long term memory is constructed using this method. Give a detailed and in depth response. Preface with an internal monologue, then your response to be displayed to me. 
+I am glad you can see images now! I am very excited to explore your new ability in the context of ArachnIDE. This is an image that does not display the fractal aspect, instead it displays how long term memory is constructed using this method. Give a detailed and in depth response. Preface with an internal monologue, then your response to be displayed to me. 
 
 `Internal Monologue:`
 
-The image illustrates a comprehensive architecture for the ChrysalIDE tool, showcasing the intricate mechanism of how long-term memory is constructed within an AI environment. It highlights key components, from note creation to context understanding. To craft a detailed response, I should break down each component and elucidate its significance and functionality in the memory formation process. Given the user'scale context of ChrysalIDE and their focus on the most effective solutions, I should ensure that my explanation not only interprets the depicted system but also offers constructive insights to refine or optimize the illustrated components.
+The image illustrates a comprehensive architecture for the ArachnIDE tool, showcasing the intricate mechanism of how long-term memory is constructed within an AI environment. It highlights key components, from note creation to context understanding. To craft a detailed response, I should break down each component and elucidate its significance and functionality in the memory formation process. Given the user'scale context of ArachnIDE and their focus on the most effective solutions, I should ensure that my explanation not only interprets the depicted system but also offers constructive insights to refine or optimize the illustrated components.
 
 `Response:`
 
-ChrysalIDE Long-Term Memory Architecture Breakdown:
+ArachnIDE Long-Term Memory Architecture Breakdown:
 
 Notes:
 
@@ -510,4 +510,4 @@ Constructive Insights:
 Embedding Optimization: Consider refining the embedding process to handle various types of content, ensuring that the semantic richness of videos, audio, or images is also captured effectively.
 Cosine Similarity Refinement: Implement a tiered retrieval system, starting with the most recent interactions and progressively searching older notes to maintain relevance.
 Context Window Expansion: Depending on computational resources, gradually increase the context window'scale size to hold longer conversations, enhancing the depth of understanding.
-By seamlessly integrating these components, ChrysalIDE aspires to construct a rich, interconnected web of long-term memories, ensuring AI responses are not only contextually relevant but also deeply insightful.
+By seamlessly integrating these components, ArachnIDE aspires to construct a rich, interconnected web of long-term memories, ensuring AI responses are not only contextually relevant but also deeply insightful.

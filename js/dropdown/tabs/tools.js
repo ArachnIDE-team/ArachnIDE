@@ -15,7 +15,7 @@ class Tool {
     }
     async downloadCode() {
         if(this.code === null){
-            let importPath = path.relative( 'H:/projects/ChrysalIDE/js/dropdown/tabs', this.codePath)
+            let importPath = path.relative( 'H:/projects/ArachnIDE/js/dropdown/tabs', this.codePath)
             this.code = (await import(importPath  /*  @vite-ignore */)).default
             // Becomes:
             // import { injectQuery as __vite__injectQuery } from "/@vite/client";
