@@ -19,8 +19,6 @@ class TextNode extends WindowedNode {
             'remove': function (callback) { this.contentEditableDiv.removeEventListener("input", callback) }
         }}
 
-    // constructor(name = '', content = undefined, text = '', sx = undefined, sy = undefined, x = undefined, y = undefined, addCodeButton = false){
-
     constructor(configuration = TextNode.DEFAULT_CONFIGURATION){
         configuration = {...TextNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.content = [TextNode._getContentElement()];
@@ -72,6 +70,8 @@ class TextNode extends WindowedNode {
     }
 
     _initialize(textarea, sx, sy, x, y, addCodeButton){
+        this.setMinSize(480,270);
+        // this.onResize(480,270);
         let windowDiv = this.windowDiv;  // Find the .content div
         let editableDiv = createContentEditableDiv();  // Define editableDiv here
 
@@ -176,7 +176,7 @@ class TextNode extends WindowedNode {
         this.addAfterInitCallback(() => {
             if (!nodeTitles.includes(this.title)) {
                 restoreZettelkastenEvent = true;
-                addNodeTagToZettelkasten(this.title, this.textarea.value)
+                addNodeTagToZettelkasten(null, this.title, this.textarea.value)
                 restoreZettelkastenEvent = false;
             }
         })
@@ -204,18 +204,15 @@ class TextNode extends WindowedNode {
         }
     }
 
+    setMinSize(minWidth, minHeight) {
+        if(!minHeight) minHeight = Math.ceil(minWidth * 1.618); // Defaults to the golden ratio
+        super.setMinSize(minWidth, minHeight)
+        this.innerContent.style.minHeight = ''; // Reset after resize
+        this.innerContent.style.minWidth = ''; // Reset after resize
+    }
+
     onResize(newWidth, newHeight) {
         super.onResize(newWidth, newHeight);
-        const contentEditable = this.contentEditableDiv;
-        if (contentEditable) {
-            if (newHeight > 300) {
-                contentEditable.style.maxHeight = `${newHeight - 55}px`;
-            } else {
-                contentEditable.style.maxHeight = `300px`;
-            }
-            contentEditable.style.maxWidth = `${newWidth}px`
-        }
-
         const htmlView = this.htmlView;
         if (htmlView) {
             htmlView.style.width = '100%';

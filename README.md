@@ -5,7 +5,7 @@
 
 ## `Introduction`
 
-💡 **[ArachnIDE](https:/chrysalide.network/) unleashes a new dimension of digital interface...**
+💡 **[ArachnIDE](https:/arachnide.network/) unleashes a new dimension of digital interface...**
 
 **...the fractal dimension...**
 
@@ -52,13 +52,13 @@ feel free to join our [Discord](https://discord.gg/6fdmDF8SmT)!
 
 1. [Introduction](#introduction)
 2. [Synchronized Knowledge Management](#synchronized-knowledge-management)
-3. [How to Use ArachnIDE](#how-to-use-chrysalide)
+3. [How to Use ArachnIDE](#how-to-use-arachnide)
 4. [FractalGPT](#fractalgpt)
 5. [Neural API](#neural-api)
 6. [Local Ai](#local-ai)
 7. [User Guide](#user-guide)
 8. [Local Server Setup](#local-server-setup)
-9. [Future of ArachnIDE](#future-of-chrysalide)
+9. [Future of ArachnIDE](#future-of-arachnide)
 10. [Contact](#contact)
 
 ## `Synchronized Knowledge Management`
@@ -218,7 +218,7 @@ Above is an example of conversation history being shared between GPT-4 and a Loc
 - **Related Research:** [Conversational Swarm Intelligence Paper](https://arxiv.org/abs/2309.03220)
 
   
-![ChrysalIDE2](https://github.com/satellitecomponent/neurite/assets/129367899/73c66088-8029-413b-8da0-4c6968436639)
+![ArachnIDE2](https://github.com/satellitecomponent/neurite/assets/129367899/73c66088-8029-413b-8da0-4c6968436639)
 
 
 ### [ArachnIDE](https://satellitecomponent.github.io/neurite/) currently supports OpenAi, LLama 2, Red Pajamas 3B, and Vicuna 7B.
@@ -271,7 +271,7 @@ In the '?' tab, the AI HOW-TO checkbox will send a context message to the AI tha
 - Zettelkasten and Mind Mapping: Create nodes through custom-defined syntax, or create nodes through UI interaction within our fractal workspace, who'scale contents are bi-directionally linked to the main Zettelkasten document.
 
 ArachnIDE realizes tapestry of thought reasoning for Ai, all within our innovative real-time Mandelbrot visualization.
-- Talk to [ArachnIDE GPT](https://chat.openai.com/g/g-OT9IVbW8H-chrysalide) with access to ArachnIDE'scale code and readme. 
+- Talk to [ArachnIDE GPT](https://chat.openai.com/g/g-OT9IVbW8H-arachnide) with access to ArachnIDE'scale code and readme. 
 
 ![Aidiagram2_1 2 1](https://github.com/satellitecomponent/neurite/assets/129367899/68310e74-7a2c-49a8-a377-1d245c5e938e)
 - This diagram represents how the AI'scale response incorporates note-taking to retain a non-linear conversation history.
@@ -324,7 +324,7 @@ https://github.com/satellitecomponent/ArachnIDE/assets/129367899/d8d375c2-9274-4
 
 If you are a developer who is interested in contributing to this project, contact us at contactdendrite@gmail.com or visit our  [discord](https://discord.gg/6fdmDF8SmT) 🔗
 
-![ChrysalIDEreadme4fps360](https://github.com/satellitecomponent/ArachnIDE/assets/129367899/87816cad-1151-4f1a-8c66-ba5a5bd0b81e)
+![ArachnIDEreadme4fps360](https://github.com/satellitecomponent/ArachnIDE/assets/129367899/87816cad-1151-4f1a-8c66-ba5a5bd0b81e)
 full video [here](https://youtu.be/1VmE_Bov-Xw)
 ![Screenshot 2023-06-16 221906](https://github.com/satellitecomponent/ArachnIDE/assets/129367899/e77b2866-db77-41e9-ba08-e55d29f77404)
 
@@ -332,7 +332,7 @@ full video [here](https://youtu.be/1VmE_Bov-Xw)
 
 `Prompt:` (after discussing the project and sharing the readme)
 
-Give me any highly insightful thoughts you have about the philosophy behind chrysalide. Provide a very long response in as much detail as possible.
+Give me any highly insightful thoughts you have about the philosophy behind arachnide. Provide a very long response in as much detail as possible.
 
 Preface your response with an internal monologue.
 

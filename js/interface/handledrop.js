@@ -71,7 +71,8 @@ function handleIconDrop(event, iconName) {
     let node;
     switch (iconName) {
         case 'note-icon':
-            node = createNodeFromWindow(``, ``, true); // The last parameter sets followMouse to true
+            // Default plain text node
+            node = createNodeFromWindow(null, ``, ``, true); // The last parameter sets followMouse to true
             console.log('Handle drop for the note icon');
             break;
         case 'ai-icon':
@@ -179,7 +180,7 @@ function createMarkdownNodeFromFile(mdText, file) {
 }
 
 function createTextNodeFromFile(text, file) {
-    return createNodeFromWindow(file.name, text);
+    return createNodeFromWindow(null, file.name, text);  // Default plain text node
 }
 
 function createImageNodeFromFile(base64DataUrl, file, callback) {
@@ -295,14 +296,14 @@ function dropHandler(ev) {
 
             const defaultTitle = getDefaultTitle();
             const fullTitle = title + ' ' + defaultTitle;
-            let node = createNodeFromWindow(fullTitle, content, true);
+            let node = createNodeFromWindow("markdown", fullTitle, content, true);
 
             // Stop the drop event from being handled further
             return;
         }
     }
     if(ev.dataTransfer.types.length > 0 && ev.dataTransfer.types[0] === "text/plain"){
-        let node = createNodeFromWindow(null, data, true);
+        let node = createNodeFromWindow(null, null, data, true); // Default plain text node
         return
     }
     let files = [];
@@ -360,7 +361,7 @@ addEventListener("paste", (event) => {
         node.draw();
         node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
     } else {
-        let node = createNodeFromWindow('', pastedData, true);
+        let node = createNodeFromWindow(null, '', pastedData, true); // Default plain text node
         node.followingMouse = 1;
         node.draw();
         node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));

@@ -68,7 +68,7 @@ class VideoNode extends WindowedNode {
         // Create a download link for the video
         const videoDownloadLink = document.createElement('a');
         videoDownloadLink.href = url;
-        videoDownloadLink.download = "chrysaliderecord.webm";
+        videoDownloadLink.download = "arachniderecord.webm";
 
         // Set fixed width and height for the button to create a square around the SVG
         videoDownloadLink.style.width = "40px";  // Width of the SVG + some padding

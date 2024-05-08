@@ -299,6 +299,7 @@ function identifyNodeTitles() {
         if (line.text.match(nodeTagRegex.start)) { //line.text.startsWith(nodeTag) && line.text.trim().split(nodeTag).length > 0) {
         // if (line.text.startsWith(nodeTag)) {
             let title = line.text.split(nodeTag)[1].trim();
+            title = title.split(" ").splice(1).join(" ").trim();
             // Remove comma if exists
             if (title.endsWith(',')) {
                 title = title.slice(0, -1);
@@ -318,7 +319,7 @@ function updateNodeTitleToLineMap() {
     myCodeMirror.eachLine((line) => {
         // if (line.text.startsWith(nodeTag)) {
         if (line.text.match(nodeTagRegex.start)) {//line.text.startsWith(nodeTag) && line.text.trim().split(nodeTag).length > 0) {
-            const title = line.text.split(nodeTag)[1].trim();
+            const title = line.text.split(nodeTag)[1].trim().split(" ").splice(1).join(" ").trim();
             currentNodeTitleLineNo = line.lineNo();  // Store the line number of the "node:" line
             nodeTitleToLineMap.set(title, currentNodeTitleLineNo);
         }

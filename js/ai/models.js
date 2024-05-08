@@ -74,6 +74,8 @@ window.modelOptions = () => [
     // Google
     new Option('Google Gemini 1.0 PRO', 'google:gemini-1.0-pro', false, false),
     new Option('Google Gemini 1.0 Vision PRO', 'google:gemini-1.0-pro-vision', false, false),
+    new Option('Google Gemini 1.5 PRO', 'google:gemini-1.5-pro-preview-0409', false, false),
+    new Option('Google Gemini 1.5 Vision PRO', 'google:gemini-1.5-pro-vision', false, false),
 
     // Mistral
     new Option('Open Mistral 7B', 'mistral:open-mistral-7b', false, false),
@@ -450,7 +452,7 @@ class GoogleModelWrapper extends ModelWrapper {
         headers.append("Authorization", `Bearer ${this.getAPIKey()}`);
 
         messages = messages.map((message) => message.content)
-
+        if(maxTokens > 8192) maxTokens = 8192; // Ouch bad workaround (close your eyes)
         const requestOptions = {
             method: "POST",
             headers,
@@ -478,6 +480,10 @@ class GoogleModelWrapper extends ModelWrapper {
     // TO-DO: Review proxy
     async handleResponseForLLMNode(response, node) {
         const data = await response.json();
+        if(data.length === 0) {
+            node.regenerateResponse();
+            return "";
+        }
         let fullResponse = data[0];
         node.aiResponseTextArea.value += fullResponse;
         node.aiResponseTextArea.dispatchEvent(new Event("input"));

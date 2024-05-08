@@ -11,11 +11,13 @@ from mistral_common.protocol.instruct.messages import (
     AssistantMessage,
     UserMessage,
 )
+import sys
 
 import requests
 
 import vertexai
-from vertexai.generative_models import GenerativeModel
+# from vertexai.generative_models import GenerativeModel
+import vertexai.preview.generative_models as generative_models
 
 app = Flask(__name__)
 CORS(app)
@@ -24,10 +26,42 @@ CORS(app)
 # credentials = Credentials.from_service_account_file("../../client_secret.json")
 # Build Vertex AI service object using the loaded credentials
 # service = build("aiplatform", "v1", credentials=credentials)
-
+#  "H:\\projects\\ArachnIDE\\client_secret.json"
 newpath = os.path.join(os.path.dirname(__file__), "..\\..\\", "client_secret.json")
 newpath = os.path.normpath(newpath)
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = newpath
+
+gemini_safety_settings = [
+    generative_models.SafetySetting(
+        category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold=generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+    ),
+    generative_models.SafetySetting(
+        category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold=generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+    ),
+    generative_models.SafetySetting(
+        category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold=generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+    ),
+    generative_models.SafetySetting(
+        category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold=generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+    )
+]
+
+# {
+#     generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+#     generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+#     generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+#     generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+# }
+# gemini_safety_settings = {
+#     generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_NONE,
+#     generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+#     generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+#     generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+# }
 
 
 @app.route('/anthropic-proxy', methods=['POST'])
@@ -65,12 +99,36 @@ def gemini_proxy():
     max_tokens = data.get('max_tokens')
     temperature = data.get('temperature')
     vertexai.init(project=project_id, location=location)
-    model = GenerativeModel(model_name=model_name)
-    try:
-        response = model.generate_content(messages)
-        return convert_gemini_response(response)
-    except Exception as e:
-        return jsonify({'error': str(e)})
+    model = generative_models.GenerativeModel(model_name=model_name)
+    # try:
+    # response = model.generate_content(messages)
+
+    generation_config = generative_models.GenerationConfig(
+        max_output_tokens=max_tokens,
+        temperature=temperature,
+        candidate_count=1,
+        top_p=0.95,
+    )
+    # generation_config = {
+    #     "max_output_tokens": max_tokens,
+    #     "temperature": temperature,
+    #     "candidate_count": 1,
+    #     "top_p": 0.95,
+    # }
+    response = model.generate_content(
+        messages,
+        generation_config=generation_config,
+        safety_settings=gemini_safety_settings,
+        stream=False
+    )
+    # return jsonify(convert_gemini_response(response)) # THIS ONE DOES NOT WORK
+    gemini_response_array = convert_gemini_response(response)
+    print("response from gemini proxy: " + str(response), flush=True)
+    return gemini_response_array  # THIS ONE DOES NOT WORK
+    # return json.dumps(convert_gemini_response(response))  # THIS ONE WORKS
+    # return jsonify(json.dumps(convert_gemini_response(response)))  # THIS ONE WORKS
+    # except Exception as e:
+    #     return jsonify({'error': str(e)})
 
 # Chat templates for HuggingFace models
 @app.route('/apply-chat-template', methods=['POST'])
@@ -208,9 +266,10 @@ def get_mistral_messages(messages):
 def convert_gemini_response(response):
     chat = []
     for candidate in response.candidates:
-        response_part = candidate.content.parts[0]
-        chat.append(response_part.text)
-    return json.dumps(chat)
+        if len(candidate.content.parts) > 0:
+            response_part = candidate.content.parts[0]
+            chat.append(response_part.text)
+    return chat
 
 # new Option('Anthropic Claude instant 1.2', 'anthropic:claude-instant-1.2', false, false),
 # new Option('Anthropic Claude 2.0', 'anthropic:claude-2.0', false, false),
@@ -251,3 +310,28 @@ def apply_model_mapping(model):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 1000))
     app.run(port=PORT)
+
+
+## Test gemini
+# import vertexai
+# import json
+# from vertexai.generative_models import GenerativeModel
+# import vertexai.preview.generative_models as generative_models
+# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "H:\\projects\\ArachnIDE\\client_secret.json"
+# project_id = "encoded-net-422415-c1"
+# location = "us-central1"
+# model_name = "gemini-1.5-pro-preview-0409"
+# vertexai.init(project=project_id, location=location)
+# model = GenerativeModel(model_name=model_name)
+# with open("H:\\projects\\ArachnIDE\\samples\\test.json", "r") as f:
+#     messages = json.load(f)
+# response = model.generate_content(messages, safety_settings={
+#      generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_NONE,
+#      generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+#      generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+#      generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+# }, generation_config={
+#     "max_output_tokens": 8192,
+#     "temperature": 1,
+#     "top_p": 0.95,
+# })

@@ -117,7 +117,7 @@ let shouldAddCodeButton = false;
 
                 const match = lines[i].match(nodeTitleRegex);
                 if (match) {
-                    return rootDiagram.getNodeByTitle(match[1].trim());  // Return the node object
+                    return rootDiagram.getNodeByTitle(match[1].trim().split(" ").splice(1).join(" ").trim());  // Return the node object
                 }
             }
             return null;  // If no matching node is found, return null or another default value
@@ -221,6 +221,7 @@ let shouldAddCodeButton = false;
         //Creates nodes either from the Zettelkasten or the window.
         _handleNode(line, i, nodeLines, nodes, currentNodeTitle) {
             currentNodeTitle = line.substr(nodeTag.length).trim();
+            currentNodeTitle = currentNodeTitle.split(" ").slice(1).join(" ");
 
             if (restoreZettelkastenEvent) {
                 let savedNode = rootDiagram.getNodeByTitle(currentNodeTitle);
@@ -429,18 +430,12 @@ let shouldAddCodeButton = false;
 
                 // Replace the node's content
                 let newNodeBody = body.split('\n');
-                // console.log("Markdown Replacement before:", newNodeBody)
-                // if(language === 'markdown'){// && !node.escaped
-                //     newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
-                //     node.escaped = true;
-                // }
-                if(language === 'markdown') newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
-                // newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));// this one
-                // newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
-                // console.log("Markdown Replacement after:", newNodeBody)
-                // const newNodeContent = [lines[startLineNo]].concat(newNodeBody);
+
+                // if(language === 'markdown') newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
+                newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
+
                 const newNodeContent = [lines[startLineNo]].concat([...newNodeBody, "```"] );
-                // const newNodeContent = [lines[startLineNo]].concat(["```" + language, ...newNodeBody, "```"]); // this one
+
                 lines.splice(startLineNo, endLineNo - startLineNo + 1, ...newNodeContent);
 
                 const newValue = lines.join('\n');
@@ -637,7 +632,8 @@ let shouldAddCodeButton = false;
                 // let cursor = noteInput.getCursor();
                 // cursor.sticky = true;
                 node.nodeObject.removeEventListener('change', node.nodeObject.zettlekastenListener);
-                node.nodeObject.code = node.plainText;
+                // node.nodeObject.code = node.plainText;
+                node.nodeObject.code = node.plainText.replace(/\\`/g, "`");
                 node.nodeObject.addEventListener('change', node.nodeObject.zettlekastenListener);
                 // noteInput.setCursor(cursor);
             }

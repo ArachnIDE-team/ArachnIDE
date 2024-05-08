@@ -12,13 +12,13 @@ This server replaces native screenshot behavior as the browser default requires 
 ## Usage
 **Default URL:**
 ```bash
-node ChrysalIDEAutomation.js
+node ArachnIDEAutomation.js
 ```
 
 This will navigate to http://localhost:8080/, ArachnIDE's default port when run locally.
 
 **Custom URL:**
 ```bash
-node ChrysalIDEAutomation.js <custom-url>
+node ArachnIDEAutomation.js <custom-url>
 ```
 Replace `<custom-url>` with your ArachnIDE URL.

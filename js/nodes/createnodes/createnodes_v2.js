@@ -14,7 +14,7 @@ document.addEventListener('dblclick', function (e) {
         node.draw();
     } else if (nodeMode && !rootDiagram.prevNodeToConnect) {
         // Node mode (Shift) + double click behavior
-        createNodeFromWindow();
+        createNodeFromWindow(); // Default text node
     }
 });
 
@@ -35,19 +35,21 @@ function getDefaultTitle() {
 }
 
 // Function to handle node creation from a window (double-click behavior)
-function createNodeFromWindow(title = null, content = null, followMouse = false) {
+function createNodeFromWindow(language = null, title = null, content = null, followMouse = false) {
     const defaultTitle = title || getDefaultTitle();
     nodefromWindow = true;
     // Set the followMouseFromWindow global flag if followMouse is true
     if (followMouse) {
         followMouseFromWindow = true;
     }
-    addNodeTagToZettelkasten(defaultTitle, content);
+    addNodeTagToZettelkasten(language, defaultTitle, content);
     return rootDiagram.getNodeByTitle(defaultTitle);
 }
 
-function addNodeTagToZettelkasten(title, content = null) {
-    const nodeTagLine = nodeTag + ' ' + title;
+function addNodeTagToZettelkasten(language = null, title, content = null) {
+    if(!language) language = "text"
+    // const nodeTagLine = nodeTag + ' ' + language + ' ' + title;
+    const nodeTagLine = nodeTag + language + ' ' + title;
     let currentZettelkastenValue = noteInput.getValue();
 
     // Check if the content ends with a newline and add one or two newlines accordingly
@@ -59,7 +61,8 @@ function addNodeTagToZettelkasten(title, content = null) {
 
     // Add content if given
     if (content) {
-        currentZettelkastenValue += '\n' + content;
+        currentZettelkastenValue += '\n' + content.replace(/`/g, "\\`");
+        // currentZettelkastenValue += '\n' + content;
     }
 
     currentZettelkastenValue +=  '\n' + nodeTag; // closing tag

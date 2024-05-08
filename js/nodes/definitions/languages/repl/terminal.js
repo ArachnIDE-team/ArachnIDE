@@ -13,6 +13,8 @@ class TerminalNode extends WindowedNode {
         saveData: undefined
     }
 
+    static SAVE_PROPERTIES = ['settings'];
+
     constructor(configuration = TerminalNode.DEFAULT_CONFIGURATION){
         configuration = {...TerminalNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.index = configuration.saved ? configuration.saveData.json.index : generateUUID();
@@ -64,7 +66,13 @@ class TerminalNode extends WindowedNode {
 
 
         this.headerContainer = this.innerContent.querySelector(".content-sticky-header");
-        this.headerContainer.innerText = "Language: " + this.settings.language + " (" + this.settings.version + ")";
+        if(!this.settings) {
+            this.addAfterInitCallback(() => {
+                this.headerContainer.innerText = "Language: " + this.settings.language + " (" + this.settings.version + ")";
+            })
+        }else{
+            this.headerContainer.innerText = "Language: " + this.settings.language + " (" + this.settings.version + ")";
+        }
         let footerContainerLeftContainer = document.createElement("div");
         footerContainerLeftContainer.className = "footer-left-container";
         footerContainerLeftContainer.style.marginLeft = "0"
@@ -128,6 +136,7 @@ class TerminalNode extends WindowedNode {
                 // console.log("Code editor change: ", e)
                 // this.onResizeInput();
                 setTimeout( this.onResizeInput.bind(this), IFRAME_LOAD_TIMEOUT)
+                setTimeout( super.afterInit.bind(this), IFRAME_LOAD_TIMEOUT)
             })
             this.inputCodeLine.contentWindow.codeEditor.options.extraKeys["Ctrl-Enter"] = () => {
                 // console.log("Code editor CTRL-Enter")

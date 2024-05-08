@@ -73,7 +73,7 @@ class FilePicker extends WindowedUI {
         confirmFileSelectionButton.className = "footer-button";
         confirmFileSelectionButton.disabled = true;
         confirmFileSelectionButton.onclick = () => {
-            this.onSelect(this.fileSystemTree.values);
+            this.onSelect(this.fileSystemTree.content.values);
             super.onDelete();
         }
 
@@ -103,7 +103,7 @@ class FilePicker extends WindowedUI {
             }
         }).then((fileSystemTree) => {
             this.fileSystemTree = fileSystemTree;
-            this.fileSystemTree.addEventListener("value", (selected, newSelection) => {
+            this.fileSystemTree.addValueListener((selected, newSelection) => {
                 console.log("Selected: ", selected, " newSelection: ", newSelection)
                 if(selected.length === 0){
                     confirmFileSelectionButton.disabled = true;

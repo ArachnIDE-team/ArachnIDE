@@ -6,6 +6,7 @@ package-lock.json
 /.idea/
 TO-DO.md
 DEV-PROMPTS.md
+PROMPTS*.md
 workspaces.json
 .arachnIDE*/
 .neurIDE*/

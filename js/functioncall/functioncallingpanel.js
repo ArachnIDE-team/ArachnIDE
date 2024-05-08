@@ -50,7 +50,7 @@ CodeMirror.defineMode("ignoreCodeBlocks", function (config) {
             if (stream.match(/^\w+/)) {
                 var currentToken = stream.current();
                 if (functionNameList.includes(currentToken)) {
-                    return "chrysalide-function-name"; // Custom style for function names
+                    return "arachnide-function-name"; // Custom style for function names
                 }
                 stream.backUp(currentToken.length); // Back up to reprocess this token in jsMode
             }
@@ -72,7 +72,7 @@ CodeMirror.defineMode("ignoreCodeBlocks", function (config) {
     };
 });
 
-const chrysalideFunctionCM = CodeMirror.fromTextArea(document.getElementById('chrysalide-function-cm'), {
+const arachnideFunctionCM = CodeMirror.fromTextArea(document.getElementById('arachnide-function-cm'), {
     mode: "ignoreCodeBlocks", // Use the custom mode
     lineNumbers: false,
     lineWrapping: true,
@@ -82,28 +82,28 @@ const chrysalideFunctionCM = CodeMirror.fromTextArea(document.getElementById('ch
 });
 
 // Add class to the CodeMirror wrapper
-chrysalideFunctionCM.display.wrapper.classList.add('chrysalide-function-cm-style');
+arachnideFunctionCM.display.wrapper.classList.add('arachnide-function-cm-style');
 // Function to update the content of the CodeMirror instance
-function updateChrysalIDEFunctionCMContent(content) {
-    chrysalideFunctionCM.setValue(content);
-    chrysalideFunctionCM.refresh();
+function updateArachnIDEFunctionCMContent(content) {
+    arachnideFunctionCM.setValue(content);
+    arachnideFunctionCM.refresh();
 }
 
 let userScrolledUpFunctionPanel = false;
 
 // Scroll event listener
-chrysalideFunctionCM.on("scroll", function () {
-    var scrollInfo = chrysalideFunctionCM.getScrollInfo();
+arachnideFunctionCM.on("scroll", function () {
+    var scrollInfo = arachnideFunctionCM.getScrollInfo();
     var atBottom = scrollInfo.height - scrollInfo.top - scrollInfo.clientHeight < 1;
     userScrolledUpFunctionPanel = !atBottom;
 });
 
 // Change event listener
-chrysalideFunctionCM.on("change", function () {
+arachnideFunctionCM.on("change", function () {
     if (!userScrolledUpFunctionPanel) {
         // Scroll to the bottom
-        var scrollInfo = chrysalideFunctionCM.getScrollInfo();
-        chrysalideFunctionCM.scrollTo(null, scrollInfo.height);
+        var scrollInfo = arachnideFunctionCM.getScrollInfo();
+        arachnideFunctionCM.scrollTo(null, scrollInfo.height);
     }
 });
 
@@ -145,8 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // Global log collector
 let logCollector = [];
 
-function runChrysalIDECode() {
-    const code = chrysalideFunctionCM.getValue();
+function runArachnIDECode() {
+    const code = arachnideFunctionCM.getValue();
     const codeBlocks = extractCodeBlocks(code);
     const codeToRun = codeBlocks.length > 0 ? codeBlocks.join('\n') : code;
 
@@ -220,7 +220,7 @@ function runChrysalIDECode() {
     // Cleanup
     window.onerror = originalOnError;
     updateTitleWithLogs();
-    chrysalideFunctionCM.setValue('');
+    arachnideFunctionCM.setValue('');
 }
 
 // Function to update the UI with the current title
@@ -290,7 +290,7 @@ function generateUUID() {
 }
 
 function addFunctionCallItem(functionName, code, isError = false) {
-    const currentCoords = chrysalideGetMandelbrotCoords(); // Get current coordinates
+    const currentCoords = arachnideGetMandelbrotCoords(); // Get current coordinates
 
     const item = document.createElement('div');
     item.classList.add('function-call-item');
@@ -393,7 +393,7 @@ function generateTitleForCode(code) {
 }
 
 const functionRunButton = document.getElementById('function-run-button');
-functionRunButton.addEventListener('click', runChrysalIDECode);
+functionRunButton.addEventListener('click', runArachnIDECode);
 
 const functionCallList = document.querySelector('.function-call-list');
 
@@ -401,15 +401,15 @@ functionCallList.addEventListener('click', function (event) {
     // Check if the clicked target is a div
     if (event.target.tagName === 'DIV') {
         if (event.target.classList.contains('active-state')) {
-            chrysalideFunctionCM.setValue('');
+            arachnideFunctionCM.setValue('');
             // If the div becomes active, repopulate the CodeMirror
             const originalText = event.target.originalText;
             if (originalText) {
-                updateChrysalIDEFunctionCMContent(originalText);
+                updateArachnIDEFunctionCMContent(originalText);
             }
         } else {
             // Clear the CodeMirror content if the div is not active
-            chrysalideFunctionCM.setValue('');
+            arachnideFunctionCM.setValue('');
         }
     }
 });

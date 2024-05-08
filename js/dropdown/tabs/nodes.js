@@ -49,8 +49,8 @@ class NodesTab {
             return array;
         }
 
-        getFSTree("H:/projects/ArachnIDE/js",["**/**.js"],[] ).then((chrysalIDEJSSourceTree) => {
-            let fileList = getFilesFromFSTree(chrysalIDEJSSourceTree.fsTree, "H:/projects/ArachnIDE/js")
+        getFSTree("H:/projects/ArachnIDE/js",["**/**.js"],[] ).then((arachnIDEJSSourceTree) => {
+            let fileList = getFilesFromFSTree(arachnIDEJSSourceTree.fsTree, "H:/projects/ArachnIDE/js")
             this.getFilesContent(fileList).then((fileObject) => {
                 let classDeclarations = [];
 

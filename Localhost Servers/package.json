@@ -1,5 +1,5 @@
 {
-  "name": "chrysalide-servers",
+  "name": "arachnide-servers",
   "version": "1.0.0",
   "description": "Starts all Localhost Servers for ArachnIDE",
   "main": "start_servers.js",

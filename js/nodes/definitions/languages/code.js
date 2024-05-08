@@ -226,7 +226,7 @@ class CodeNode extends WindowedNode {
                     restoreZettelkastenEvent = true;
                     let content = iframeElement.contentWindow.codeEditor.getValue();
                     if(this.settings.language === "markdown") content = content.replace(/`/g, "\\`");
-                    addNodeTagToZettelkasten(this.title,  content)
+                    addNodeTagToZettelkasten(this.settings.language, this.title,  content)
                     restoreZettelkastenEvent = false;
                 }
             })

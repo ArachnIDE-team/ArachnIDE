@@ -2,9 +2,9 @@ const playwright = require('playwright');
 const http = require('http');
 const url = require('url');
 
-const defaultChrysalIDEUrl = 'http://localhost:8080/';
+const defaultArachnIDEUrl = 'http://localhost:8080/';
 
-async function startChrysalIDE(url, browserType = 'chromium') {
+async function startArachnIDE(url, browserType = 'chromium') {
     const browser = await playwright[browserType].launch({ headless: false });
     const page = await browser.newPage();
 
@@ -59,10 +59,10 @@ const args = process.argv.slice(2);
 let page; // Store the page object globally
 
 // Use provided URL or default if not provided
-const chrysalideUrl = args.length >= 1 ? args[0] : defaultChrysalIDEUrl;
+const arachnideUrl = args.length >= 1 ? args[0] : defaultArachnIDEUrl;
 const browserType = args[1] || 'chromium';
 
-startChrysalIDE(chrysalideUrl, browserType).then(async ({ page: p }) => {
+startArachnIDE(arachnideUrl, browserType).then(async ({ page: p }) => {
     page = p;
     // Start the server
     server.listen(8081, () => {
@@ -70,4 +70,4 @@ startChrysalIDE(chrysalideUrl, browserType).then(async ({ page: p }) => {
     });
 });
 
-module.exports = { startChrysalIDE, takeScreenshot };
+module.exports = { startArachnIDE, takeScreenshot };

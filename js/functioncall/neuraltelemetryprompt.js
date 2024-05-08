@@ -7,8 +7,8 @@ class NeuralTelemetry {
 
     // Method to directly fetch current Mandelbrot coordinates
     getCurrentMandelbrotCoords() {
-        // Assuming chrysalideGetMandelbrotCoords is a globally available function
-        const coords = chrysalideGetMandelbrotCoords();
+        // Assuming arachnideGetMandelbrotCoords is a globally available function
+        const coords = arachnideGetMandelbrotCoords();
         return {
             zoom: coords.zoom,
             pan: coords.pan
@@ -145,7 +145,7 @@ async function performSequence(animations) {
     });
 
     // Execute the queue of animations
-    await chrysalideAnimationQueue(transformedAnimations);
+    await arachnideAnimationQueue(transformedAnimations);
 }`,
         examples: [
             `// Expected Input Format for animations:
@@ -155,7 +155,7 @@ async function performSequence(animations) {
 //     ...
 // ]`,
             `// An Example of how to use performSequence(animations)
-async function chrysalideExploreSequence() {
+async function arachnideExploreSequence() {
     try {
         const animations = [
             // Edge of Scepter Valley (Disc 3)
@@ -181,7 +181,7 @@ async function chrysalideExploreSequence() {
     }
 }
 
-chrysalideExploreSequence()`
+arachnideExploreSequence()`
         ],
         options: { neuralApi: true, vision: true }
     },
@@ -323,14 +323,14 @@ async function furtherMovementSequence() {
 }
 
 // Combine the sequences with the Zettelkasten call in between
-async function completeChrysalIDEInteraction() {
+async function completeArachnIDEInteraction() {
     await initialSequence();
     callZettelkasten();
     await furtherMovementSequence();
 }
 
 // Execute the complete interaction
-completeChrysalIDEInteraction();`
+completeArachnIDEInteraction();`
         ],
         options: { neuralApi: true, vision: false }
     },
@@ -378,9 +378,9 @@ You TAKE ACTION based off the provided SCREENSHOTS of ArachnIDE's interface.`;
 }
 
 // Usage
-const chrysalideNeuralApiPrompt = neuralApiPrompt();
-const chrysalideNeuralVisionPrompt = visionPrompt();
+const arachnideNeuralApiPrompt = neuralApiPrompt();
+const arachnideNeuralVisionPrompt = visionPrompt();
 
 // Example console log
-//console.log(chrysalideNeuralApiPrompt);
-//console.log(chrysalideNeuralVisionPrompt);
+//console.log(arachnideNeuralApiPrompt);
+//console.log(arachnideNeuralVisionPrompt);

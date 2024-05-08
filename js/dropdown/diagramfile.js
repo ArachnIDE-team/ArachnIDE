@@ -394,7 +394,7 @@ function loadnet(text, clobber, createEdges = true) {
     let newNodes = [];
     for (let nodeJSON of data.nodes) {
         let node = restoreNode(nodeJSON);
-        newNodes.push(node);
+        if(node !== undefined) newNodes.push(node);
     }
 
     populateDirectionalityMap(newNodes.map((node) => node.content), rootDiagram.nodeMap);

@@ -1,10 +1,10 @@
 {
-  "name": "chrysalide-automation",
+  "name": "arachnide-automation",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ChrysalIDEAutomation.js"
+    "start": "node ArachnIDEAutomation.js"
   },
   "keywords": [],
   "author": "",

@@ -49,7 +49,7 @@ function easeInOutCubic(t) {
 
 
 
-function chrysalideZoom(zoomFactor, targetX = window.innerWidth / 2, targetY = window.innerHeight / 2, duration = 1000) {
+function arachnideZoom(zoomFactor, targetX = window.innerWidth / 2, targetY = window.innerHeight / 2, duration = 1000) {
     const dest = rootDiagram.background.toZ(new vec2(targetX, targetY));
     const adjustedZoomFactor = 1 / zoomFactor;
 
@@ -65,7 +65,7 @@ function chrysalideZoom(zoomFactor, targetX = window.innerWidth / 2, targetY = w
     }, easeInOutCubic);
 }
 
-function chrysalidePan(deltaX, deltaY, duration = 1000) {
+function arachnidePan(deltaX, deltaY, duration = 1000) {
     const dp = rootDiagram.background.toDZ(new vec2(deltaX, deltaY).scale(settings.panSpeed));
     const startPan = rootDiagram.background.pan;
     const endPan = startPan.plus(dp);
@@ -76,7 +76,7 @@ function chrysalidePan(deltaX, deltaY, duration = 1000) {
     }, easeInOutCubic);
 }
 
-function chrysalideRotate(rotationAngle, pivotX, pivotY, duration = 1000) {
+function arachnideRotate(rotationAngle, pivotX, pivotY, duration = 1000) {
     const p = rootDiagram.background.toZ(new vec2(pivotX, pivotY));
     const zc = p.minus(rootDiagram.background.pan);
     const r = new vec2(Math.cos(rotationAngle), Math.sin(rotationAngle));
@@ -107,7 +107,7 @@ const defaultMovements = {
     // Add more default movements as needed
 };
 
-function chrysalideMovement(movementTypes = [], customZoomParams = {}, customPanParams = {}, customRotateParams = {}, customDuration = 1000) {
+function arachnideMovement(movementTypes = [], customZoomParams = {}, customPanParams = {}, customRotateParams = {}, customDuration = 1000) {
     return new Promise((resolve, reject) => {
         activeAnimationsCount++;
 
@@ -198,7 +198,7 @@ autopilotReferenceFrame = this;
 panToI = new vec2(0, 0); */
 
 
-function chrysalideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, speed = 0.1) {
+function arachnideSetMandelbrotCoords(zoomMagnitude, panReal, panImaginary, speed = 0.1) {
     return new Promise((resolve) => {
         let animate = true
 
@@ -266,7 +266,7 @@ vec2.prototype.closeEnough = function (target, autopilotThreshold) {
 };
 
 
-function chrysalideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
+function arachnideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
     return new Promise((resolve) => {
         activeAnimationsCount++;
         rootDiagram.autopilot.referenceFrame = undefined;
@@ -323,7 +323,7 @@ function chrysalideZoomToNodeTitle(nodeOrTitle, zoomLevel = 1.0) {
     });
 }
 
-async function chrysalideSearchNotes(searchTerm, maxNodesOverride = null) {
+async function arachnideSearchNotes(searchTerm, maxNodesOverride = null) {
     const nodesArray = Object.values(rootDiagram.nodes); // Assuming this contains full node objects
 
     // Clear previous search highlights
@@ -358,17 +358,17 @@ async function chrysalideSearchNotes(searchTerm, maxNodesOverride = null) {
 }
 
 
-async function chrysalideSearchAndZoom(searchTerm, maxNodesOverride = null, zoomLevel = 1.0, delayBetweenNodes = 2000) {
+async function arachnideSearchAndZoom(searchTerm, maxNodesOverride = null, zoomLevel = 1.0, delayBetweenNodes = 2000) {
     return new Promise(async (resolve, reject) => {
         try {
             activeAnimationsCount++;
 
             // Search for nodes based on the searchTerm
-            const matchedNodes = await chrysalideSearchNotes(searchTerm, maxNodesOverride);
+            const matchedNodes = await arachnideSearchNotes(searchTerm, maxNodesOverride);
 
             // Loop through each matched node and zoom to it
             for (const node of matchedNodes) {
-                await chrysalideZoomToNodeTitle(node, zoomLevel);
+                await arachnideZoomToNodeTitle(node, zoomLevel);
 
                 // Wait for the specified delay before moving to the next node
                 await new Promise(r => setTimeout(r, delayBetweenNodes));
@@ -387,9 +387,9 @@ async function chrysalideSearchAndZoom(searchTerm, maxNodesOverride = null, zoom
 
 
 // Example usage
-// chrysalideSearchAndZoom("desired search term", null, 1.0, 3000);
+// arachnideSearchAndZoom("desired search term", null, 1.0, 3000);
 
-function chrysalideResetView(animate = true, duration = 2000) {
+function arachnideResetView(animate = true, duration = 2000) {
     return new Promise((resolve, reject) => {
         const defaultZoomMagnitude = 1.3;
         const defaultPanReal = -0.3;
@@ -422,7 +422,7 @@ function chrysalideResetView(animate = true, duration = 2000) {
     });
 }
 
-function chrysalideGetMandelbrotCoords(forFunctionCall = false) {
+function arachnideGetMandelbrotCoords(forFunctionCall = false) {
     // Extract and format zoom and pan values
     const zoomValue = rootDiagram.background.zoom.x.toString();
     const panReal = rootDiagram.background.pan.x.toString();
@@ -441,12 +441,12 @@ function chrysalideGetMandelbrotCoords(forFunctionCall = false) {
     }
 }
 
-function chrysalideReceiveCurrentView() {
+function arachnideReceiveCurrentView() {
     // Get current coordinates in standard format
-    const standardCoords = chrysalideGetMandelbrotCoords();
+    const standardCoords = arachnideGetMandelbrotCoords();
 
     // Get current coordinates in function call format
-    const functionCallFormat = chrysalideGetMandelbrotCoords(true);
+    const functionCallFormat = arachnideGetMandelbrotCoords(true);
 
     // Prompt user for a title for the saved view
     const title = prompt("Enter a title for the saved view:");
@@ -578,8 +578,8 @@ function initializeSavedViews() {
 
 initializeSavedViews();
 
-function chrysalideSaveCurrentView() {
-    const view = chrysalideReceiveCurrentView();
+function arachnideSaveCurrentView() {
+    const view = arachnideReceiveCurrentView();
 
     if (view === null) {
         console.log("View save cancelled by user.");
@@ -602,18 +602,18 @@ function chrysalideSaveCurrentView() {
 }
 
 document.getElementById('saveCoordinatesBtn').addEventListener('click', function () {
-    chrysalideSaveCurrentView();
+    arachnideSaveCurrentView();
 });
 
 document.getElementById('deleteCoordinatesBtn').addEventListener('click', function () {
     if (selectedCoordinateIndex !== null) {
-        chrysalideDeleteSavedView(selectedCoordinateIndex);
+        arachnideDeleteSavedView(selectedCoordinateIndex);
     } else {
         alert('No coordinate selected for deletion.');
     }
 });
 
-function chrysalideDeleteSavedView(index) {
+function arachnideDeleteSavedView(index) {
     // Check if the index is within bounds
     if (index !== null && savedViews[index]) {
         // Remove the selected view from the array
@@ -637,15 +637,15 @@ function chrysalideDeleteSavedView(index) {
 }
 
 
-function chrysalideReturnToSavedView(savedView, animate = true, speed = 0.0001) {
+function arachnideReturnToSavedView(savedView, animate = true, speed = 0.0001) {
     if (savedView && savedView.standardCoords) {
         // Extract real and imaginary parts from pan
         const panParts = savedView.standardCoords.pan.split('+i');
         const panReal = parseFloat(panParts[0]);
         const panImaginary = panParts.length > 1 ? parseFloat(panParts[1]) : 0;
 
-        // Call chrysalideSetMandelbrotCoords with the parsed coordinates
-        chrysalideSetMandelbrotCoords(
+        // Call arachnideSetMandelbrotCoords with the parsed coordinates
+        arachnideSetMandelbrotCoords(
             parseFloat(savedView.standardCoords.zoom),
             panReal,
             panImaginary,
@@ -677,7 +677,7 @@ function selectAndReturnToSavedView(animate = true, speed = 0.1) {
 
     // Return to the selected view with specified animation settings
     if (selectedView) {
-        chrysalideReturnToSavedView(selectedView, animate, speed);
+        arachnideReturnToSavedView(selectedView, animate, speed);
     } else {
         console.log("View not found with title:", selectedTitle);
     }
@@ -711,7 +711,7 @@ async function exploreBoundaryPoints({
 async function promptToSaveView() {
     const save = confirm("Save this view?");
     if (save) {
-        chrysalideSaveCurrentView();
+        arachnideSaveCurrentView();
     }
 }
 
@@ -724,7 +724,7 @@ function shuffleArray(array) {
 }
 
 
-function chrysalideCaptureScreenshot() {
+function arachnideCaptureScreenshot() {
     if (window.startedViaPlaywright) {
         // Playwright controlled session, use fetch to request screenshot
         fetch('http://localhost:8081/screenshot')
@@ -744,12 +744,12 @@ function chrysalideCaptureScreenshot() {
     }
 }
 
-function chrysalideDelay(delay) {
+function arachnideDelay(delay) {
     return new Promise(resolve => setTimeout(resolve, delay));
 }
 
 // Verbose Schema
-async function chrysalideAnimationQueue(animations) {
+async function arachnideAnimationQueue(animations) {
     for (const animation of animations) {
         const { action, params, delayBefore = 0, delayAfter = 0 } = animation;
 
@@ -770,7 +770,7 @@ async function chrysalideAnimationQueue(animations) {
 }
 
 // Enchanced to reduce size of request format.
-async function chrysalideQueueAnimations(animations) {
+async function arachnideQueueAnimations(animations) {
     // Artificially increment the animation count
     activeAnimationsCount++;
 
@@ -787,7 +787,7 @@ async function chrysalideQueueAnimations(animations) {
         };
     });
 
-    await chrysalideAnimationQueue(transformedAnimations);
+    await arachnideAnimationQueue(transformedAnimations);
 
     // Artificially decrement the animation count
     activeAnimationsCount--;
@@ -809,10 +809,10 @@ async function waitForAllAnimations(additionalDelay = 0) {
     });
 }
 
-document.getElementById('screenshotButton').addEventListener('click', chrysalideCaptureScreenshot);
+document.getElementById('screenshotButton').addEventListener('click', arachnideCaptureScreenshot);
 
 
-async function chrysalideReturnScreenshot() {
+async function arachnideReturnScreenshot() {
     return new Promise(async (resolve, reject) => {
         if (window.startedViaPlaywright) {
             // Playwright controlled session, use fetch to request screenshot
@@ -839,9 +839,9 @@ async function chrysalideReturnScreenshot() {
 }
 
 
-async function chrysalideCallMovementAi(movementIntention, totalIterations = 1, currentIteration = 0) {
+async function arachnideCallMovementAi(movementIntention, totalIterations = 1, currentIteration = 0) {
     if (currentIteration < totalIterations) {
-        const screenshotBase64 = await chrysalideReturnScreenshot();
+        const screenshotBase64 = await arachnideReturnScreenshot();
 
         if (screenshotBase64) {
 
@@ -850,7 +850,7 @@ async function chrysalideCallMovementAi(movementIntention, totalIterations = 1, 
             let messages = [
                 {
                     role: 'system',
-                    content: chrysalideNeuralVisionPrompt
+                    content: arachnideNeuralVisionPrompt
                 },
                 {
                     role: 'system',
@@ -873,13 +873,13 @@ async function chrysalideCallMovementAi(movementIntention, totalIterations = 1, 
 
             try {
                 await callVisionModel(messages, async () => {
-                    runChrysalIDECode(true); // Run code with increment and decrement of activeAnimations.
+                    runArachnIDECode(true); // Run code with increment and decrement of activeAnimations.
 
                     // Wait for all animations to complete
                     await waitForAllAnimations();
                     console.log(`awaited`);
                     // Recursive call for the next iteration
-                    await chrysalideCallMovementAi(movementIntention, totalIterations, currentIteration + 1);
+                    await arachnideCallMovementAi(movementIntention, totalIterations, currentIteration + 1);
                 });
             } catch (error) {
                 console.error("Error in API call:", error);
@@ -895,7 +895,7 @@ async function chrysalideCallMovementAi(movementIntention, totalIterations = 1, 
 /* 
 
 const autopilotThreshold2 = 0.1;
-function chrysalideZoomToNodeTitle(nodeTitle, zoomLevel = 1.5) {
+function arachnideZoomToNodeTitle(nodeTitle, zoomLevel = 1.5) {
     return new Promise((resolve, reject) => {
         const cm = window.myCodemirror;
         const node = scrollToTitle(nodeTitle, cm);
@@ -958,7 +958,7 @@ function resolveAiMessageIfAppropriate(response, isError = false) {
     }
 }
 
-async function chrysalidePromptZettelkasten(message) {
+async function arachnidePromptZettelkasten(message) {
     activeAnimationsCount++;
     isPromiseResolved = false;
 
@@ -994,7 +994,7 @@ async function chrysalidePromptZettelkasten(message) {
     return streamedResponse;
 }
 
-function chrysalideGetUserResponse(message) {
+function arachnideGetUserResponse(message) {
     // Display a prompt dialog with the specified message
     let userResponse = prompt(message);
 
@@ -1003,11 +1003,11 @@ function chrysalideGetUserResponse(message) {
 }
 
 
-function chrysalideAddNote(nodeTitle, nodeText) {
+function arachnideAddNote(nodeTitle, nodeText) {
     return new Promise((resolve) => {
         activeAnimationsCount++;
         let formattedNodeTitle = nodeTitle.replace(/\n/g, ' ');
-        formattedNodeTitle = chrysalideGetUniqueNodeTitle(formattedNodeTitle);
+        formattedNodeTitle = arachnideGetUniqueNodeTitle(formattedNodeTitle);
 
         if (nodeText === undefined || nodeText === null) {
             nodeText = '';
@@ -1042,7 +1042,7 @@ function chrysalideAddNote(nodeTitle, nodeText) {
     });
 }
 
-function chrysalideGetUniqueNodeTitle(baseTitle) {
+function arachnideGetUniqueNodeTitle(baseTitle) {
     let counter = 2;
     let uniqueTitle = baseTitle;
     while (nodeTitleToLineMap.has(uniqueTitle)) {
@@ -1075,63 +1075,63 @@ function initializeFunctionMappings() {
 // Register the base function with its alternate names
 registerFunctions([
     {
-        baseFunctionName: 'chrysalideAddNote',
-        baseFunction: chrysalideAddNote,
+        baseFunctionName: 'arachnideAddNote',
+        baseFunction: arachnideAddNote,
         alternateNames: ['addNote', 'createNote', 'zettelkastenAddNote', `promptNote`]
     },
     {
-        baseFunctionName: 'chrysalidePromptZettelkasten',
-        baseFunction: chrysalidePromptZettelkasten,
+        baseFunctionName: 'arachnidePromptZettelkasten',
+        baseFunction: arachnidePromptZettelkasten,
         alternateNames: ['promptZettelkasten', 'zettelkastenPrompt', 'promptZettelkastenAi', 'callZettelkastenAi', `zettelkastenAi`]
     },
     {
-        baseFunctionName: 'chrysalideGetUserResponse',
-        baseFunction: chrysalideGetUserResponse,
+        baseFunctionName: 'arachnideGetUserResponse',
+        baseFunction: arachnideGetUserResponse,
         alternateNames: ['getUserResponse', 'promptUser', 'requestUserResponse']
     },
     {
-        baseFunctionName: 'chrysalideZoomToNodeTitle',
-        baseFunction: chrysalideZoomToNodeTitle,
+        baseFunctionName: 'arachnideZoomToNodeTitle',
+        baseFunction: arachnideZoomToNodeTitle,
         alternateNames: ['zoomToNodeTitle', 'focusNode', 'zoomToNote', 'zoomToNoteByTitle', `zoomToNode`]
     },
     {
-        baseFunctionName: 'chrysalideCallMovementAi',
-        baseFunction: chrysalideCallMovementAi,
+        baseFunctionName: 'arachnideCallMovementAi',
+        baseFunction: arachnideCallMovementAi,
         alternateNames: ['callMovementAi', 'promptMovementAi', 'initiateMovementAi']
     },
     {
-        baseFunctionName: 'chrysalideQueueAnimations',
-        baseFunction: chrysalideQueueAnimations,
-        alternateNames: ['queueAnimations', 'performSequence', 'chrysalidePerformSequence']
+        baseFunctionName: 'arachnideQueueAnimations',
+        baseFunction: arachnideQueueAnimations,
+        alternateNames: ['queueAnimations', 'performSequence', 'arachnidePerformSequence']
     },
     {
-        baseFunctionName: 'chrysalideResetView',
-        baseFunction: chrysalideResetView,
+        baseFunctionName: 'arachnideResetView',
+        baseFunction: arachnideResetView,
         alternateNames: ['resetView', 'returnToStart', 'reinitializeView']
     },
     {
-        baseFunctionName: 'chrysalideSetMandelbrotCoords',
-        baseFunction: chrysalideSetMandelbrotCoords,
+        baseFunctionName: 'arachnideSetMandelbrotCoords',
+        baseFunction: arachnideSetMandelbrotCoords,
         alternateNames: ['setMandelbrotCoords', 'updateMandelbrotPosition', 'mandelbrotCoords']
     },
     {
-        baseFunctionName: 'chrysalideMovement',
-        baseFunction: chrysalideMovement,
+        baseFunctionName: 'arachnideMovement',
+        baseFunction: arachnideMovement,
         alternateNames: ['movement', 'startMovement', 'performMovement']
     },
     {
-        baseFunctionName: 'chrysalideDelay',
-        baseFunction: chrysalideDelay,
+        baseFunctionName: 'arachnideDelay',
+        baseFunction: arachnideDelay,
         alternateNames: ['delay', 'setDelay']
     },
     {
-        baseFunctionName: 'chrysalideSearchNotes',
-        baseFunction: chrysalideSearchNotes,
+        baseFunctionName: 'arachnideSearchNotes',
+        baseFunction: arachnideSearchNotes,
         alternateNames: ['searchNotes', 'returnSearchedNodes', `searchNodes`]
     },
     {
-        baseFunctionName: 'chrysalideSearchAndZoom',
-        baseFunction: chrysalideSearchAndZoom,
+        baseFunctionName: 'arachnideSearchAndZoom',
+        baseFunction: arachnideSearchAndZoom,
         alternateNames: ['searchAndZoom', 'searchZoom', `zoomToRelevantNodes`]
     },
 

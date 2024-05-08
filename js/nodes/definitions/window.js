@@ -303,6 +303,8 @@ class WindowedNode extends Node {
         this.innerContent.style.minHeight = (minHeight - 35) + "px"
         this.windowDiv.style.height = minHeight + "px";
         this.windowDiv.style.width = minWidth + "px";
+        this.windowDiv.style.minHeight = minHeight + "px";
+        this.windowDiv.style.minWidth = minWidth + "px";
     }
 
     _initWindow() {
