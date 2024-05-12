@@ -7,9 +7,16 @@
             padding: 0;
             background-color: #000000;
         }
-
+@font-face {
+    font-family: "Name Smile";
+    src: url("fonts/namesmile/Name Smile.otf") format("opentype");
+}
+@font-face {
+    font-family: "Octosquare";
+    src: url("fonts/octosquares/TT Octosquares Trial Condensed Regular.ttf") format("truetype");
+}
 * {
-    font-family: "Inter", sans-serif;
+    font-family: "Octosquare", "Inter", sans-serif;
     color: #888;
     font-size: 16px;
 }
