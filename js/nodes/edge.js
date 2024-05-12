@@ -158,7 +158,7 @@ class Edge {
         this.html.setAttribute("vector-effect", "non-scaling-stroke")
 
         const stressValue = Math.max(this.stress(), 0.01);
-        let wscale = (this.style['stroke-width'] / 2000) / (0.5 + stressValue) * (this.mouseIsOver ? 1.5 : 1.0);
+        let wscale = (this.style['stroke-width'] / 500) / (0.5 + stressValue) * (this.mouseIsOver ? 1.5 : 1.0);
         wscale = Math.min(wscale, this.maxWidth);
         let path = "M ";
         let validPath = true;
@@ -222,6 +222,7 @@ class Edge {
             path += " L ";
             path += rootDiagram.background.toSVG(edgePoints[5]).str().replace(",", " ");
         } else {
+            curve = curve /  2;
             // 3-4 path (3 segments, 4 joins)
             let offset = curve * 1.5; // Adjust offset based on curve
             let horizontalCurve = horizontal > 0 ? curve : - curve;
@@ -232,7 +233,6 @@ class Edge {
             let segment2Length = !positiveVertical ? vertical - verticalMidPoint : verticalMidPoint;
             segment1Length -=  positiveVertical ? node2Size.y : -node2Size.y;
             segment2Length +=  positiveVertical ? node2Size.y : -node2Size.y;
-            console.log("Vertical: ", vertical, " verticalDistance ", verticalDistance, "segments: ", segment1Length, segment2Length);
 
             let segment1Distance = segment1Length - 2 * verticalCurve;
             let segment2Distance = segment2Length - 2 * verticalCurve;
@@ -316,34 +316,23 @@ class Edge {
             this.html.setAttribute("d", path);
 
             if (this.directionality.start && this.directionality.end) {
-                let startPoint = this.directionality.start.pos;
-                let endPoint = this.directionality.end.pos;
+                let pointLeft = this.directionality.start === this.pts[0];
 
                 let startScale = this.directionality.start.scale;
                 let endScale = this.directionality.end.scale;
 
-                // Introduce a perspective factor (adjust this value to tweak the effect)
-                let perspectiveFactor = 0.5; // Range [0, 1], where 0 is no effect and 1 is maximum effect
 
-                // Adjust scales based on the perspective factor
-                let adjustedStartScale = 1 + (startScale - 1) * perspectiveFactor;
-                let adjustedEndScale = 1 + (endScale - 1) * perspectiveFactor;
-
-                // Calculate weights for the midpoint based on adjusted scales
-                let totalAdjustedScale = adjustedStartScale + adjustedEndScale;
-                let startWeight = adjustedEndScale / totalAdjustedScale;
-                let endWeight = adjustedStartScale / totalAdjustedScale;
-
-                // Calculate the weighted midpoint
-                let midPoint = startPoint.scale(startWeight).plus(endPoint.scale(endWeight));
-
-                // Introduce factors for scaling the length and width of the arrow
                 let arrowScaleFactor = 1.2;
-
                 let arrowLength = ((startScale + endScale) / 2 * wscale * 5) * arrowScaleFactor;
                 let arrowWidth = ((startScale + endScale) / 2 * wscale * 3) * arrowScaleFactor;
 
-                let direction = endPoint.minus(startPoint);
+                let midPoint = pointLeft ? endingPoint : startingPoint;
+                midPoint = !leftFirst ? midPoint.minus(new vec2(arrowLength, 0)) : midPoint.plus((new vec2(arrowLength, 0)));
+                // midPoint = pointLeft ? midPoint.minus(new vec2(arrowLength, 0)) : midPoint.plus((new vec2(arrowLength, 0)));
+                // midPoint = midPoint.plus((new vec2(arrowLength, 0)));
+                console.log("leftFirst", leftFirst, "pointLeft", pointLeft)
+                // let direction = !leftFirst ? new vec2(-1, 0):new vec2(1, 0);
+                let direction = !(!pointLeft || leftFirst) ? new vec2(-1, 0):new vec2(1, 0);
                 let directionNormed = direction.normed(arrowLength);
                 let perp = new vec2(-directionNormed.y, directionNormed.x).normed(arrowWidth);
 
@@ -361,6 +350,7 @@ class Edge {
                 let arrowCenterX = arrowBaseCenterX * arrowFlipFactor + arrowTip.x * (1 - arrowFlipFactor);
                 let arrowCenterY = arrowBaseCenterY * arrowFlipFactor + arrowTip.y * (1 - arrowFlipFactor);
                 let arrowCenter = new vec2(arrowCenterX, arrowCenterY);
+
 
                 // Function to rotate a point around a center by 180 degrees
                 function rotatePoint(point, center) {
