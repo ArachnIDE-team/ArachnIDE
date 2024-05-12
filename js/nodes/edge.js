@@ -4,7 +4,7 @@ class Edge {
     constructor(pts, length = 0.6, strength = 0.1, style = {
         stroke: "red",
         "stroke-width": "0.01",
-        fill: "red"
+        // fill: "red"
     }) {
         this.pts = pts;
         this.length = length;
@@ -149,45 +149,168 @@ class Edge {
             return t.plus(n.pos);
         }, new vec2(0, 0)).unscale(this.pts.length);
     }
+
     draw() {
         this.html.setAttribute("stroke", this.mouseIsOver ? "lightskyblue" : this.style.stroke);
-        this.html.setAttribute("fill", this.mouseIsOver ? "lightskyblue" : this.style.fill);
+        this.html.setAttribute("fill", "none");
+        // this.html.setAttribute("stroke", this.mouseIsOver ? "lightskyblue" : this.style.fill);
+        // this.html.setAttribute("fill", this.mouseIsOver ? "lightskyblue" : this.style.fill);
+        this.html.setAttribute("vector-effect", "non-scaling-stroke")
 
         const stressValue = Math.max(this.stress(), 0.01);
-        let wscale = this.style['stroke-width'] / (0.5 + stressValue) * (this.mouseIsOver ? 1.5 : 1.0);
+        let wscale = (this.style['stroke-width'] / 2000) / (0.5 + stressValue) * (this.mouseIsOver ? 1.5 : 1.0);
         wscale = Math.min(wscale, this.maxWidth);
         let path = "M ";
-        let c = this.center();
         let validPath = true;
 
+        let node1Size = rootDiagram.background.toS(new vec2(this.pts[0].width * this.pts[0].scale / 2, this.pts[0].height * this.pts[0].scale / 2));
+        let node2Size = rootDiagram.background.toS(new vec2(this.pts[1].width * this.pts[1].scale / 2, this.pts[1].height * this.pts[1].scale / 2));
+
         // Constructing the main path
-        for (let n of this.pts) {
-            let r = n.scale * wscale;
-            let minusC = n.pos.minus(c);
-            let rotated = minusC.rot90();
+        let node1Left = this.pts[0].pos.minus(new vec2(node1Size.x, 0));
+        let node1Right = this.pts[0].pos.plus(new vec2(node1Size.x, 0));
+        let node2Right = this.pts[1].pos.plus(new vec2(node2Size.x, 0));
+        let node2Left = this.pts[1].pos.minus(new vec2(node2Size.x, 0));
 
-            if (rotated.x !== 0 || rotated.y !== 0) {
-                let left = rotated.normed(r);
+        let leftFirst = node1Left.x - node2Right.x > 0;
+        let startingPoint = leftFirst ? node1Left : node1Right;
+        let endingPoint =  leftFirst ? node2Right : node2Left;
 
-                if (!isNaN(left.x) && !isNaN(left.y) && !isNaN(n.pos.x) && !isNaN(n.pos.y)) {
-                    path += rootDiagram.background.toSVG(n.pos.minus(left)).str();
-                    path += " L ";
-                    path += rootDiagram.background.toSVG(left.plus(n.pos)).str() + " ";
-                } else {
-                    validPath = false;
-                    break;
-                }
-            }
-        }
+        let horizontal = (startingPoint.x - endingPoint.x) / 2;
+        let vertical = (startingPoint.y - endingPoint.y);
+        let curve = 0.2;
 
-        // Closing the main path
-        let firstPoint = this.pts[0].pos.minus(this.pts[0].pos.minus(c).rot90().normed(this.pts[0].scale * wscale));
-        if (!isNaN(firstPoint.x) && !isNaN(firstPoint.y)) {
-            path += " " + rootDiagram.background.toSVG(firstPoint).str() + "z";
+        let between = node2Right.x > node1Left.x && node2Left.x < node1Right.x;
+
+        let positiveVertical = vertical > 0;
+        if(!between) {
+            curve = Math.min(curve, Math.abs(vertical)) / 2;
+
+            // 3-2 path (3 segments, 2 joins)
+            let edgePoints = [
+                // Segment 1
+                startingPoint,
+                // Join 1
+                startingPoint.minus(new vec2(horizontal, 0).plus(new vec2(horizontal < 0 ? curve : -curve, 0))), // X
+                startingPoint.minus(new vec2(horizontal, 0)).minus(new vec2(0, positiveVertical ? curve : -curve)), // Y
+                // Segment 2
+                // Join 2
+                endingPoint.plus(new vec2(horizontal, 0)).plus(new vec2(0, positiveVertical  ? curve : -curve)), // Y
+                endingPoint.plus(new vec2(horizontal, 0)).minus(new vec2(horizontal > 0 ? curve : -curve, 0)), // X
+                // Segment 3
+                endingPoint
+            ]
+            // Bézier curves control points
+            let controlPoints = [
+                startingPoint.minus(new vec2(horizontal, 0)),
+                endingPoint.plus(new vec2(horizontal, 0))
+            ]
+
+            path += rootDiagram.background.toSVG(edgePoints[0]).str().replace(",", " ");
+            path += " L ";
+            path += rootDiagram.background.toSVG(edgePoints[1]).str().replace(",", " ");
+            path += " C ";
+            path += rootDiagram.background.toSVG(controlPoints[0]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(controlPoints[0]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(edgePoints[2]).str().replace(",", " ");
+            path += " L ";
+            path += rootDiagram.background.toSVG(edgePoints[3]).str().replace(",", " ");
+            path += " C ";
+            path += rootDiagram.background.toSVG(controlPoints[1]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(controlPoints[1]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(edgePoints[4]).str().replace(",", " ");
+            path += " L ";
+            path += rootDiagram.background.toSVG(edgePoints[5]).str().replace(",", " ");
         } else {
-            validPath = false;
-        }
+            // 3-4 path (3 segments, 4 joins)
+            let offset = curve * 1.5; // Adjust offset based on curve
+            let horizontalCurve = horizontal > 0 ? curve : - curve;
+            let verticalCurve = positiveVertical ? curve : - curve;
+            let verticalDistance = vertical - node2Size.y - node1Size.y;
+            let verticalMidPoint = verticalDistance / 2;
+            let segment1Length = !positiveVertical ? verticalMidPoint  :  vertical - verticalMidPoint;
+            let segment2Length = !positiveVertical ? vertical - verticalMidPoint : verticalMidPoint;
+            segment1Length -=  positiveVertical ? node2Size.y : -node2Size.y;
+            segment2Length +=  positiveVertical ? node2Size.y : -node2Size.y;
+            console.log("Vertical: ", vertical, " verticalDistance ", verticalDistance, "segments: ", segment1Length, segment2Length);
 
+            let segment1Distance = segment1Length - 2 * verticalCurve;
+            let segment2Distance = segment2Length - 2 * verticalCurve;
+
+            let join12HorizontalCurve = Math.abs(segment1Length) - Math.abs(2 * verticalCurve) > 0 ? horizontalCurve : horizontalCurve - Math.abs(segment1Distance / 2);
+            let join1VerticalCurve =  Math.abs(segment1Length) - Math.abs(2 * verticalCurve) > 0 ? -verticalCurve: - segment1Distance / 2 - verticalCurve;
+            let join2VerticalCurve =  Math.abs(segment1Length) - Math.abs(2 * verticalCurve) > 0 ? verticalCurve: segment1Distance / 2 + verticalCurve;
+
+            let join34HorizontalCurve = Math.abs(segment2Length) - Math.abs(2 * verticalCurve) > 0 ? horizontalCurve : horizontalCurve - Math.abs(segment2Distance / 2);
+            let join3VerticalCurve = Math.abs(segment2Length) - Math.abs(2 * verticalCurve) > 0 ? verticalCurve: segment2Distance / 2 + verticalCurve;
+            let join4VerticalCurve = Math.abs(segment2Length) - Math.abs(2 * verticalCurve) > 0 ? -verticalCurve: - segment2Distance / 2 - verticalCurve;
+
+            if((join1VerticalCurve > join2VerticalCurve && positiveVertical) || (join4VerticalCurve > join3VerticalCurve && join1VerticalCurve < join2VerticalCurve && !positiveVertical) ) {
+                join12HorizontalCurve = -join12HorizontalCurve;
+            }
+            if((join4VerticalCurve > join3VerticalCurve && positiveVertical) || (join4VerticalCurve < join3VerticalCurve && join1VerticalCurve > join2VerticalCurve && !positiveVertical)) {
+                join34HorizontalCurve = -join34HorizontalCurve;
+            }
+
+            let edgePoints = [
+                // Segment offset (starting point)
+                startingPoint,
+                startingPoint.plus(new vec2(offset, 0)),
+                // Join 1
+                startingPoint.plus(new vec2(offset, 0)).plus(new vec2(join12HorizontalCurve, join1VerticalCurve)),
+                // Segment 1 |
+                // Join 2
+                startingPoint.plus(new vec2(offset, 0)).plus(new vec2(join12HorizontalCurve, join2VerticalCurve - segment1Length)),
+                // Segment 2 ---
+                startingPoint.plus(new vec2(offset, 0)).plus(new vec2(horizontalCurve - curve, -segment1Length)),
+                endingPoint.minus(new vec2(offset, 0)).minus(new vec2(horizontalCurve - curve, -segment2Length)),
+                // Join 3
+                endingPoint.minus(new vec2(offset, 0)).minus(new vec2(join34HorizontalCurve, join3VerticalCurve - segment2Length)),
+                // Segment 3 |
+                // Join 4
+                endingPoint.minus(new vec2(offset, 0)).minus(new vec2(join34HorizontalCurve, join4VerticalCurve)),
+                // Segment offset (ending point)
+                endingPoint.minus(new vec2(offset, 0)),
+                endingPoint
+            ];
+
+            // Control points (one for each join segment)
+            let controlPoints = [
+                startingPoint.plus(new vec2(offset, 0)).plus(new vec2(join12HorizontalCurve, 0)),
+                startingPoint.plus(new vec2(offset, 0)).plus(new vec2(join12HorizontalCurve, -segment1Length)),
+                endingPoint.minus(new vec2(offset, 0)).minus(new vec2(join34HorizontalCurve, -segment2Length)),
+                endingPoint.minus(new vec2(offset, 0)).minus(new vec2(join34HorizontalCurve, 0)),
+            ];
+
+            path += rootDiagram.background.toSVG(edgePoints[0]).str().replace(",", " ");
+            path += " L ";
+            path += rootDiagram.background.toSVG(edgePoints[1]).str().replace(",", " ");
+            path += " C ";
+            path += rootDiagram.background.toSVG(controlPoints[0]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(controlPoints[0]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(edgePoints[2]).str().replace(",", " ");
+            path += " L ";
+            path += rootDiagram.background.toSVG(edgePoints[3]).str().replace(",", " ");
+            path += " C ";
+            path += rootDiagram.background.toSVG(controlPoints[1]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(controlPoints[1]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(edgePoints[4]).str().replace(",", " ");
+            path += " L ";
+            path += rootDiagram.background.toSVG(edgePoints[5]).str().replace(",", " ");
+            path += " C ";
+            path += rootDiagram.background.toSVG(controlPoints[2]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(controlPoints[2]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(edgePoints[6]).str().replace(",", " ");
+            path += " L ";
+            path += rootDiagram.background.toSVG(edgePoints[7]).str().replace(",", " ");
+            path += " C ";
+            path += rootDiagram.background.toSVG(controlPoints[3]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(controlPoints[3]).str().replace(",", " ") + ", ";
+            path += rootDiagram.background.toSVG(edgePoints[8]).str().replace(",", " ");
+            path += " L ";
+            path += rootDiagram.background.toSVG(edgePoints[9]).str().replace(",", " ");
+
+        }
 
         if (validPath) {
             this.html.setAttribute("d", path);
@@ -277,6 +400,7 @@ class Edge {
             }
         }
     }
+
     step(dt) {
         if (dt === undefined || isNaN(dt)) {
             dt = 0;

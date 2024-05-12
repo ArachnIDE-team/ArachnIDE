@@ -31,9 +31,12 @@ function connectRandom(n) {
 */
 
 function connectDistance(na, nb, linkStrength = 0.1, linkStyle = {
-    stroke: "none",
-    "stroke-width": "0.005",
-    fill: "lightcyan",
+    // stroke: "none",
+    stroke: "lightcyan",
+    "stroke-width": "5",
+    // "stroke-width": "0.5",
+    // "stroke-width": "0.005",
+    // fill: "lightcyan",
     opacity: "0.5"
 }) {
     // Log UUIDs for debugging
