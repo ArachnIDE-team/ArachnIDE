@@ -158,7 +158,8 @@ class Edge {
         this.html.setAttribute("vector-effect", "non-scaling-stroke")
 
         const stressValue = Math.max(this.stress(), 0.01);
-        let wscale = (this.style['stroke-width'] / 500) / (0.5 + stressValue) * (this.mouseIsOver ? 1.5 : 1.0);
+        // let wscale = (this.style['stroke-width'] / 500) / (0.5 + stressValue) * (this.mouseIsOver ? 1.5 : 1.0);
+        let wscale = (this.style['stroke-width'] / 750) * (this.mouseIsOver ? 1.5 : 1.0);
         wscale = Math.min(wscale, this.maxWidth);
         let path = "M ";
         let validPath = true;
@@ -327,12 +328,12 @@ class Edge {
                 let arrowWidth = ((startScale + endScale) / 2 * wscale * 3) * arrowScaleFactor;
 
                 let midPoint = pointLeft ? endingPoint : startingPoint;
-                midPoint = !leftFirst ? midPoint.minus(new vec2(arrowLength, 0)) : midPoint.plus((new vec2(arrowLength, 0)));
+                midPoint = (!leftFirst && pointLeft) || (leftFirst && !pointLeft) ? midPoint.minus(new vec2(arrowLength, 0)) : midPoint.plus((new vec2(arrowLength, 0)));
                 // midPoint = pointLeft ? midPoint.minus(new vec2(arrowLength, 0)) : midPoint.plus((new vec2(arrowLength, 0)));
                 // midPoint = midPoint.plus((new vec2(arrowLength, 0)));
                 console.log("leftFirst", leftFirst, "pointLeft", pointLeft)
                 // let direction = !leftFirst ? new vec2(-1, 0):new vec2(1, 0);
-                let direction = !(!pointLeft || leftFirst) ? new vec2(-1, 0):new vec2(1, 0);
+                let direction = (!leftFirst && pointLeft) || (leftFirst && !pointLeft) ? new vec2(-1, 0):new vec2(1, 0);
                 let directionNormed = direction.normed(arrowLength);
                 let perp = new vec2(-directionNormed.y, directionNormed.x).normed(arrowWidth);
 
