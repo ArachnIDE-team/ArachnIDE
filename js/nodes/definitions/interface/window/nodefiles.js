@@ -190,7 +190,13 @@ class NodeFilesUI extends WindowedUI {
         saveAutoLabelSVG.setAttribute('width', "16");
         saveAutoLabelSVG.setAttribute('height', "16");
         saveAutoLabelSVG.setAttribute('transform', "translate(-5 4)");
-        saveButtonsContainer.append(saveButton, saveAutoCheckbox, saveAutoLabel, saveAutoLabelSVG)
+        saveAutoLabel.style.minWidth = "24px";
+        saveAutoLabel.style.paddingRight = "0";
+        saveAutoLabel.style.paddingTop = "0";
+        // saveAutoLabel.style.paddingBottom = "0";
+
+        saveAutoLabel.append(saveAutoLabelSVG);
+        saveButtonsContainer.append(saveButton, saveAutoCheckbox, saveAutoLabel)
 
         let loadButtonsContainer = document.createElement('div');
         loadButtonsContainer.className = "node-file-button-container";
@@ -221,7 +227,12 @@ class NodeFilesUI extends WindowedUI {
         loadAutoLabelSVG.setAttribute('width', "16");
         loadAutoLabelSVG.setAttribute('height', "16");
         loadAutoLabelSVG.setAttribute('transform', "translate(-5 4)");
-        loadButtonsContainer.append(loadButton, loadAutoCheckbox, loadAutoLabel, loadAutoLabelSVG);
+        loadAutoLabel.append(loadAutoLabelSVG)
+        loadAutoLabel.style.minWidth = "24px";
+        loadAutoLabel.style.paddingRight = "0";
+        loadAutoLabel.style.paddingTop = "0";
+        // loadAutoLabel.style.paddingBottom = "0";
+        loadButtonsContainer.append(loadButton, loadAutoCheckbox, loadAutoLabel);
 
         rightInnerContainer.append(saveButtonsContainer, loadButtonsContainer)
 

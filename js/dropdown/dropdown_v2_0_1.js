@@ -75,6 +75,46 @@
         this.toolsTab = new ToolsTab();
         this.nodesTab = new NodesTab();
 
+        const buttonLabels = document.querySelectorAll(".button-label");
+        buttonLabels.forEach(function(label) {
+            let panelContainerID = label.getAttribute("for");
+            let panelContainer = document.querySelector("#" + panelContainerID + " > div");
+            let togglePanel = document.querySelector("#" + panelContainerID + " > .toggle-panel");
+            togglePanel.onclick = label.onclick = function() {
+                const openDropdowns = panelContainer.querySelectorAll('.options-replacer.show');
+                openDropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                    const dropdownContainer = dropdown.closest('.select-replacer');
+                    if (dropdownContainer) {
+                        dropdownContainer.classList.add('closed');
+                    }
+                });
+                if (panelContainer.classList.contains('hidden')) {
+                    panelContainer.classList.add('panel-open');
+                    // Expand the panel
+                    panelContainer.classList.remove('hidden');
+                    panelContainer.style.display = ''; // Make it visible for height calculation
+
+                    // Directly set the height to start the transition
+                    panelContainer.style.height = panelContainer.scrollHeight + 'px';
+                } else {
+                    panelContainer.classList.remove('panel-open');
+
+                    // Collapse the panel
+                    panelContainer.style.height = '0px'; // Trigger the collapse animation
+
+                    // Wait for the transition to finish before adding 'hidden'
+                    function onTransitionEnd() {
+                        panelContainer.classList.add('hidden');
+                        panelContainer.style.display = 'none'; // Fully hide after animation
+                        panelContainer.removeEventListener('transitionend', onTransitionEnd);
+                    }
+
+                    panelContainer.addEventListener('transitionend', onTransitionEnd, { once: true });
+                }
+            }
+        })
+
     }
 
     setSliderBackground(slider) {

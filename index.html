@@ -184,7 +184,7 @@
                     </div>
                 </div>
                 <!-- Toggle button for function call panel -->
-                <div class="toggle-function-panel" onclick="toggleFunctionCallPanel()">
+                <div class="toggle-panel" onclick="toggleFunctionCallPanel()">
                     <div class="bar left-bar"></div>
                     <div class="icon-wrapper">
                         <!-- Wrapper for the icon only -->
@@ -311,7 +311,7 @@
                         <div class="flex-container">
                             <div class="inline-container" title="Enable Local Ai Features">
                                 <input type="checkbox" id="localLLM">
-                                <label for="localLLM">:</label>
+                                <label for="localLLM">Local</label>
                             </div>
                             <button id="downloadAiButton" class="key-button" title="Install Local AI Models into Browser Cache">INSTALL</button>
                             <div class="inline-container" title="Select Local Model">
@@ -506,6 +506,28 @@ not agree on the policy but this way, we all get the free bonus for Gemini. If y
                 <div id="tab2" class="tabcontent">
                     <!-- Second tab content here -->
                     <div class="submenu">
+
+                        <div class="label-bar-container">
+                            <label for="fractalSettingsContainer" class="button-label">Fractal Settings</label>
+                            <div class="fractal-settings-container" id="fractalSettingsContainer">
+                                <div class="fractal-settings-panel hidden">
+                                    HELLO
+
+                                </div>
+                                <div class="toggle-panel" style="padding-top: 15px;">
+                                    <div class="bar left-bar"></div>
+                                    <div class="icon-wrapper">
+                                        <div class="toggle-icon">
+                                            <!-- Icon SVG -->
+                                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="bar right-bar"></div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="settingsSlider centered" style="margin-bottom: 10px;">
                             <label style="white-space: nowrap;">
                                 z <sup id="exponent_value" style="color: powderblue">2</sup> + c

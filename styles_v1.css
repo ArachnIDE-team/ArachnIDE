@@ -1279,48 +1279,82 @@ select-replacer > div:first-child {
 }
 
 
+/* Hide the checkbox visually but remain accessible */
 input[type="checkbox"] {
     display: none;
 }
 
-/* Create a custom checkbox */
-    input[type="checkbox"] + label:before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 3px;
-        width: 14px;
-        height: 14px;
-        border: 1px solid #353535;
-        background-color: #222226;
-        display: inline-block;
-        border-radius: 25%;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-    }
+        input[type="checkbox"] + label {
+            padding: 19px;
+            position: relative;
+            display: inline-block;
+            vertical-align: middle; /* Helps with vertical alignment */
+            cursor: pointer;
+            /* Add other styles as needed */
+        }
 
+        input[type="checkbox"] + label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%; /* Adjust this to better align vertically */
+            transform: translateY(-50%); /* Centers the checkbox relative to the label's height */
+            width: 14px;
+            height: 14px;
+            background-color: transparent; /* Make the checkbox background transparent */
+            display: inline-block;
+        }
 
-input[type="checkbox"]:checked + label:before {
-    background-color: #006BB6;
-}
-
-
-input[type="checkbox"] + label {
-    padding-left: 25px;
-}
-
-input[type="checkbox"] + label {
-    position: relative;
-    top: -3px;
-}
-
-input[type="checkbox"]:checked + label:after {
-    content: '✔';
-    position: absolute;
-    top: 1px;
-    left: 2px;
-    font-size: 15px;
-    color: #bbb;
-}
+        input[type="checkbox"]:checked + label:after {
+            content: '✔';
+            position: absolute;
+            top: 1px;
+            left: 87%; /* Adjust if necessary for better centering */
+            transform: translate(0, -50%); /* Adjust for precise vertical centering */
+            font-size: 18px;
+            color: #bbb; /* Change the checkmark color to white */
+        }
+        /* General label styling */
+        input[type="checkbox"] + label {
+            user-select: none;
+            cursor: pointer; /* Indicates clickable */
+            position: relative; /* For absolute positioning of :before and :after */
+        }
+        /* Styling applies to all checkboxes and labels */
+        input[type="checkbox"] + label {
+            display: inline-block;
+            padding: 3px 11px;
+            min-width: 50px; /* Ensure consistent width */
+            color: #888;
+            background-color: #222226;
+            border-radius: 0 10px 0px 10px;
+            border-top: 2px solid #555; /* Border on the left */
+            border-right: 3px solid #555; /* Border on the bottom */
+            border-left: 3px solid #8882; /* Border on the left */
+            border-bottom: 2px solid #8882; /* Border on the bottom */
+            margin: 3px 4px;
+            font-size: 14px;
+            text-align: center;
+            vertical-align: middle;
+            transition: background-color 0.3s, color 0.1s;
+        }
+        /* Change label style when associated checkbox is checked */
+        input[type="checkbox"]:checked + label {
+            background-color: rgb(30, 55, 81);
+            border-left: 3px solid #888; /* Border on the left */
+            border-bottom: 2px solid #888; /* Border on the bottom */
+            color: #bbb;
+        }
+        /* Hover effects for labels */
+        input[type="checkbox"] + label:hover {
+            background-color: #333; /* Hover BG color */
+            color: #bbb; /* Hover text color */
+        }
+        /* Hover effects for checked labels */
+        input[type="checkbox"]:checked + label:hover {
+            background-color: rgb(30, 55, 81); /* Hover BG color for checked state */
+            color: #bbb; /* Hover text color for checked state */
+        }
 
 label {
     user-select: none;
@@ -1773,18 +1807,17 @@ input[type=range] {
         margin-right: auto;
     }
 
-textarea[id^='custom-instructions-textarea-'] {
-    bottom: 8px;
-    position: absolute;
-    margin: 10px; /* Outer spacing */
-    background-color: #222226; /* Background color */
-    color: #bbb; /* Text color, assuming you want white text */
-    padding: 10px; /* Inner spacing */
-    font-size: 14px; /* Text size */
-    width: 60%; /* Full width */
-    height: 60%;
-    resize: none; /* Turn off the resize handle */
-}
+        textarea[id^='custom-instructions-textarea-'] {
+            position: absolute;
+            margin: 10px; /* Outer spacing */
+            background-color: #222226; /* Background color */
+            color: #bbb; /* Text color, assuming you want white text */
+            padding: 10px; /* Inner spacing */
+            font-size: 14px; /* Text size */
+            width: 55%; /* Full width */
+            height: 50%;
+            resize: none; /* Turn off the resize handle */
+        }
 
     textarea[id^='custom-instructions-textarea-']:focus {
         outline: none; /* Removes default browser outline */
@@ -2129,10 +2162,7 @@ textarea[id^='custom-instructions-textarea-'] {
     width: 100%;
 }
 
-
-
-
-.toggle-function-panel {
+.toggle-panel {
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -2159,6 +2189,7 @@ textarea[id^='custom-instructions-textarea-'] {
     height: 20px;
 }
 
+/* Styles for .bar */
 .bar {
     flex-grow: 1; /* Allow bars to take up available space */
     max-width: 20%;
@@ -2184,6 +2215,54 @@ textarea[id^='custom-instructions-textarea-'] {
     background-color: #555; /* Change color on hover */
 }
 
+
+/* Hover effect for .toggle-panel affecting .toggle-icon and bars */
+.panel-open + .toggle-panel .icon-wrapper .toggle-icon {
+    transform: scaleY(-1);
+}
+
+.toggle-panel:hover .toggle-icon svg path {
+    stroke: RGB(200,200,255);
+}
+
+.toggle-panel:hover .toggle-icon {
+    transform: scale(1.1); /* Increase size slightly */
+}
+
+.toggle-panel:hover .bar {
+    background-color: #555; /* Change color on hover */
+}
+
+/* Styles for .button-label */
+.button-label {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Ensure the text remains centered */
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none; /* In case you apply this class to <a> tags */
+    gap: 15px; /* Space between bars and the label text */
+}
+
+.button-label::before,
+.button-label::after {
+    content: ''; /* Necessary for displaying the pseudo-element */
+    background-color: #8882;
+    height: 2px; /* Thickness of the bar, matching .bar */
+    flex-grow: 1; /* Allow bars to take up available space on either side */
+    transition: background-color 0.3s ease; /* Smooth transition for background color, matching .bar */
+}
+
+/* Unified hover effects specifically targeting background color changes */
+.label-bar-container:hover .bar,
+.label-bar-container:hover .button-label::before,
+.label-bar-container:hover .button-label::after {
+    background-color: #555; /* Change color on hover for bars and pseudo-elements */
+}
+
+.label-bar-container:hover .button-label {
+    color: #bbb; /* Adjust for visibility on dark background for label */
+}
 
 .function-call-panel {
     margin-top: 5px;
