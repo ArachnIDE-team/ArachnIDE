@@ -727,8 +727,8 @@ input[type="text"i]:hover {
     flex-wrap: wrap;
     justify-content: space-between;
     width: 270px;
-    padding-top: 6px;
-    /* adjust this as needed */
+    padding-top: 6px;    /* adjust this as needed */
+    margin: auto;
 }
 
             .checkboxarray div {
@@ -2160,6 +2160,20 @@ input[type=range] {
     border-bottom: 1px solid #131313; /* Example border */
     height: fit-content;
     width: 100%;
+}
+
+.toggle-panel-container {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.toggle-panel-inner-container {
+    display: flex;
+    transition: height 0.2s ease;
+    height: 0;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .toggle-panel {

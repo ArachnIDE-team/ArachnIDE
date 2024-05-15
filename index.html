@@ -272,33 +272,9 @@
                             <textarea id="note-input" class="zettelkasten" rows="10" cols="50"></textarea>
                         </div>
 
-                        <div class="checkboxarray">
-                            <div title="Enable Web Search Results">
-                                <input type="checkbox" id="google-search-checkbox" name="enable-search">
-                                <label for="google-search-checkbox">Search</label>
 
-                            </div>
-                            <div title="Enable Code Instructions and Buttons">
-                                <input type="checkbox" id="code-checkbox" name="code-checkbox">
-                                <label for="code-checkbox">Code</label>
-                            </div>
-                            <div title="Self-Prompted AI">
-                                <input type="checkbox" id="auto-mode-checkbox">
-                                <label for="auto-mode-checkbox">Auto</label>
-                            </div>
-                            <div title="Retrieve Document Snippets and send to AI">
-                                <input type="checkbox" id="embed-checkbox">
-                                <label for="embed-checkbox">Data</label>
-                            </div>
-                            <div title="Query Wolfram Alpha">
-                                <input type="checkbox" id="enable-wolfram-alpha" name="enable-wolfram-alpha">
-                                <label for="enable-wolfram-alpha">Wolfram</label>
-                            </div>
-                            <div title="Query Wikipedia">
-                                <input type="checkbox" id="wiki-checkbox">
-                                <label for="wiki-checkbox">Wiki</label>
-                            </div>
-                        </div>
+
+
                     </div>
                 </div>
                 <div id="tab4" class="tabcontent">
@@ -308,67 +284,172 @@
                     <button id="ai-cursor-button">Enable Ai Cursor</button>
                 </div>-->
                         <br />
-                        <div class="flex-container">
-                            <div class="inline-container" title="Enable Local Ai Features">
-                                <input type="checkbox" id="localLLM">
-                                <label for="localLLM">Local</label>
-                            </div>
-                            <button id="downloadAiButton" class="key-button" title="Install Local AI Models into Browser Cache">INSTALL</button>
-                            <div class="inline-container" title="Select Local Model">
-                                <select id="LocalLLMselect" class="model-dropdown custom-select">
-                                    <option value="RedPajama-INCITE-Chat-3B-v1-q4f32_0" selected>&#9889; Red Pajama 3B f32</option>
-                                    <option value="vicuna-v1-7b-q4f32_0">&#9889; Vicuna 7B f32</option>
-                                    <option value="Llama-2-7b-chat-hf-q4f32_1">&#9889; Llama 2 7B f32</option>
-                                    <!--<option value="Llama-2-13b-chat-hf-q4f32_1">&#9889; Llama 2 13B f32</option>-->
-                                    <option value="Llama-2-70b-chat-hf-q4f16_1">&#9889; Llama 2 70B f16</option>
-                                    <!-- <option value="WizardCoder-15B-V1.0-q4f32_1">&#9889; WizardCoder 15B f32</option>-->
-                                </select>
-                            </div>
-                            <div class="inline-container">
-                                <div class="loader" id="loadingIcon" style="display:none;"></div>
-                            </div>
-                            <div class="inline-container">
-                                <div class="loader-fillBackground" id="filledLoadingIcon" style="display:none;">
-                                    <div class="loader-fill initial-animation"></div>
-                                </div>
-                            </div>
-                            <div class="inline-container">
-                                <div id="errorIcon" style="display:none;">
-                                    <div class="error-icon-css">
-                                        <div class="error-x-mark">
-                                            <span class="error-x-mark-left"></span>
-                                            <span class="error-x-mark-right"></span>
+
+                        <div class="label-bar-container">
+                            <label for="modelSelectContainer" class="button-label">Select AI</label>
+                            <div class="toggle-panel-container" id="modelSelectContainer">
+                                <div class="toggle-panel-inner-container hidden">
+                                    <div class="flex-container">
+                                        <div class="inline-container" title="Enable Local Ai Features">
+                                            <input type="checkbox" id="localLLM">
+                                            <label for="localLLM">Local</label>
+                                        </div>
+                                        <button id="downloadAiButton" class="key-button" title="Install Local AI Models into Browser Cache">INSTALL</button>
+                                        <div class="inline-container" title="Select Local Model">
+                                            <select id="LocalLLMselect" class="model-dropdown custom-select">
+                                                <option value="RedPajama-INCITE-Chat-3B-v1-q4f32_0" selected>&#9889; Red Pajama 3B f32</option>
+                                                <option value="vicuna-v1-7b-q4f32_0">&#9889; Vicuna 7B f32</option>
+                                                <option value="Llama-2-7b-chat-hf-q4f32_1">&#9889; Llama 2 7B f32</option>
+                                                <!--<option value="Llama-2-13b-chat-hf-q4f32_1">&#9889; Llama 2 13B f32</option>-->
+                                                <option value="Llama-2-70b-chat-hf-q4f16_1">&#9889; Llama 2 70B f16</option>
+                                                <!-- <option value="WizardCoder-15B-V1.0-q4f32_1">&#9889; WizardCoder 15B f32</option>-->
+                                            </select>
+                                        </div>
+                                        <div class="inline-container">
+                                            <div class="loader" id="loadingIcon" style="display:none;"></div>
+                                        </div>
+                                        <div class="inline-container">
+                                            <div class="loader-fillBackground" id="filledLoadingIcon" style="display:none;">
+                                                <div class="loader-fill initial-animation"></div>
+                                            </div>
+                                        </div>
+                                        <div class="inline-container">
+                                            <div id="errorIcon" style="display:none;">
+                                                <div class="error-icon-css">
+                                                    <div class="error-x-mark">
+                                                        <span class="error-x-mark-left"></span>
+                                                        <span class="error-x-mark-right"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div style="display: flex; justify-content: space-evenly; align-items: center; ">
+                                        <label for="model-select" style="margin-right: 10px;">Select Model:</label>
+                                        <div class="dropdown-container">
+                                            <select id="model-select" class="model-selector custom-select" onchange="checkOtherModel(this)">
+                                                <!-- <option value="other">Other...</option> -->
+                                            </select>
+                                            <input id="model-input" class="model-input" style="display: none;" placeholder="Enter model name">
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="toggle-panel" style="padding-top: 15px;">
+                                    <div class="bar left-bar"></div>
+                                    <div class="icon-wrapper">
+                                        <div class="toggle-icon">
+                                            <!-- Icon SVG -->
+                                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="bar right-bar"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="label-bar-container">
+                            <label for="contextSettingsContainer" class="button-label">Context settings</label>
+                            <div class="toggle-panel-container" id="contextSettingsContainer">
+                                <div class="toggle-panel-inner-container hidden">
+                                    <div class="checkboxarray">
+                                        <div title="Enable Web Search Results">
+                                            <input type="checkbox" id="google-search-checkbox" name="enable-search">
+                                            <label for="google-search-checkbox">Search</label>
+
+                                        </div>
+                                        <div title="Enable Code Instructions and Buttons">
+                                            <input type="checkbox" id="code-checkbox" name="code-checkbox">
+                                            <label for="code-checkbox">Code</label>
+                                        </div>
+                                        <div title="Self-Prompted AI">
+                                            <input type="checkbox" id="auto-mode-checkbox">
+                                            <label for="auto-mode-checkbox">Auto</label>
+                                        </div>
+                                        <div title="Retrieve Document Snippets and send to AI">
+                                            <input type="checkbox" id="embed-checkbox">
+                                            <label for="embed-checkbox">Data</label>
+                                        </div>
+                                        <div title="Query Wolfram Alpha">
+                                            <input type="checkbox" id="enable-wolfram-alpha" name="enable-wolfram-alpha">
+                                            <label for="enable-wolfram-alpha">Wolfram</label>
+                                        </div>
+                                        <div title="Query Wikipedia">
+                                            <input type="checkbox" id="wiki-checkbox">
+                                            <label for="wiki-checkbox">Wiki</label>
+                                        </div>
+                                    </div>
+                                    <div class="gridLayout">
+
+                                        <div class="settingsSlider" title="Set the Token Limit for Calls to GPT">
+                                            <label for="max-tokens-slider">Max Tokens: <br /><span id="max-tokens-display">2000</span></label>
+                                            <input type="range" id="max-tokens-slider" name="max-tokens-slider" min="10" max="16000" value="2000" step="1">
+                                        </div>
+
+                                        <div class="settingsSlider" title="Set the Tempurature for Calls to GPT">
+                                            <label id="model-temperature-label" for="model-temperature">Tempurature:<br /> 0.6</label>
+                                            <input type="range" id="model-temperature" name="model-temperature" min="0" max="1" step="0.1" value="0.6" onchange="dropdown.aiTab.updateLabel()">
+                                        </div>
+
+                                        <div class="settingsSlider" title="Set the Proportion of Tokens Dedicated to AI Memory">
+                                            <span id="max-context-size-display">2000</span>
+                                            <input type="range" id="max-context-size-slider" name="max-context-size-slider" min="0" max="2000" value="555" step="1">
+                                        </div>
+
+                                        <div class="settingsSlider" title="Number of Notes Retrieved from ArachnIDE and Sent to AI">
+                                            <label id="node-slider-label">Top 3 <br />nodes</label>
+                                            <input type="range" id="node-count-slider" name="node-count-slider" min="1" max="25" value="3">
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="toggle-panel" style="padding-top: 15px;">
+                                    <div class="bar left-bar"></div>
+                                    <div class="icon-wrapper">
+                                        <div class="toggle-icon">
+                                            <!-- Icon SVG -->
+                                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="bar right-bar"></div>
                                 </div>
                             </div>
                         </div>
                         <br />
-                        <div class="api-container">
-                            <div class="api-inputs custom-scrollbar">
-                                <div>
-                                    <label for="OpenAI-api-key-input">OpenAI API Key:</label>
-                                    <!-- storage name: openaiApiKey-->
-                                    <input type="password" class="input-key" id="OpenAI-api-key-input">
-                                </div>
-                                <div>
-                                    <label for="HuggingFace-api-key-input">Hugging Face API Key:</label>
-                                    <!-- storage name: huggingfaceApiKey-->
-                                    <input type="password" class="input-key" id="HuggingFace-api-key-input">
-                                </div>
-                                <div>
-                                    <label for="Anthropic-api-key-input">Anthropic API Key:</label>
-                                    <!-- storage name: anthropicApiKey-->
-                                    <input type="password" class="input-key" id="Anthropic-api-key-input">
-                                </div>
-<!--                                <div>-->
-<!--                                    <label for="GoogleGemini-api-key-input">Google Gemini API Key:</label>-->
-<!--                                    &lt;!&ndash; storage name: googleApiKey&ndash;&gt;-->
-<!--                                    <input type="password" class="input-key" id="GoogleGemini-api-key-input">-->
-<!--                                </div>-->
-<!--                                <div class="g-signin2" data-onsuccess="onSignIn"></div>-->
-                                <div>
-                                    <label for="GoogleGemini-project-id-input" title="Google Gemini API Access Instructions:
+                        <div class="label-bar-container">
+                            <label for="apiKeyContainer" class="button-label">API Keys</label>
+                            <div class="toggle-panel-container" id="apiKeyContainer">
+                                <div class="toggle-panel-inner-container hidden">
+                                    <div class="api-container">
+                                        <div class="api-inputs custom-scrollbar">
+                                            <div>
+                                                <label for="OpenAI-api-key-input">OpenAI API Key:</label>
+                                                <!-- storage name: openaiApiKey-->
+                                                <input type="password" class="input-key" id="OpenAI-api-key-input">
+                                            </div>
+                                            <div>
+                                                <label for="HuggingFace-api-key-input">Hugging Face API Key:</label>
+                                                <!-- storage name: huggingfaceApiKey-->
+                                                <input type="password" class="input-key" id="HuggingFace-api-key-input">
+                                            </div>
+                                            <div>
+                                                <label for="Anthropic-api-key-input">Anthropic API Key:</label>
+                                                <!-- storage name: anthropicApiKey-->
+                                                <input type="password" class="input-key" id="Anthropic-api-key-input">
+                                            </div>
+                                            <!--                                <div>-->
+                                            <!--                                    <label for="GoogleGemini-api-key-input">Google Gemini API Key:</label>-->
+                                            <!--                                    &lt;!&ndash; storage name: googleApiKey&ndash;&gt;-->
+                                            <!--                                    <input type="password" class="input-key" id="GoogleGemini-api-key-input">-->
+                                            <!--                                </div>-->
+                                            <!--                                <div class="g-signin2" data-onsuccess="onSignIn"></div>-->
+                                            <div>
+                                                <label for="GoogleGemini-project-id-input" title="Google Gemini API Access Instructions:
  1) Create a Project
  2) Create a Service Account for that project
  3) Enable Vertex AI for the Service Account
@@ -377,76 +458,57 @@
 You dont need any API Key nor any OAuth 2.0 Client IDs, just a Service Account with the right permissions.
 PS: Google policy is to pretend User's log in and IAM service adoption, this workaround prevents your credentials to be leaked, i personally do
 not agree on the policy but this way, we all get the free bonus for Gemini. If you want to talk about it write me a PM, maybe we can fit it.">Google Gemini Project ID	&#9888;:</label>
-                                    <!-- storage name: googleProjectID-->
-                                    <input type="password" class="input-key" id="GoogleGemini-project-id-input">
-                                </div>
-                                <div>
-                                    <label for="Mistral-api-key-input">Mistral AI API Key:</label>
-                                    <!-- storage name: mistralApiKey-->
-                                    <input type="password" class="input-key" id="Mistral-api-key-input">
-                                </div>
-                                <div>
-                                    <label for="Cohere-api-key-input">Cohere API Key:</label>
-                                    <!-- storage name: cohereApiKey-->
-                                    <input type="password" class="input-key" id="Cohere-api-key-input">
-                                </div>
-                                <div>
-                                    <label for="Google-search-api-key-input">Google Search API Key:</label>
-                                    <!-- storage name: googleSearchApiKey-->
-                                    <input type="password" class="input-key"  id="Google-search-api-key-input">
-                                </div>
-                                <div>
-                                    <label for="Google-search-engine-id-input">Google Search Engine ID:</label>
-                                    <!-- storage name: googleSearchEngineId-->
-                                    <input type="password" class="input-key" id="Google-search-engine-id-input">
-                                </div>
-                                <div>
-                                    <label for="Wolfram-api-key-input">Wolfram API Key:</label>
-                                    <!-- storage name: wolframApiKey-->
-                                    <input type="password" class="input-key" id="Wolfram-api-key-input">
-                                </div>
-                            </div>
+                                                <!-- storage name: googleProjectID-->
+                                                <input type="password" class="input-key" id="GoogleGemini-project-id-input">
+                                            </div>
+                                            <div>
+                                                <label for="Mistral-api-key-input">Mistral AI API Key:</label>
+                                                <!-- storage name: mistralApiKey-->
+                                                <input type="password" class="input-key" id="Mistral-api-key-input">
+                                            </div>
+                                            <div>
+                                                <label for="Cohere-api-key-input">Cohere API Key:</label>
+                                                <!-- storage name: cohereApiKey-->
+                                                <input type="password" class="input-key" id="Cohere-api-key-input">
+                                            </div>
+                                            <div>
+                                                <label for="Google-search-api-key-input">Google Search API Key:</label>
+                                                <!-- storage name: googleSearchApiKey-->
+                                                <input type="password" class="input-key"  id="Google-search-api-key-input">
+                                            </div>
+                                            <div>
+                                                <label for="Google-search-engine-id-input">Google Search Engine ID:</label>
+                                                <!-- storage name: googleSearchEngineId-->
+                                                <input type="password" class="input-key" id="Google-search-engine-id-input">
+                                            </div>
+                                            <div>
+                                                <label for="Wolfram-api-key-input">Wolfram API Key:</label>
+                                                <!-- storage name: wolframApiKey-->
+                                                <input type="password" class="input-key" id="Wolfram-api-key-input">
+                                            </div>
+                                        </div>
 
-                            <div class="api-buttons">
-                                <button class="key-button" onclick="dropdown.aiTab.saveKeys()">Save Keys</button>
-                                <button class="key-button" onclick="dropdown.aiTab.clearKeys()">Clear Keys</button>
-                                <button class="key-button" id="saveToFileButton" onclick="dropdown.aiTab.saveKeysToFile()">Keys .txt</button>
-                                <button class="key-button" id="loadFromFileButton" onclick="dropdown.aiTab.loadKeysFromFile()">Load Keys</button>
+                                        <div class="api-buttons">
+                                            <button class="key-button" onclick="dropdown.aiTab.saveKeys()">Save Keys</button>
+                                            <button class="key-button" onclick="dropdown.aiTab.clearKeys()">Clear Keys</button>
+                                            <button class="key-button" id="saveToFileButton" onclick="dropdown.aiTab.saveKeysToFile()">Keys .txt</button>
+                                            <button class="key-button" id="loadFromFileButton" onclick="dropdown.aiTab.loadKeysFromFile()">Load Keys</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="toggle-panel" style="padding-top: 15px;">
+                                    <div class="bar left-bar"></div>
+                                    <div class="icon-wrapper">
+                                        <div class="toggle-icon">
+                                            <!-- Icon SVG -->
+                                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="bar right-bar"></div>
+                                </div>
                             </div>
-                        </div>
-                        <br />
-                        <div style="display: flex; justify-content: space-evenly; align-items: center; ">
-                            <label for="model-select" style="margin-right: 10px;">Select Model:</label>
-                            <div class="dropdown-container">
-                                <select id="model-select" class="model-selector custom-select" onchange="checkOtherModel(this)">
-                                    <!-- <option value="other">Other...</option> -->
-                                </select>
-                                <input id="model-input" class="model-input" style="display: none;" placeholder="Enter model name">
-                            </div>
-                        </div>
-                        <br />
-                        <div class="gridLayout">
-
-                            <div class="settingsSlider" title="Set the Token Limit for Calls to GPT">
-                                <label for="max-tokens-slider">Max Tokens: <br /><span id="max-tokens-display">2000</span></label>
-                                <input type="range" id="max-tokens-slider" name="max-tokens-slider" min="10" max="16000" value="2000" step="1">
-                            </div>
-
-                            <div class="settingsSlider" title="Set the Tempurature for Calls to GPT">
-                                <label id="model-temperature-label" for="model-temperature">Tempurature:<br /> 0.6</label>
-                                <input type="range" id="model-temperature" name="model-temperature" min="0" max="1" step="0.1" value="0.6" onchange="dropdown.aiTab.updateLabel()">
-                            </div>
-
-                            <div class="settingsSlider" title="Set the Proportion of Tokens Dedicated to AI Memory">
-                                <span id="max-context-size-display">2000</span>
-                                <input type="range" id="max-context-size-slider" name="max-context-size-slider" min="0" max="2000" value="555" step="1">
-                            </div>
-
-                            <div class="settingsSlider" title="Number of Notes Retrieved from ArachnIDE and Sent to AI">
-                                <label id="node-slider-label">Top 3 <br />nodes</label>
-                                <input type="range" id="node-count-slider" name="node-count-slider" min="1" max="25" value="3">
-                            </div>
-
                         </div>
                     </div>
                 </div>
@@ -507,12 +569,81 @@ not agree on the policy but this way, we all get the free bonus for Gemini. If y
                     <!-- Second tab content here -->
                     <div class="submenu">
 
+<!--                        <div class="label-bar-container">-->
+<!--                            <label for="backgroundTypeContainer" class="button-label">Background type</label>-->
+<!--                            <div class="toggle-panel-container" id="backgroundTypeContainer">-->
+<!--                                <div class="toggle-panel-inner-container hidden">-->
+<!--                                    Coming soon-->
+<!--                                </div>-->
+<!--                                <div class="toggle-panel" style="padding-top: 15px;">-->
+<!--                                    <div class="bar left-bar"></div>-->
+<!--                                    <div class="icon-wrapper">-->
+<!--                                        <div class="toggle-icon">-->
+<!--                                            &lt;!&ndash; Icon SVG &ndash;&gt;-->
+<!--                                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
+<!--                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>-->
+<!--                                            </svg>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                    <div class="bar right-bar"></div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
                         <div class="label-bar-container">
                             <label for="fractalSettingsContainer" class="button-label">Fractal Settings</label>
-                            <div class="fractal-settings-container" id="fractalSettingsContainer">
-                                <div class="fractal-settings-panel hidden">
-                                    HELLO
+                            <div class="toggle-panel-container" id="fractalSettingsContainer">
+                                <div class="toggle-panel-inner-container hidden">
+                                    <div class="settingsSlider centered" style="margin-bottom: 10px;">
+                                        <label style="white-space: nowrap;">
+                                            z <sup id="exponent_value" style="color: powderblue">2</sup> + c
+                                        </label>
+                                        <input id="exponent" type="range" min="1" max="8" value="2">
+                                    </div>
+                                    <div class="settingsSlider centered" style="margin-bottom: 10px;">
+                                        <div style="display:flex; justify-content: space-between;">
+                                            <div id="quality_value">Quality</div>
+                                            <div id="fps">fps:?? (is javascript enabled?)</div>
+                                        </div>
+                                        <input id="quality" type="range" min="0" max="100" value="16">
+                                    </div>
+                                    <div class="gridLayout">
 
+                                        <div class="settingsSlider">
+                                            <label for="length">Length: <span id="length_value"></span></label>
+                                            <input id="length" type="range" min="0" max="100" value="50">
+                                        </div>
+
+                                        <div class="settingsSlider">
+                                            <label for="renderWidthMultSlider">Width: <span id="renderWidthMultValue"></span></label>
+                                            <input type="range" id="renderWidthMultSlider" min="0" max="12" step="0.001">
+                                        </div>
+
+                                        <div class="settingsSlider">
+                                            <label for="maxLinesSlider">Max Lines: <span id="maxLinesValue"></span></label>
+                                            <input type="range"
+                                                   id="maxLinesSlider"
+                                                   min="0"
+                                                   max="2048"
+                                                   step="1"
+                                                   title="Set the removal limit for number of lines displayed">
+                                        </div>
+
+                                        <div class="settingsSlider">
+                                            <label for="regenDebtSlider">Speed: <span id="regenDebtValue"></span></label>
+                                            <input type="range" id="regenDebtSlider" min="0" max="4" step="0.001">
+                                        </div>
+                                        <div class="settingsSlider" title="Set the strength of line generation around your mouse.">
+                                            <label for="flashlightStrength">Strength: <span id="flashlightStrength_value"></span></label>
+                                            <input id="flashlightStrength" type="range" min="0" max="1" step="0.001">
+                                        </div>
+
+                                        <div class="settingsSlider" title="Set the radius of line generation around your mouse">
+                                            <label for="flashlightRadius">Radius: <span id="flashlightRadius_value"></span></label>
+                                            <input type="range" id="flashlightRadius" min="0" max="1" step="0.001">
+                                        </div>
+
+                                    </div>
                                 </div>
                                 <div class="toggle-panel" style="padding-top: 15px;">
                                     <div class="bar left-bar"></div>
@@ -528,100 +659,69 @@ not agree on the policy but this way, we all get the free bonus for Gemini. If y
                                 </div>
                             </div>
                         </div>
-                        <div class="settingsSlider centered" style="margin-bottom: 10px;">
-                            <label style="white-space: nowrap;">
-                                z <sup id="exponent_value" style="color: powderblue">2</sup> + c
-                            </label>
-                            <input id="exponent" type="range" min="1" max="8" value="2">
-                        </div>
-                        <div class="settingsSlider centered" style="margin-bottom: 10px;">
-                            <div style="display:flex; justify-content: space-between;">
-                                <div id="quality_value">Quality</div>
-                                <div id="fps">fps:?? (is javascript enabled?)</div>
-                            </div>
-                            <input id="quality" type="range" min="0" max="100" value="16">
-                        </div>
-                        <div class="gridLayout">
+                        <div class="label-bar-container">
+                            <label for="backgroundTypeContainer" class="button-label">Colors</label>
+                            <div class="toggle-panel-container" id="backgroundTypeContainer">
+                                <div class="toggle-panel-inner-container hidden">
+                                    <div id="colorselection">
+                                        <div class="color-picker-container">
+                                            <div class="color-picker-item">
+                                                <label for="rColor">R</label>
+                                                <input type="color" id="rColor" name="rColor" value="#FF0000">
+                                            </div>
+                                            <div class="color-picker-item">
+                                                <label for="gColor">G</label>
+                                                <input type="color" id="gColor" name="gColor" value="#00FF00">
+                                            </div>
+                                            <div class="color-picker-item">
+                                                <label for="bColor">B</label>
+                                                <input type="color" id="bColor" name="bColor" value="#0000FF">
+                                            </div>
+                                            <div class="color-picker-item">
+                                                <label for="colorPicker">BG</label>
+                                                <input type="color" id="colorPicker" name="colorPicker" value="#000000" style="background:#222226;">
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div id="colorsliders">
+                                            <input type="range" min="0" max="255" id="rSlider" value="0" style="display: none;">
+                                            <div class="gridLayout">
 
-                            <div class="settingsSlider">
-                                <label for="length">Length: <span id="length_value"></span></label>
-                                <input id="length" type="range" min="0" max="100" value="50">
-                            </div>
+                                                <div class="settingsSlider">
+                                                    <label for="cSlider">Brightness<span id="c_value"></span></label>
+                                                    <input type="range" min="0" max="255" id="cSlider" value="128">
+                                                </div>
 
-                            <div class="settingsSlider">
-                                <label for="renderWidthMultSlider">Width: <span id="renderWidthMultValue"></span></label>
-                                <input type="range" id="renderWidthMultSlider" min="0" max="12" step="0.001">
-                            </div>
+                                                <div class="settingsSlider">
+                                                    <label for="sSlider">Saturation<span id="s_value"></span></label>
+                                                    <input type="range" min="0" max="255" id="sSlider" value="127">
+                                                </div>
 
-                            <div class="settingsSlider">
-                                <label for="maxLinesSlider">Max Lines: <span id="maxLinesValue"></span></label>
-                                <input type="range"
-                                       id="maxLinesSlider"
-                                       min="0"
-                                       max="2048"
-                                       step="1"
-                                       title="Set the removal limit for number of lines displayed">
-                            </div>
+                                                <div class="settingsSlider">
+                                                    <label for="outer_opacity">Outer Opacity<span id="outer_opacity_value"></span></label>
+                                                    <input id="outer_opacity" type="range" min="0" max="100" value="100">
+                                                </div>
 
-                            <div class="settingsSlider">
-                                <label for="regenDebtSlider">Speed: <span id="regenDebtValue"></span></label>
-                                <input type="range" id="regenDebtSlider" min="0" max="4" step="0.001">
-                            </div>
-                            <div class="settingsSlider" title="Set the strength of line generation around your mouse.">
-                                <label for="flashlightStrength">Strength: <span id="flashlightStrength_value"></span></label>
-                                <input id="flashlightStrength" type="range" min="0" max="1" step="0.001">
-                            </div>
+                                                <div class="settingsSlider">
+                                                    <label for="inner_opacity">Inner Opacity<span id="inner_opacity_value"></span></label>
+                                                    <input id="inner_opacity" type="range" min="0" max="100" value="100">
+                                                </div>
 
-                            <div class="settingsSlider" title="Set the radius of line generation around your mouse">
-                                <label for="flashlightRadius">Radius: <span id="flashlightRadius_value"></span></label>
-                                <input type="range" id="flashlightRadius" min="0" max="1" step="0.001">
-                            </div>
-
-                        </div>
-                        <div id="colorselection">
-                            <div class="color-picker-container">
-                                <div class="color-picker-item">
-                                    <label for="rColor">R</label>
-                                    <input type="color" id="rColor" name="rColor" value="#FF0000">
-                                </div>
-                                <div class="color-picker-item">
-                                    <label for="gColor">G</label>
-                                    <input type="color" id="gColor" name="gColor" value="#00FF00">
-                                </div>
-                                <div class="color-picker-item">
-                                    <label for="bColor">B</label>
-                                    <input type="color" id="bColor" name="bColor" value="#0000FF">
-                                </div>
-                                <div class="color-picker-item">
-                                    <label for="colorPicker">BG</label>
-                                    <input type="color" id="colorPicker" name="colorPicker" value="#000000" style="background:#222226;">
-                                </div>
-                            </div>
-                            <br />
-                            <div id="colorsliders">
-                                <input type="range" min="0" max="255" id="rSlider" value="0" style="display: none;">
-                                <div class="gridLayout">
-
-                                    <div class="settingsSlider">
-                                        <label for="cSlider">Brightness<span id="c_value"></span></label>
-                                        <input type="range" min="0" max="255" id="cSlider" value="128">
+                                            </div>
+                                        </div>
                                     </div>
-
-                                    <div class="settingsSlider">
-                                        <label for="sSlider">Saturation<span id="s_value"></span></label>
-                                        <input type="range" min="0" max="255" id="sSlider" value="127">
+                                </div>
+                                <div class="toggle-panel" style="padding-top: 15px;">
+                                    <div class="bar left-bar"></div>
+                                    <div class="icon-wrapper">
+                                        <div class="toggle-icon">
+                                            <!-- Icon SVG -->
+                                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </div>
                                     </div>
-
-                                    <div class="settingsSlider">
-                                        <label for="outer_opacity">Outer Opacity<span id="outer_opacity_value"></span></label>
-                                        <input id="outer_opacity" type="range" min="0" max="100" value="100">
-                                    </div>
-
-                                    <div class="settingsSlider">
-                                        <label for="inner_opacity">Inner Opacity<span id="inner_opacity_value"></span></label>
-                                        <input id="inner_opacity" type="range" min="0" max="100" value="100">
-                                    </div>
-
+                                    <div class="bar right-bar"></div>
                                 </div>
                             </div>
                         </div>

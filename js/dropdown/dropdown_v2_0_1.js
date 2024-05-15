@@ -78,7 +78,7 @@
         const buttonLabels = document.querySelectorAll(".button-label");
         buttonLabels.forEach(function(label) {
             let panelContainerID = label.getAttribute("for");
-            let panelContainer = document.querySelector("#" + panelContainerID + " > div");
+            let panelContainer = document.querySelector("#" + panelContainerID + " > div.toggle-panel-inner-container");
             let togglePanel = document.querySelector("#" + panelContainerID + " > .toggle-panel");
             togglePanel.onclick = label.onclick = function() {
                 const openDropdowns = panelContainer.querySelectorAll('.options-replacer.show');
