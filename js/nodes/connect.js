@@ -41,7 +41,7 @@ function connectDistance(na, nb, linkStrength = 0.1, linkStyle = {
 }) {
     // Log UUIDs for debugging
     //console.log(`Connecting: ${na.uuid} to ${nb.uuid}`);
-
+    if (na === nb) return null;
     const existingEdge = na.edges.find(edge =>
         edge.pts.some(pt => pt.uuid === nb.uuid) &&
         nb.edges.some(edge => edge.pts.some(pt => pt.uuid === na.uuid))
