@@ -199,7 +199,7 @@ def count_tokens():
         project_id = data.get('projectID')
         location = data.get('location')
         vertexai.init(project=project_id, location=location)
-        model = GenerativeModel(model_name=model[len('google:'):])
+        model = generative_models.GenerativeModel(model_name=model[len('google:'):])
         count_tokens = model.count_tokens(text)
         return jsonify({"count": count_tokens.total_tokens, "approximation": False, "model_info": model_info})
     elif model.startswith('mistral:'):
@@ -292,6 +292,8 @@ model_map = {
     "anthropic:claude-3-opus-20240229": "openai:gpt-4",
     "anthropic:claude-3-sonnet-20240229": "openai:gpt-4",
     "anthropic:claude-3-haiku-20240307": "openai:gpt-4",
+    "openai:gpt-4o": "openai:gpt-4",
+    "openai::gpt-4o-2024-05-13": "openai:gpt-4",
     # "mistral:open-mistral-7b" : "huggingface:mistralai/Mistral-7B-v0.1",
     # "mistral:open-mixtral-8x7b" : "huggingface:mistralai/Mixtral-8x7B-v0.1",
     # "mistral:open-mixtral-8x22b" : "huggingface:mistralai/Mixtral-8x22B-v0.1",

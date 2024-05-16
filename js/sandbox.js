@@ -126,6 +126,6 @@ connectDistance(textNode, llmNode)
 
 textNode.pos.x = textNode.pos.x + 0.1
 textNode.pos.y = textNode.pos.y + 2
-textNode.content.querySelector("iframe").remove()
+// textNode.content.querySelector("iframe").remove()
 
 rootDiagram.background.pan = new vec2(-2.32, -0.65)

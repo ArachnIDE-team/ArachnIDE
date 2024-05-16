@@ -17,6 +17,8 @@ window.modelOptions = () => [
     //new Option('GPT-3.5-turbo-0613', 'openai:gpt-3.5-turbo-0613', false, false),
     new Option('GPT-3.5-16k-0613', 'openai:gpt-3.5-turbo-16k-0613', false, false),
     new Option('GPT-4', 'openai:gpt-4', false, false),
+    new Option('GPT-4o', 'openai:gpt-4o', false, false),
+    new Option('GPT-4o 13 may 24', 'openai:gpt-4o-2024-05-13', false, false),
     new Option('GPT-4-0613', 'openai:gpt-4-0613', false, false),
     new Option('GPT-4-vision', 'openai:gpt-4-vision-preview', false, false),
     new Option('GPT-3.5-1106', 'openai:gpt-3.5-turbo-1106', false, false),
@@ -76,6 +78,8 @@ window.modelOptions = () => [
     new Option('Google Gemini 1.0 Vision PRO', 'google:gemini-1.0-pro-vision', false, false),
     new Option('Google Gemini 1.5 PRO', 'google:gemini-1.5-pro-preview-0409', false, false),
     new Option('Google Gemini 1.5 Vision PRO', 'google:gemini-1.5-pro-vision', false, false),
+    new Option('Google Gemini 1.5 Flash 14 may 24', 'google:gemini-1.5-flash-preview-0514', false, false),
+    new Option('Google Gemini 1.5 PRO 14 may 24', 'google:gemini-1.5-pro-preview-0514', false, false),
 
     // Mistral
     new Option('Open Mistral 7B', 'mistral:open-mistral-7b', false, false),
