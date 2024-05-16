@@ -1025,6 +1025,8 @@ select-replacer > div:first-child {
             background-color: #222226;
             border: inset;
             border-color: #8882;
+            width: 100%;
+            margin-left: -10px;
         }
 
         .model-selector {
@@ -2173,7 +2175,7 @@ input[type=range] {
     transition: height 0.2s ease;
     height: 0;
     flex-direction: column;
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 
 .toggle-panel {
@@ -2276,6 +2278,10 @@ input[type=range] {
 
 .label-bar-container:hover .button-label {
     color: #bbb; /* Adjust for visibility on dark background for label */
+}
+
+.label-bar-container:not(:last-child) {
+    margin-bottom: 20px;
 }
 
 .function-call-panel {
