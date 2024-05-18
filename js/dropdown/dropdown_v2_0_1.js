@@ -124,6 +124,13 @@
         const percentage = (value - min) / (max - min) * 100;
         slider.style.background = `linear-gradient(to right, #006BB6 0%, #006BB6 ${percentage}%, #18181c ${percentage}%, #18181c 100%)`;
     }
+    setComplementarySliderBackground(slider) {
+        const min = slider.min ? parseFloat(slider.min) : 0;
+        const max = slider.max ? parseFloat(slider.max) : 100;
+        const value = slider.value ? parseFloat(slider.value) : 0;// linear-gradient(to right, rgb(0, 107, 182) 0%, 33.3333%, rgb(255, 255, 0) 33.3333%, rgb(255, 192, 0)  100%)
+        const percentage = (value - min) / (max - min) * 100;
+        slider.style.background = `linear-gradient(to right, #006BB6 0%, #006BB6 ${percentage}%, #ffff00 ${percentage}%, #ffc000 100%)`;
+    }
 
     updateSlider(slider) {
         // Set the background color split initially

@@ -44,6 +44,7 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
 
     const temperature = parseFloat(document.getElementById(`node-temperature-${node.index}`).value);
     const maxTokens = parseInt(document.getElementById(`node-max-tokens-${node.index}`).value);
+    const maxContext = parseInt(document.getElementById(`node-max-context-${node.index}`).value);
     const modelToUse = getModelToUse(selectedModel);
 
     // Create a new AbortController each time the function is called
@@ -54,7 +55,8 @@ async function callchatLLMnode(messages, node, stream = false, selectedModel = n
     let fullResponse;
 
     try {
-        const response = await providerWrapper.sendChat(messages, temperature, maxTokens, signal, stream);
+        const response = await providerWrapper.sendChat(messages, temperature, maxTokens - maxContext, signal, stream);
+        // const response = await providerWrapper.sendChat(messages, temperature, maxTokens, maxTokens - maxContext, signal, stream);
         if (!response.ok) {
             const errorData = await response.json();
             console.error("Error calling " + providerWrapper.selectedOption + " API:", errorData);

@@ -230,6 +230,10 @@ class LLMAgentNode extends WindowedNode {
         const temperatureSliderContainer = LLMAgentNode._createSlider(`node-temperature-${index}`, 'Temperature', initialTemperature, 0, 1, 0.1);
         const maxTokensSliderContainer = LLMAgentNode._createSlider(`node-max-tokens-${index}`, 'Max Tokens', initialMaxTokens, 10, 16000, 1);
         const maxContextSizeSliderContainer = LLMAgentNode._createSlider(`node-max-context-${index}`, 'Max Context', initialMaxContextSize, 1, initialMaxTokens, 1);
+        const maxCompletionSizeSliderLabel = document.createElement("label");
+        maxCompletionSizeSliderLabel.setAttribute("for", `node-max-context-${index}`);
+
+        maxContextSizeSliderContainer.appendChild(maxCompletionSizeSliderLabel);
 
 
         // Create settings container
@@ -455,6 +459,9 @@ class LLMAgentNode extends WindowedNode {
         if (haltCheckbox) {
             haltCheckbox.checked = true;
         }
+
+        // Reinitialize the controller for future use
+        this.controller = new AbortController();
     }
 
     _setupAiNodeResponseDivListeners() {
@@ -611,10 +618,10 @@ class LLMAgentNode extends WindowedNode {
                            "Output cost: $" + (model_info.output_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
                            "Max tokens: " + Math.max(model_info.max_input_tokens, model_info.max_output_tokens ) + " Tok";
                        // Update also token slider and context slider
-                       this._updateMaxTokensSliderMax(Math.max(model_info.max_input_tokens, model_info.max_output_tokens ))
+                       this._updateMaxTokensSliderMax(model_info.max_input_tokens, model_info.max_output_tokens);
                    } else {
                        this.content.querySelector("div.select-replacer").removeAttribute("title")
-                       this._updateMaxTokensSliderMax(16000)
+                       this._updateMaxTokensSliderMax(16000, 16000)
                    }
                    console.log("Message token count: ", count, " for messages: ", messages)
                });
@@ -627,10 +634,11 @@ class LLMAgentNode extends WindowedNode {
         this.countTokenTimeout = setTimeout(performUpdate, delay);
     }
 
-    _updateMaxTokensSliderMax(max){
+    _updateMaxTokensSliderMax(maxInput, maxOutput) {
         const maxTokensSlider = this.content.querySelector('#node-max-tokens-' + this.index);
         const maxContextSizeSlider = this.content.querySelector('#node-max-context-' + this.index);
-        maxTokensSlider.setAttribute("max", "" + max);
+        maxTokensSlider.setAttribute("max", "" + maxInput);
+        maxContextSizeSlider.setAttribute("data-max-completion", maxOutput)
         maxTokensSlider.dispatchEvent(new Event('input'));
         maxContextSizeSlider.dispatchEvent(new Event('input'));
     }
@@ -661,6 +669,7 @@ class LLMAgentNode extends WindowedNode {
 
             // Reset the flag and uncheck the checkbox
             this.aiResponseHalted = false;
+            this.shouldContinue = true;
 
             if (haltCheckbox) {
                 haltCheckbox.checked = false;
@@ -820,18 +829,21 @@ class LLMAgentNode extends WindowedNode {
 
         sliders.forEach(slider => {
             // Attach event listener to each slider
-            slider.addEventListener('input',  () => {
-                // Retrieve the associated label within the node
-                const label = this.content.querySelector(`label[for='${slider.id}']`);
-                if (label) {
-                    // Extract the base label text (part before the colon)
-                    const baseLabelText = label.innerText.split(':')[0];
-                    label.innerText = `${baseLabelText}: ${slider.value}`;
-
-                    dropdown.setSliderBackground(slider);  // Assuming this is a predefined function
-                }
-                // Additional logic for each slider, if needed
-            });
+                slider.addEventListener('input', () => {
+                    // Retrieve the associated label within the node
+                    const label = this.content.querySelector(`label[for='${slider.id}']`);
+                    if (label) {
+                        // Extract the base label text (part before the colon)
+                        const baseLabelText = label.innerText.split(':')[0];
+                        label.innerText = `${baseLabelText}: ${slider.value}`;
+                        if(!slider.id.startsWith("node-max-context")) {
+                            dropdown.setSliderBackground(slider);  // Assuming this is a predefined function
+                        } else {
+                            dropdown.setComplementarySliderBackground(slider);  // Assuming this is a predefined function
+                        }
+                    }
+                    // Additional logic for each slider, if needed
+                });
 
             // Trigger the input event to set initial state
             slider.dispatchEvent(new Event('input'));
@@ -882,12 +894,22 @@ class LLMAgentNode extends WindowedNode {
         // Event listener for maxContextSizeSlider
         if (maxContextSizeSlider) {
             maxContextSizeSlider.addEventListener('input', () => {
-                const maxContextSizeLabel = this.content.querySelector(`label[for='node-max-context-${this.index}']`);
+                const maxContextSizeLabel = this.content.querySelector(`label[for='node-max-context-${this.index}']:first-child`);
+                const maxCompletionSizeLabel = this.content.querySelector(`label[for='node-max-context-${this.index}']:not(:first-child)`);
+
                 if (maxContextSizeLabel) {
-                    const maxContextValue = parseInt(maxContextSizeSlider.value, 10);
+                    let maxContextValue = parseInt(maxContextSizeSlider.value, 10);
+                    const maxCompletionValue = parseInt(maxContextSizeSlider.getAttribute("data-max-completion"));
                     const maxContextMax = parseInt(maxContextSizeSlider.max, 10);
+                    if(maxContextMax - maxCompletionValue > maxContextValue) {
+                        maxContextSizeSlider.value = maxContextMax - maxCompletionValue;
+                        maxContextSizeSlider.dispatchEvent(new Event('input'));
+                        return;
+                    }
                     const ratio = Math.round((maxContextValue / maxContextMax) * 100);
                     maxContextSizeLabel.innerText = `Context: ${ratio}% (${maxContextValue} tokens)`;
+                    maxCompletionSizeLabel.innerText = `Completion: ${100 - ratio}% (${maxContextMax - maxContextValue} tokens)`;
+
                 }
             });
         }

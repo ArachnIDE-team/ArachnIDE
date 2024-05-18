@@ -256,8 +256,9 @@ class LLMNode extends LLMAgentNode {
         const temperatureSliderContainer = LLMNode._createSlider(`node-temperature-${index}`, 'Temperature', initialTemperature, 0, 1, 0.1);
         const maxTokensSliderContainer = LLMNode._createSlider(`node-max-tokens-${index}`, 'Max Tokens', initialMaxTokens, 10, 16000, 1);
         const maxContextSizeSliderContainer = LLMNode._createSlider(`node-max-context-${index}`, 'Max Context', initialMaxContextSize, 1, initialMaxTokens, 1);
-
-
+        const maxCompletionSizeSliderLabel = document.createElement("label");
+        maxCompletionSizeSliderLabel.setAttribute("for", `node-max-context-${index}`);
+        maxContextSizeSliderContainer.appendChild(maxCompletionSizeSliderLabel);
         // Create settings container
         const aiNodeSettingsContainer = LLMNode._createSettingsContainer();
 

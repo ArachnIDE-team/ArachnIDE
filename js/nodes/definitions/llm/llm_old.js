@@ -479,6 +479,9 @@ class LLMOldNode extends WindowedNode {
         if (haltCheckbox) {
             haltCheckbox.checked = true;
         }
+
+        // Reinitialize the controller for future use
+        this.controller = new AbortController();
     }
 
     _setupAiNodeResponseDivListeners() {
@@ -675,12 +678,13 @@ class LLMOldNode extends WindowedNode {
 
             // Reset the flag and uncheck the checkbox
             this.aiResponseHalted = false;
+            this.shouldContinue = true;
 
             if (haltCheckbox) {
                 haltCheckbox.checked = false;
             }
 
-            this.sendLLMNodeMessage();
+            this.sendLLMNodeMessage().then();
         });
 
         if (haltCheckbox) {
