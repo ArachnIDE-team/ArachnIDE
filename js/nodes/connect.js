@@ -30,15 +30,7 @@ function connectRandom(n) {
 }
 */
 
-function connectDistance(na, nb, linkStrength = 0.1, linkStyle = {
-    // stroke: "none",
-    stroke: "lightcyan",
-    "stroke-width": "5",
-    // "stroke-width": "0.5",
-    // "stroke-width": "0.005",
-    // fill: "lightcyan",
-    opacity: "0.5"
-}) {
+function connectDistance(na, nb, linkStrength = 0.1, linkStyle = {stroke: "lightcyan", "stroke-width": "5", opacity: "0.5"}) {
     // Log UUIDs for debugging
     //console.log(`Connecting: ${na.uuid} to ${nb.uuid}`);
     if (na === nb) return null;
