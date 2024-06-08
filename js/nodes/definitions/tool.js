@@ -36,6 +36,9 @@ class ToolNode extends WindowedNode {
             this.description = description;
             this.index = index;
         }
+        this.innerContent.style.width = "100%";
+        this.innerContent.style.height = "100%";
+        this.innerContent.style.flexDirection = "column";
         this._addDescription();
         this._addCustomInterface();
         this._addPerformButton();
@@ -45,16 +48,13 @@ class ToolNode extends WindowedNode {
         this.descriptionPanel = document.createElement("div");
         this.descriptionPanel.className = "tool-description";
         this.descriptionPanel.innerText = this.description;
-        this.descriptionPanel.style.width = "100%"
         this.innerContent.append(this.descriptionPanel);
     }
     _addPerformButton(){
         this.performButton = document.createElement("button");
-        this.performButton.className = "footer-button";
-        this.performButton.innerText = "Perform"
-        this.performButton.style.width = "100%"
+        this.performButton.className = "footer-button tool-button";
+        this.performButton.innerText = "Perform";
         this.performButton.onclick = this.perform.bind(this);
-        this.innerContent.style.width = "100%";
         this.innerContent.append(this.performButton);
     }
 

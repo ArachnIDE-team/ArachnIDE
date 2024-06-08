@@ -2534,6 +2534,11 @@ div.language-md {
 
 .tool-description {
     font-family: monospace;
+    width: 100%;
+    flex-grow: 1;
+}
+.tool-button {
+    width: 100%;
 }
 
 .window-ui {
