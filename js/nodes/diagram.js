@@ -297,7 +297,8 @@ class Diagram extends Node {
         let pts = edgeList.p.map((k) => nodeMap[k]);
 
         if (pts.includes(undefined)) {
-            console.warn("missing keys", edgeList, nodeMap);
+            console.warn("Edge missing keys", edgeList, nodeMap);
+            return;
         }
 
         // Check if edge already exists
