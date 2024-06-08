@@ -1,8 +1,9 @@
 
 
 globalThis.nodeClasses = [TextNode, JavascriptNode, JSONNode, MarkdownNode, PythonNode, HTMLEditorNode, CSSNode,
-    LinkNode, LLMNode, ImageNode, AudioNode, VideoNode, WolframNode, WorkspaceExplorerNode, WebEditorNode, MetaNode,
-    ProjectNode, ModuleNode, JavascriptFrontendModuleNode, JavascriptTerminalNode, NodeJSTerminalNode]
+    LinkNode, LLMNode, LLMAgentNode, LLMOldNode, ImageNode, AudioNode, VideoNode, WolframNode, WorkspaceExplorerNode,
+    WebEditorNode, MetaNode, ProjectNode, ModuleNode, JavascriptFrontendModuleNode, JavascriptTerminalNode,
+    NodeJSTerminalNode]
 
 globalThis.textNodeClasses = [TextNode, JavascriptNode, JSONNode, MarkdownNode, PythonNode, HTMLEditorNode, CSSNode];
 

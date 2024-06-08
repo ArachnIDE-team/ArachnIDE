@@ -352,8 +352,9 @@ class LLMNode extends LLMAgentNode {
         const isAssistant = selectedModel.includes('1106');
         console.log('Selected Model:', selectedModel, "Vision", isVisionModel, "Assistant", isAssistant);
 
-        let messages = await this.getMessages(message, isVisionModel);
-
+        // Use Prompt area if message is not passed.
+        this.latestUserMessage = message ? message : this.promptTextArea.value;
+        let messages = await this.getMessages(isVisionModel);
 
         // Append the user prompt to the AI response area with a distinguishing mark and end tag
         this.aiResponseTextArea.value += `\n\n${PROMPT_IDENTIFIER} ${this.latestUserMessage}\n`;
@@ -369,7 +370,7 @@ class LLMNode extends LLMAgentNode {
 
     }
 
-    async getMessages(message, isVisionModel) {
+    async getMessages(isVisionModel) {
         const nodeIndex = this.index;
 
         const maxTokensSlider = this.content.querySelector('#node-max-tokens-' + this.index);
@@ -381,11 +382,6 @@ class LLMNode extends LLMAgentNode {
 
         // Determine if there are any connected AI nodes
         let hasConnectedAiNode = this.updateConnectedAiNodeState();
-
-
-        //Use Prompt area if message is not passed.
-        this.latestUserMessage = message ? message : this.promptTextArea.value;
-
 
         //Initialize messages array.
         let nodeTitle = this.getTitle();
@@ -609,11 +605,6 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
         let lastPromptsAndResponses;
         lastPromptsAndResponses = getLastPromptsAndResponses(20, contextSize, this.id);
 
-        // // Append the user prompt to the AI response area with a distinguishing mark and end tag
-        // this.aiResponseTextArea.value += `\n\n${PROMPT_IDENTIFIER} ${this.latestUserMessage}\n`;
-        // // Trigger the input event programmatically
-        // this.aiResponseTextArea.dispatchEvent(new Event('input'));
-
         let wolframData;
         if (document.getElementById(`enable-wolfram-alpha-checkbox-${nodeIndex}`).checked) {
             const wolframContext = getLastPromptsAndResponses(2, 300, this.id);
@@ -742,6 +733,9 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
         }
         return [remainingTokens, totalTokenCount, false];
     }
+
+
+
 }
 
 function createLLMNode(name = '', sx = undefined, sy = undefined, x = undefined, y = undefined) {

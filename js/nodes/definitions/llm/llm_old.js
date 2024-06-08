@@ -482,6 +482,8 @@ class LLMOldNode extends WindowedNode {
 
         // Reinitialize the controller for future use
         this.controller = new AbortController();
+        // Update token count
+        this._updateModelInfoAndCount();
     }
 
     _setupAiNodeResponseDivListeners() {
@@ -611,7 +613,8 @@ class LLMOldNode extends WindowedNode {
         // ... other event listeners for promptTextArea ...
     }
 
-    _updateModelInfoAndCount(delay=500){
+    _updateModelInfoAndCount(delay=null, updateSliders=true){
+        if(delay === null) delay = 500;
         let performUpdate = () => {
             // console.log("Message token count start")
             this.tokenCounterDiv.innerHTML = "&#128207; Tokens";
@@ -638,8 +641,10 @@ class LLMOldNode extends WindowedNode {
                             "Output cost: $" + (model_info.output_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
                             "Max tokens: " + Math.max(model_info.max_input_tokens, model_info.max_input_tokens ) + " Tok";
                         // Update also token slider and context slider
+                        if(updateSliders) this._updateMaxTokensSliderMax(model_info.max_input_tokens, model_info.max_output_tokens);
                     } else {
                         this.content.querySelector("div.select-replacer").removeAttribute("title")
+                        if(updateSliders) this._updateMaxTokensSliderMax(16000, 16000);
                     }
                     console.log("Message token count: ", count, " for messages: ", messages)
                 });
@@ -723,6 +728,7 @@ class LLMOldNode extends WindowedNode {
     <svg width="24" height="24" class="icon">
         <use xlink:href="#refresh-icon"></use>
     </svg>`;
+                this._updateModelInfoAndCount();
             }
         };
 
@@ -735,6 +741,16 @@ class LLMOldNode extends WindowedNode {
                 this.regenerateResponse();
             }
         });
+    }
+
+    onDisconnect(index){
+        super.onDisconnect(index)
+        this._updateModelInfoAndCount();
+    }
+
+    onConnect(edge){
+        super.onConnect(edge)
+        this._updateModelInfoAndCount();
     }
 
     _setupAiNodeSettingsButtonListeners() {
@@ -884,6 +900,7 @@ class LLMOldNode extends WindowedNode {
 
             maxTokensSlider.addEventListener('input', () => {
                 this.savedMaxTokens = parseInt(maxTokensSlider.value, 10);
+                this._updateModelInfoAndCount(null, false);
             });
         }
 
@@ -893,6 +910,7 @@ class LLMOldNode extends WindowedNode {
 
             maxContextSizeSlider.addEventListener('input', () => {
                 this.savedMaxContextSize = parseInt(maxContextSizeSlider.value, 10);
+                this._updateModelInfoAndCount(null, false);
             });
         }
 
@@ -1006,8 +1024,9 @@ class LLMOldNode extends WindowedNode {
         const isAssistant = selectedModel.includes('1106');
         console.log('Selected Model:', selectedModel, "Vision", isVisionModel, "Assistant", isAssistant);
 
-        let messages = await this.getMessages(message, isVisionModel);
-
+        // Use Prompt area if message is not passed.
+        this.latestUserMessage = message ? message : this.promptTextArea.value;
+        let messages = await this.getMessages(isVisionModel);
 
         // Append the user prompt to the AI response area with a distinguishing mark and end tag
         this.aiResponseTextArea.value += `\n\n${PROMPT_IDENTIFIER} ${this.latestUserMessage}\n`;
@@ -1021,7 +1040,7 @@ class LLMOldNode extends WindowedNode {
         if(messages !== null) this.callLLM(selectedModel, messages);
     }
 
-    async getMessages(message, isVisionModel) {
+    async getMessages(isVisionModel) {
         const nodeIndex = this.index;
 
         const maxTokensSlider = this.content.querySelector('#node-max-tokens-' + this.index);
@@ -1036,7 +1055,7 @@ class LLMOldNode extends WindowedNode {
 
 
         //Use Prompt area if message is not passed.
-        this.latestUserMessage = message ? message : this.promptTextArea.value;
+        // this.latestUserMessage = message ? message : this.promptTextArea.value;
 
 
         //Initialize messages array.

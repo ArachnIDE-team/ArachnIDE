@@ -71,6 +71,7 @@ class LLMAgentNode extends WindowedNode {
     }
 
     set savedLocalLLMSelect(value) {
+        if(value === "") value = "Default"
         const setSavedModelLLMSelect = function(selection) {
             this.localLLMSelect.value = selection;
             // Force a UI update for select
@@ -300,9 +301,14 @@ class LLMAgentNode extends WindowedNode {
 
         let localLLMCheckbox = document.getElementById("localLLM");
 
-        let options = [...localModelOptions]; // copy to avoid changing the original array
+        let options = [...localModelOptions]; // copy to avoid changing the original array (meh, dude you are changing
+        // the object, it does affect the original array anyway)
         options.forEach((option, index) => {
-            if(index === 0) option.selected = true;
+            // if(index === 0) {
+            //     option.selected = true;
+            // } else {
+            //     option.selected = false;
+            // }
             LocalLLMSelect.add(option, index);
         });
         // Initial setup based on checkbox state
@@ -314,7 +320,7 @@ class LLMAgentNode extends WindowedNode {
                 option.hidden = !localLLMCheckbox.checked;  // Show or hide based on checkbox initial state
             }
         });
-
+        LocalLLMSelect.value = options[0].value; // Avoid changing option objects of the array
         return LocalLLMSelect;
     }
 
@@ -462,6 +468,8 @@ class LLMAgentNode extends WindowedNode {
 
         // Reinitialize the controller for future use
         this.controller = new AbortController();
+        // Update token count
+        this._updateModelInfoAndCount();
     }
 
     _setupAiNodeResponseDivListeners() {
@@ -591,7 +599,8 @@ class LLMAgentNode extends WindowedNode {
         // ... other event listeners for promptTextArea ...
     }
 
-    _updateModelInfoAndCount(delay=500){
+    _updateModelInfoAndCount(delay=null, updateSliders=true){
+        if(delay === null) delay = 500;
         let performUpdate = () => {
             // console.log("Message token count start")
             this.tokenCounterDiv.innerHTML = "&#128207; Tokens";
@@ -618,10 +627,10 @@ class LLMAgentNode extends WindowedNode {
                            "Output cost: $" + (model_info.output_cost_per_token * 1000000).toFixed(2) + " / MTok\n" +
                            "Max tokens: " + Math.max(model_info.max_input_tokens, model_info.max_output_tokens ) + " Tok";
                        // Update also token slider and context slider
-                       this._updateMaxTokensSliderMax(model_info.max_input_tokens, model_info.max_output_tokens);
+                       if(updateSliders) this._updateMaxTokensSliderMax(model_info.max_input_tokens, model_info.max_output_tokens);
                    } else {
                        this.content.querySelector("div.select-replacer").removeAttribute("title")
-                       this._updateMaxTokensSliderMax(16000, 16000)
+                       if(updateSliders) this._updateMaxTokensSliderMax(16000, 16000)
                    }
                    console.log("Message token count: ", count, " for messages: ", messages)
                });
@@ -714,6 +723,7 @@ class LLMAgentNode extends WindowedNode {
     <svg width="24" height="24" class="icon">
         <use xlink:href="#refresh-icon"></use>
     </svg>`;
+                this._updateModelInfoAndCount();
             }
         };
 
@@ -726,6 +736,16 @@ class LLMAgentNode extends WindowedNode {
                 this.regenerateResponse();
             }
         });
+    }
+
+    onDisconnect(index){
+        super.onDisconnect(index)
+        this._updateModelInfoAndCount();
+    }
+
+    onConnect(edge){
+        super.onConnect(edge)
+        this._updateModelInfoAndCount();
     }
 
     _setupAiNodeSettingsButtonListeners() {
@@ -878,6 +898,7 @@ class LLMAgentNode extends WindowedNode {
 
             maxTokensSlider.addEventListener('input', () => {
                 this.savedMaxTokens = parseInt(maxTokensSlider.value, 10);
+                this._updateModelInfoAndCount(null, false);
             });
         }
 
@@ -887,6 +908,7 @@ class LLMAgentNode extends WindowedNode {
 
             maxContextSizeSlider.addEventListener('input', () => {
                 this.savedMaxContextSize = parseInt(maxContextSizeSlider.value, 10);
+                this._updateModelInfoAndCount(null, false);
             });
         }
 
@@ -990,7 +1012,9 @@ class LLMAgentNode extends WindowedNode {
         const isAssistant = selectedModel.includes('1106');
         console.log('Selected Model:', selectedModel, "Vision", isVisionModel, "Assistant", isAssistant);
 
-        let messages = await this.getMessages(message, isVisionModel);
+        // Use Prompt area if message is not passed.
+        this.latestUserMessage = message ? message : this.promptTextArea.value;
+        let messages = await this.getMessages(isVisionModel);
 
 
         // Append the user prompt to the AI response area with a distinguishing mark and end tag
@@ -1005,7 +1029,7 @@ class LLMAgentNode extends WindowedNode {
         if(messages !== null) this.callLLM(selectedModel, messages);
     }
 
-    async getMessages(message, isVisionModel) {
+    async getMessages(isVisionModel) {
         const nodeIndex = this.index;
 
         const maxTokensSlider = this.content.querySelector('#node-max-tokens-' + this.index);
@@ -1014,7 +1038,7 @@ class LLMAgentNode extends WindowedNode {
         let contextSize = 0;
 
         //Use Prompt area if message is not passed.
-        this.latestUserMessage = message ? message : this.promptTextArea.value;
+        // this.latestUserMessage = message ? message : this.promptTextArea.value;
 
 
         let messages = [];
@@ -1044,11 +1068,6 @@ class LLMAgentNode extends WindowedNode {
         // Init value of getLastPromptsAndResponses
         let lastPromptsAndResponses;
         lastPromptsAndResponses = getLastPromptsAndResponses(20, contextSize, this.id);
-
-        // Append the user prompt to the AI response area with a distinguishing mark and end tag
-        this.aiResponseTextArea.value += `\n\n${PROMPT_IDENTIFIER} ${this.latestUserMessage}\n`;
-        // Trigger the input event programmatically
-        this.aiResponseTextArea.dispatchEvent(new Event('input'));
 
         if (lastPromptsAndResponses.trim().length > 0) {
             messages.push({
@@ -1156,6 +1175,393 @@ class LLMAgentNode extends WindowedNode {
         }
         return [remainingTokens, totalTokenCount, false];
     }
+
+    // analyzeVariables(node, from, depth = 0, usedVars = []) {
+    //     if (depth === 0 || !node) {
+    //         return usedVars;
+    //     }
+    //
+    //     const variableUsages = jsParser.language.query(`(identifier) @variable-usage`).matches(node);
+    //
+    //     // Filter based on identifier text (excluding "from", "from.*")
+    //     const filteredUsages = variableUsages.filter(
+    //         (match) => match.captures[0].node.text !== from && !match.captures[0].node.text.startsWith(`${from}.`)
+    //     );
+    //
+    //     const extractedVars = filteredUsages.map((match) => match.captures[0].node.text);
+    //
+    //     usedVars.push(...extractedVars);
+    //     for (const child of node.children) {
+    //         this.analyzeVariables(child, from, depth - 1, [...usedVars]); // Spread operator for a copy
+    //     }
+    //
+    //     return usedVars;
+    // }
+
+    staticAnalyzeMessages(depth = 0) {
+        let code = this.constructor.prototype.getMessages.toString();
+        let ast = parseJs(code);
+        return this.staticAnalyzeVariable("messages", "this", ast, depth)
+    }
+
+
+    staticAnalyzeVariable(variableRegex, notVariableName, node, depth = 0) {
+        // const jsParser = new TreeSitter();
+        // jsParser.setLanguage(treeSitterJavaScript);
+
+              // Enhanced query to capture variable manipulations (without the 'arguments:' feature)
+              let variableUsages = jsParser.language.query(`
+          [
+            (identifier) @variable-usage
+            (assignment_expression left: (identifier) @variable-assignment)
+            (update_expression argument: (identifier) @variable-update)
+            ((member_expression
+              object: (this)
+              property: (property_identifier) @member-attribute)
+            )
+            (call_expression) @call-expression
+          ]
+        `).matches(node).filter((match) => {
+                  const capture = match.captures[0];
+
+                  // Handle call expressions separately
+                  if (capture.name === "call-expression") {
+                      const callExpressionNode = capture.node;
+                      for (const arg of callExpressionNode.namedChildren) {
+                          if (arg.type === "identifier" && arg.text.match(variableRegex)) {
+                              return true;
+                          }
+                      }
+                      return false;
+                  }
+
+                  // Original filtering logic for other capture types
+                  const text = capture.node.text;
+                  return text.match(variableRegex) &&
+                      text !== notVariableName &&
+                      !text.startsWith(`${notVariableName}.`);
+              });
+        let analyzedUsages = [];
+        for (const usage of variableUsages) {
+            const capture = usage.captures[0];
+            const node = capture.node;
+            let variableName = node.text;
+
+            // Check if it's a 'this' member attribute (unchanged logic)
+            if (capture.name === 'member-attribute') {
+                variableName = `this.${variableName}`;
+            }
+
+
+            let manipulationType = capture.name.replace("variable-", "") || "usage";
+            let valueNode = null;
+
+            if (manipulationType === "assignment") {
+                valueNode = node.parent.right;
+            } else if (manipulationType === "call-expression") {
+                // Find the argument node that matches our variable
+                for (const arg of node.namedChildren) {
+                    if (arg.type === "identifier" && arg.text.match(variableRegex)) {
+                        valueNode = arg;
+                        break;
+                    }
+                }
+            }
+
+            let valueAnalysis = [];
+            if (valueNode && depth > 0) {
+                valueAnalysis = this.staticAnalyzeVariable(".*", variableName, valueNode, depth - 1);
+            } else if (valueNode) {
+                if (valueNode.type === "string" || valueNode.type === "number") {
+                    valueAnalysis.push({ text: valueNode.text, type: valueNode.type });
+                }
+            }
+            // --- Sentence Retrieval Logic (Improved) ---
+            let parent = node.parent;
+            while (parent) {
+                if (parent.type === "variable_declarator" ||
+                    parent.type === "expression_statement" ||
+                    parent.type === "assignment_expression" ||
+                    parent.type === "call_expression" // Add call_expression to the check
+                    // Add more checks for other relevant statement types
+                ) {
+                    // Complete usage found, use parent node for sentence text
+                    analyzedUsages.push({
+                        text: parent.text,
+                        type: manipulationType,
+                        value: valueAnalysis
+                    });
+                    break;
+                }
+                parent = parent.parent;
+            }
+
+            // If we haven't found a complete sentence, just use the node's text
+            if (!analyzedUsages.length) {
+                analyzedUsages.push({
+                    text: node.text, // Fallback to just the node if no parent statement found
+                    type: manipulationType,
+                    value: valueAnalysis
+                });
+            }
+            // --- End of Sentence Retrieval ---
+        }
+
+        return analyzedUsages;
+    }
+
+
+    //   staticAnalyzeVariable(variableRegex, notVariableName, node, depth = 0) {
+  //       // const jsParser = new TreeSitter();
+  //       // jsParser.setLanguage(treeSitterJavaScript);
+  //
+  //       // Enhanced query to capture variable manipulations (without the 'arguments:' feature)
+  //       let variableUsages = jsParser.language.query(`
+  //   [
+  //     (identifier) @variable-usage
+  //     (assignment_expression left: (identifier) @variable-assignment)
+  //     (update_expression argument: (identifier) @variable-update)
+  //     ((member_expression
+  //       object: (this)
+  //       property: (property_identifier) @member-attribute)
+  //     )
+  //     (call_expression) @call-expression
+  //   ]
+  // `).matches(node).filter((match) => {
+  //           const capture = match.captures[0];
+  //
+  //           // Handle call expressions separately
+  //           if (capture.name === "call-expression") {
+  //               const callExpressionNode = capture.node;
+  //               for (const arg of callExpressionNode.namedChildren) {
+  //                   if (arg.type === "identifier" && arg.text.match(variableRegex)) {
+  //                       return true;
+  //                   }
+  //               }
+  //               return false;
+  //           }
+  //
+  //           // Original filtering logic for other capture types
+  //           const text = capture.node.text;
+  //           return text.match(variableRegex) &&
+  //               text !== notVariableName &&
+  //               !text.startsWith(`${notVariableName}.`);
+  //       });
+  //
+  //       let analyzedUsages = [];
+  //       for (const usage of variableUsages) {
+  //           const capture = usage.captures[0];
+  //           const node = capture.node;
+  //           let variableName = node.text;
+  //
+  //           // Check if it's a 'this' member attribute (unchanged logic)
+  //           if (capture.name === 'member-attribute') {
+  //               variableName = `this.${variableName}`;
+  //           }
+  //
+  //
+  //           let manipulationType = capture.name.replace("variable-", "") || "usage";
+  //           let valueNode = null;
+  //
+  //           if (manipulationType === "assignment") {
+  //               valueNode = node.parent.right;
+  //           } else if (manipulationType === "call-expression") {
+  //               // Find the argument node that matches our variable
+  //               for (const arg of node.namedChildren) {
+  //                   if (arg.type === "identifier" && arg.text.match(variableRegex)) {
+  //                       valueNode = arg;
+  //                       break;
+  //                   }
+  //               }
+  //           }
+  //
+  //           let valueAnalysis = [];
+  //           if (valueNode) {
+  //               if (valueNode.type === "string" || valueNode.type === "number") {
+  //                   valueAnalysis.push({ text: valueNode.text, type: valueNode.type });
+  //               } else if (depth > 0) {
+  //                   valueAnalysis = this.staticAnalyzeVariable(".*", variableName, valueNode, depth - 1);
+  //               }
+  //           }
+  //           // --- Sentence Retrieval Logic (Improved) ---
+  //           let parent = node.parent;
+  //           while (parent) {
+  //               if (parent.type === "variable_declarator" ||
+  //                   parent.type === "expression_statement" ||
+  //                   parent.type === "assignment_expression" ||
+  //                   parent.type === "call_expression" // Add call_expression to the check
+  //                   // Add more checks for other relevant statement types
+  //               ) {
+  //                   // Complete usage found, use parent node for sentence text
+  //                   analyzedUsages.push({
+  //                       text: parent.text,
+  //                       type: manipulationType,
+  //                       value: valueAnalysis
+  //                   });
+  //                   break;
+  //               }
+  //               parent = parent.parent;
+  //           }
+  //
+  //           // If we haven't found a complete sentence, just use the node's text
+  //           if (!analyzedUsages.length) {
+  //               analyzedUsages.push({
+  //                   text: node.text, // Fallback to just the node if no parent statement found
+  //                   type: manipulationType,
+  //                   value: valueAnalysis
+  //               });
+  //           }
+  //           // --- End of Sentence Retrieval ---
+  //       }
+  //
+  //       return analyzedUsages;
+  //   }
+
+
+    // staticAnalyzeVariable(variableRegex, notVariableName, node, depth = 0) {
+    //     // const jsParser = new TreeSitter();
+    //     // jsParser.setLanguage(treeSitterJavaScript);
+    //
+    //     // Enhanced query to capture various variable manipulations
+    //     let variableUsages = jsParser.language.query(`
+    // [
+    //   (identifier) @variable-usage
+    //   (assignment_expression left: (identifier) @variable-assignment)
+    //   (update_expression argument: (identifier) @variable-update)
+    //   ((member_expression
+    //     object: (this)
+    //     property: (property_identifier) @member-attribute)
+    //   )
+    // ]
+    //   `).matches(node).filter((match) => {
+    //         const capture = match.captures[0];
+    //         const text = capture.node.text;
+    //         return text.match(variableRegex) &&
+    //             text !== notVariableName &&
+    //             !text.startsWith(`${notVariableName}.`);
+    //     });
+    //
+    //     let analyzedUsages = [];
+    //     for (const usage of variableUsages) {
+    //         const capture = usage.captures[0];
+    //         const node = capture.node;
+    //         let variableName = capture.name === 'member-attribute' ? `this.${node.text}` : node.text;
+    //
+    //         let manipulationType = capture.name.replace("variable-", ""); // assignment, argument, update, etc.
+    //         let valueNode = null;
+    //
+    //         // Identify value node based on manipulation type
+    //         if (manipulationType === "assignment") {
+    //             valueNode = node.parent.right;
+    //         } else if (manipulationType === "argument") {
+    //             // ... handle function argument case
+    //         } // ... handle other manipulation types
+    //
+    //         // Analyze value node for primitive types or recursive analysis
+    //         let valueAnalysis = [];
+    //         if (valueNode) {
+    //             if (valueNode.type === "string" || valueNode.type === "number") {
+    //                 valueAnalysis.push({ text: valueNode.text, type: valueNode.type });
+    //             } else if (depth > 0) {
+    //                 valueAnalysis = this.staticAnalyzeVariable(".*", usage.name, valueNode, depth - 1);
+    //             }
+    //         }
+    //
+    //         analyzedUsages.push({
+    //             text: variableName,
+    //             type: manipulationType,
+    //             value: valueAnalysis
+    //         });
+    //     }
+    //
+    //     return analyzedUsages;
+    // }
+
+    // staticAnalyzeVariable(variableRegex, notVariableName, node, depth = 0) {
+    //     // Query to capture variable usages and 'this' member attributes
+    //     let variableUsages = jsParser.language.query(`
+    //   [
+    //     (identifier) @variable-usage
+    //     ((member_expression
+    //       object: (this)
+    //       property: (property_identifier) @member-attribute)
+    //     )
+    //   ]
+    // `).matches(node).filter((match) => {
+    //         const capture = match.captures[0];
+    //         const text = capture.node.text;
+    //         return text.match(variableRegex) &&
+    //             text !== notVariableName &&
+    //             !text.startsWith(`${notVariableName}.`);
+    //     });
+    //
+    //     let completeUsages = [];
+    //     for (const usage of variableUsages) {
+    //         const capture = usage.captures[0];
+    //         const node = capture.node;
+    //         let parent = node.parent;
+    //         let variableName = node.text;
+    //
+    //         // Check if it's a 'this' member attribute and prepend 'this.'
+    //         if (capture.name === 'member-attribute') {
+    //             variableName = `this.${variableName}`;
+    //         }
+    //
+    //         while (parent) {
+    //             if (parent.type === "variable_declarator" ||
+    //                 parent.type === "expression_statement" ||
+    //                 parent.type === "assignment_expression"
+    //                 // Add more checks for conditional statements if needed
+    //             ) {
+    //                 // Complete usage found, process or log information
+    //                 completeUsages.push({ node: parent, name: variableName });
+    //                 break;
+    //             }
+    //             parent = parent.parent;
+    //         }
+    //     }
+    //
+    //     let analyzedUsages = [];
+    //     for (const usage of completeUsages) {
+    //         const usedVars = depth > 0 ? this.staticAnalyzeVariable(".*", usage.name, usage.node, depth - 1) : [];
+    //         analyzedUsages.push({ text: usage.name, usedVariables: usedVars });
+    //     }
+    //     return analyzedUsages;
+    // }
+
+    // staticAnalyzeMessage(depth = 0) {
+    //     let code = this.constructor.prototype.getMessages.toString();
+    //     let ast = parseJs(code);
+    //
+    //     let messagesUsages = jsParser.language.query(`
+    //                       (identifier) @variable-usage
+    //                     `).matches(ast).filter((match) => match.captures[0].node.text === "messages");
+    //
+    //     let completeUsages = [];
+    //     for (const usage of messagesUsages) {
+    //         let parent = usage.captures[0].node.parent;
+    //         while (parent) {
+    //             if (parent.type === "variable_declarator" ||
+    //                 parent.type === "expression_statement" ||
+    //                 parent.type === "assignment_expression"
+    //                 // Add more checks for conditional statements if needed
+    //             ) {
+    //                 // Complete usage found, process or log information
+    //                 completeUsages.push(parent);
+    //                 break;
+    //             }
+    //             parent = parent.parent;
+    //         }
+    //     }
+    //
+    //     let analyzedUsages = [];
+    //     for (const usage of completeUsages) {
+    //         const usedVars = this.analyzeVariables(usage, "messages", depth);
+    //         analyzedUsages.push({ text: usage.text, usedVariables: usedVars });
+    //     }
+    //     return analyzedUsages;
+    // }
+
 }
 
 function createLLMAgentNode(name = '', sx = undefined, sy = undefined, x = undefined, y = undefined) {
