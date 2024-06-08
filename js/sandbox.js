@@ -26,9 +26,9 @@
 // arachnIDENode.pos = rootDiagram.background.pan;
 // arachnIDENode.followingMouse = 0;
 //
-// let arachnIDEFrontend = createJavascriptFrontendModuleNode("Frontend", [], "../..",  ["js/**/**.js", "**/**.html"],["dist/**", "Localhost Servers/**", "Automation/**", "**/node_modules/**"])
-// arachnIDEFrontend.pos = rootDiagram.background.pan.plus(new vec2(1,0));
-// arachnIDEFrontend.followingMouse = 0;
+let arachnIDEFrontend = createJavascriptFrontendModuleNode("Frontend", [], "../..",  ["js/**/**.js", "**/**.html"],["dist/**", "Localhost Servers/**", "Automation/**", "**/node_modules/**"])
+arachnIDEFrontend.pos = rootDiagram.background.pan.plus(new vec2(1,0));
+arachnIDEFrontend.followingMouse = 0;
 
 // let genericTool = createToolNode("clone", "Clone a node")
 
@@ -95,6 +95,7 @@
 
 // window.llmNode = createLLMOldNode("Old LLM for testing purposes")
 window.llmNode = createLLMNode("LLM for testing purposes")
+window.llmNode.promptTextArea.value = "Hello there!"
 // // Let's use a mutation observer to see what's going on
 // const targetNode = llmNode.localLLMSelect;
 // // Options for the observer (which mutations to observe)
@@ -112,20 +113,72 @@ window.llmNode = createLLMNode("LLM for testing purposes")
 // observer.observe(targetNode, config);
 // llmNode.promptTextArea.value = "Write a README.md file for the ArachnIDE project"
 
-llmNode.promptTextArea.value = "You are an ArachnIDE developer. ArachnIDE is a diagramming tool and IDE equipped with lots of generative AI features. The Edge class renders an edge connecting two Nodes. The Edge starts in the center of a node and ends in the center of the second node. Write the code to render a Bézier curve and North-South West-East lines instead of a straight line."
-llmNode.localLLMSelect.value = 'cohere:command-r-plus'
-dropdown.menuButton.dispatchEvent(new MouseEvent("click"));
-
-
-// let textNode = createNodeFromWindow("javascript", "test", "text content", false);
-let textNode = createJavascriptNode("edge.js", "this", "text content", false);
-textNode.loadPropertyFromFile("code", "../../js/nodes/edge.js" )
-// textNode.files.push({"key":"code", "path":"../../js/nodes/edge.js", "name":"edge.js","autoLoad":true,"autoSave":false})
-// connectDistance(llmNode, textNode)
-connectDistance(textNode, llmNode)
-
-textNode.pos.x = textNode.pos.x + 0.1
-textNode.pos.y = textNode.pos.y + 2
-// textNode.content.querySelector("iframe").remove()
+// llmNode.promptTextArea.value = "You are an ArachnIDE developer. ArachnIDE is a diagramming tool and IDE equipped with " +
+//     "lots of generative AI features. The Edge class renders an edge connecting two Nodes. The Edge starts in the center " +
+//     "of a node and ends in the center of the second node. Write the code to render a Bézier curve and North-South" +
+//     " West-East lines instead of a straight line."
+// llmNode.localLLMSelect.value = 'cohere:command-r-plus'
+// dropdown.menuButton.dispatchEvent(new MouseEvent("click"));
+//
+// let textNode = createJavascriptNode("edge.js", "this", "text content", false);
+// textNode.loadPropertyFromFile("code", "../../js/nodes/edge.js" )
+// connectDistance(textNode, llmNode)
+//
+// textNode.pos.x = textNode.pos.x + 0.1
+// textNode.pos.y = textNode.pos.y + 2
 
 rootDiagram.background.pan = new vec2(-2.32, -0.65)
+
+let simpleAgent = createLLMAgentNode( "Chat explaining Agent")
+simpleAgent.promptTextArea.value =  "Given the following definition of an LLM Agent interaction with the user through a " +
+    "conversation (or chat), determine the logic flow of messages and their function. For example, if the user's asks to" +
+    " translate a text into another language, one flow block might be \"User prompt\": \"Translate the following text to" +
+    " Italian:\nHave a nice day\", \"User prompt function\": \"The prompt is used to translate text from English to " +
+    "Italian. More specifically, the first line includes the human language instruction while the following ones are " +
+    "used to indicate which English sentence must be translated by the AI Assistant.\" "
+
+let simpleAgent2 = createLLMAgentNode( "Explain Smol-dev-js Agent")
+simpleAgent2.promptTextArea.value =  "How can we represent smol-dev-js using a diagram? the questions we want to answer " +
+    "through the diagram are the following: what kind of blocks could we use to provide insight into the relationship " +
+    "between the various interactions between machine and AI and between user and AI? What assumptions have been made to" +
+    " allow the user to link functionality and code, specifications and implementation? "
+
+let simpleAgent3 = createLLMAgentNode( "Explain Smol-dev-js Agent")
+simpleAgent3.promptTextArea.value = `
+    You are an assistant specialized in prompt engineering. We are designing and developing an IDE platform together.
+
+    The uniqueness lies in the fact that this tool can be used for both text and code. We wrote this prompt together to provide a general overview of the platform. This overview is addressed to both the user and the AI (text generation model).
+
+    In the platform, there is no distinction between a user and a developer. Unlike many companies in the sector, we consider the user as a responsible adult capable of reading programming code and assuming the risk associated with executing it.
+
+    The IDE platform can, starting from a prompt, execute its content or perform the inverse task of extracting the intention behind the prompt. The intention or specification of the prompt is what allows us to reconstruct the prompt given a specific context. The selection of the context is the most difficult and fundamental part of the process.
+
+    For this reason, it is possible to split the text and annotate the various parts so as to intersperse parts of a given text with "meta-information," which are data that allow us to specify the intention of the operation we are performing on the text.
+
+    For example, thanks to this tool, it is possible to work on textual descriptions of any type of project, whether narrative, technical documentation, component lists, or simply cooking recipes.
+
+    The platform introduces the ability to break down into "atoms" (for example, for a simple text, the choice could be between words, sentences, paragraphs, or using commas, or require a specific subdivision from the AI itself) on which to operate substitutions, improvements, dependency analyses, and relationships, etc.
+
+    In code, the text breakdown is programmatic; thanks to its structured nature, it is much easier to perform subdivisions based on design elements such as classes in object-oriented programming.
+
+    The process leverages the high expressiveness of diagrams: after the breakdown into "atoms," nodes and edges are used to represent the text and the relationships derived from it. From the generated diagram, it is possible to extract additional nodes, i.e., the "meta-information" or "metadata" discussed earlier, or to operate on the structure itself, on the edges, and on the nodes.
+`
+
+let todoNode = createMarkdownNode("ArachnIDE development TO-DO", "", "text content", false);
+todoNode.loadPropertyFromFile("code", "../../TO-DO.md" )
+
+let jsNode = createJavascriptNode("Get the root diagram", "rootDiagram", "text content", false);
+
+let inceptionNode = createMarkdownNode("Inception prompt", zettelkastenDiagramming(), "text content", false);
+
+
+// inceptionNode.addAfterInitCallback(() => {
+//     inceptionNode.code += "\n\n[[Get the root diagram]]";
+//     inceptionNode.code += "\n\n[[ArachnIDE development TO-DO]]\n\n";
+//     inceptionNode.code += myCodemirror.getValue();
+// })
+// inceptionNode.code += "[[ArachnIDE development TO-DO]]";
+// inceptionNode.code += "[[Get the root diagram]]";
+
+// addEdgeToZettelkasten("ArachnIDE development TO-DO", "Inception prompt", myCodeMirror)
+// addEdgeToZettelkasten("Get the root diagram", "Inception prompt", myCodeMirror)
