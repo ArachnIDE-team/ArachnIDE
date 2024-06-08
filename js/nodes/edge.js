@@ -329,10 +329,6 @@ class Edge {
 
                 let midPoint = pointLeft ? endingPoint : startingPoint;
                 midPoint = (!leftFirst && pointLeft) || (leftFirst && !pointLeft) ? midPoint.minus(new vec2(arrowLength, 0)) : midPoint.plus((new vec2(arrowLength, 0)));
-                // midPoint = pointLeft ? midPoint.minus(new vec2(arrowLength, 0)) : midPoint.plus((new vec2(arrowLength, 0)));
-                // midPoint = midPoint.plus((new vec2(arrowLength, 0)));
-                console.log("leftFirst", leftFirst, "pointLeft", pointLeft)
-                // let direction = !leftFirst ? new vec2(-1, 0):new vec2(1, 0);
                 let direction = (!leftFirst && pointLeft) || (leftFirst && !pointLeft) ? new vec2(-1, 0):new vec2(1, 0);
                 let directionNormed = direction.normed(arrowLength);
                 let perp = new vec2(-directionNormed.y, directionNormed.x).normed(arrowWidth);
