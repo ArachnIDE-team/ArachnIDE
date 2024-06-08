@@ -16,7 +16,7 @@ class MergedCode extends ToolNode {
 
     onConnectionChanged(){
         let inputNodes = this.getInputNodes();
-        if(inputNodes.length === 1 && (inputNodes[0] instanceof JavascriptFrontendModuleNode)) {
+        if(inputNodes.length === 1 && (inputNodes[0] instanceof ModuleNode)) {
             this.performButton.removeAttribute("disabled");
         }else {
             this.performButton.setAttribute("disabled","true");
@@ -33,9 +33,9 @@ class MergedCode extends ToolNode {
     }
     perform() {
         let inputNodes = this.getInputNodes();
-        if(inputNodes.length === 0) return this.error("Connect a node", "This tool takes one input node.\nPlease connect it to a JavascriptFrontendModule node.")
+        if(inputNodes.length === 0) return this.error("Connect a node", "This tool takes one input node.\nPlease connect it to a Javascript ModuleNode.")
         if(inputNodes.length > 1) return this.error("Too many input nodes", "This tool takes only one input node")
-        if(!(inputNodes[0] instanceof JavascriptFrontendModuleNode)) return this.error("Wrong input node type", "This tool takes only one input node of type JavascriptFrontendModule.")
+        if(!(inputNodes[0] instanceof ModuleNode)) return this.error("Wrong input node type", "This tool takes only one input node of type Javascript ModuleNode.")
         this.getFilesContent(inputNodes[0].sources.files).then((fileObject) => {
             let javascriptNode = createJavascriptNode("Merged Code for module: " + inputNodes[0].name, fileObject.join("\n"))
             let distance = javascriptNode.pos.minus(this.pos).scale(2);
