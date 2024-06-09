@@ -135,13 +135,23 @@ class FileDeclarationUsages extends ToolNode {
             let selectedFileNode = createJavascriptNode(selectedFile, selectedCode);
             let distance = selectedFileNode.pos.minus(this.pos).scale(2);
             selectedFileNode.pos = selectedFileNode.pos.minus(distance)
+            let radius = selectedFileNode.scale * 2;
             connectDistance(selectedFileNode, this)
             // for(let fileName of Object.keys(fileScopeUsage.files)) {
             let usageFiles = Array.from(Object.keys(fileScopeUsage.files));
+            // Dimension experiments
+            // usageFiles = [...usageFiles, ...usageFiles];
+            // usageFiles = [...usageFiles, ...usageFiles, ...usageFiles];
+            // usageFiles.splice(0, Math.ceil(usageFiles.length /2))
+            // usageFiles.splice(0, 27)
+            // usageFiles.splice(0, 32)
+            // End of dimension experiments
+            if(usageFiles.length > 15) radius *= usageFiles.length / 48*Math.PI
+            console.log("Radius:" , radius)
             usageFiles.forEach((fileName, index) => {
                 let otherFileNode = createJavascriptNode(fileName, fileObject[fileName]);
                 connectDistance(selectedFileNode, otherFileNode)
-                let circularDisplacement = new vec2(2 * Math.cos(2 * Math.PI * (index/usageFiles.length)), 2 * Math.sin(2 * Math.PI * (index/usageFiles.length)))
+                let circularDisplacement = new vec2(radius * Math.cos(2 * Math.PI * (index/usageFiles.length)), radius * Math.sin(2 * Math.PI * (index/usageFiles.length)))
                 distance = otherFileNode.pos.minus(this.pos).scale(2).minus(circularDisplacement);
                 otherFileNode.pos = otherFileNode.pos.minus(distance)
             });

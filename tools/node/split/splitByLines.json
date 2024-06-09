@@ -1,0 +1,4 @@
+{
+    "name": "split by lines",
+    "description": "Given any text Node extracts lines. Creates a new text Node with the same type for each of the lines"
+}
