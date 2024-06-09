@@ -1,7 +1,7 @@
 # `ArachnIDE`
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
-![localhost_8080_ (9)](https://github.com/satellitecomponent/neurite/assets/129367899/609781ec-7440-479a-859c-9248fd60644f)
+![localhost_8080_ (9)](https://raw.githubusercontent.com/ArachnIDE-team/ArachnIDE/main/assets/Screenshot%202024-06-09%20132833.png)
 
 ## `Introduction`
 
