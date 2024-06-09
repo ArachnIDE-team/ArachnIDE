@@ -179,7 +179,8 @@ class Edge {
 
         let horizontal = (startingPoint.x - endingPoint.x) / 2;
         let vertical = (startingPoint.y - endingPoint.y);
-        let curve = 0.2;
+        let curve = Math.max(this.pts[0].scale, this.pts[1].scale) / 7.5;
+        // let curve = 0.2;
 
         let between = node2Right.x > node1Left.x && node2Left.x < node1Right.x;
 
