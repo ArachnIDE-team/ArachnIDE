@@ -42,6 +42,13 @@ class NodeJSTerminalNode extends TerminalNode {
         saveData: undefined
     }
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "terminal-icon-symbol",
+        name: "Terminal NodeJS Node",
+        defaultFavourite: -1
+    }
+
     constructor(configuration = NodeJSTerminalNode.DEFAULT_CONFIGURATION){
         configuration = {...NodeJSTerminalNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.settings = {...NodeJSTerminalNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
@@ -75,7 +82,16 @@ class NodeJSTerminalNode extends TerminalNode {
         })
     }
 
+    static ondrop() {
+        let node = createNodeJSTerminalNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the NodeJS terminal icon');
 
+        return node;
+    }
 }
 // Review, the object is only passed by string, we don't have a clue about errors, types, promises etc...
 class NodeJSObjectUtils extends ObjectTreeUtils {

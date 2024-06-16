@@ -46,6 +46,12 @@ class MarkdownNode extends CodeNode {
 
     static SAVE_PROPERTIES = [];
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "markdown-icon-symbol",
+        name: "Markdown Code Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = MarkdownNode.DEFAULT_CONFIGURATION){
         configuration = {...MarkdownNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -137,6 +143,7 @@ class MarkdownNode extends CodeNode {
         this.codeButton.removeAttribute("disabled")
         this.codeButton.addEventListener("click", this.onClickReset.bind(this))
     }
+
     onResize(newWidth, newHeight) {
         super.onResize(newWidth, newHeight);
         if (this.markdownView) {
@@ -144,6 +151,17 @@ class MarkdownNode extends CodeNode {
             this.markdownView.style.width = `${newWidth}px`;
             this.markdownView.style.height = `${newHeight - 55}px`;
         }
+    }
+
+    static ondrop() {
+        let node = createMarkdownNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the MarkDown Editor icon');
+
+        return node;
     }
 }
 

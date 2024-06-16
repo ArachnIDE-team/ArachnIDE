@@ -35,31 +35,6 @@ function getIframeUrl(iframeContent) {
     return match ? match[1] : null; // Return URL or null if not found
 }
 
-// WARNING: this was commented without reference
-// function nodemousedown(id) {
-//     if (id < nodes.length) {
-//         nodes[id].mousedown();
-//     }
-// }
-//
-// function nodemouseup(id) {
-//     if (id < nodes.length) {
-//         nodes[id].mouseup();
-//     }
-// }
-//
-// function nodemousemove(id) {
-//     if (id < nodes.length) {
-//         nodes[id].mousemove();
-//     }
-// }
-//
-// function nodeclick(id) {
-//     if (id < nodes.length) {
-//         nodes[id].mouseclick();
-//     }
-// }
-
 
 function cancel(event) {
     if (event.stopPropagation) {

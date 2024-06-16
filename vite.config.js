@@ -18,6 +18,8 @@ export default {
         jsxFragment: 'Fragment'
     },
     server: {
-        port: 8080
+        port: 8080,
+        // host: true // We tried mobile, it's not easy to keep it compatible.
+        // Maybe later we can add gestures and touch events, but for code execution I don't know
     }
 };

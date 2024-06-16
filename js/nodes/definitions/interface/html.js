@@ -27,6 +27,13 @@ class HTMLNode extends Node {
         container: undefined,
         // templates: []
     }
+
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: null,
+        name: "HTML content Node",
+        defaultFavourite: -1
+    }
     // constructor(title, content, scaleProportions) {
     constructor(configuration = HTMLNode.DEFAULT_CONFIGURATION) {
         configuration = {...HTMLNode.DEFAULT_CONFIGURATION, ...configuration};

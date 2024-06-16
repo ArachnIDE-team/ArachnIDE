@@ -16,6 +16,12 @@ class ProjectNodeHTML {
         }
     }
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "project-icon-symbol",
+        name: "Project Node",
+        defaultFavourite: -1
+    }
     constructor(configuration = ProjectNodeHTML.DEFAULT_CONFIGURATION) {
         configuration = {...ProjectNodeHTML.DEFAULT_CONFIGURATION, ...configuration}
         this.sources = {...ProjectNodeHTML.DEFAULT_CONFIGURATION.sources, ...configuration.sources}

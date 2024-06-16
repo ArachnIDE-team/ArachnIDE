@@ -10,6 +10,13 @@ class ToolNode extends WindowedNode {
 
     static OBSERVERS = {}
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: null,
+        name: "Tool Node",
+        defaultFavourite: -1
+    }
+
     constructor(configuration = ToolNode.DEFAULT_CONFIGURATION) {
         configuration = {...ToolNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.sources = {...ToolNode.DEFAULT_CONFIGURATION.sources, ...configuration.sources}

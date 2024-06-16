@@ -42,6 +42,13 @@ class JavascriptTerminalNode extends TerminalNode {
         saveData: undefined
     }
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "terminal-icon-symbol",
+        name: "Terminal JS ES6 Node",
+        defaultFavourite: -1
+    }
+
     constructor(configuration = JavascriptTerminalNode.DEFAULT_CONFIGURATION){
         configuration = {...JavascriptTerminalNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.settings = {...JavascriptTerminalNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
@@ -75,7 +82,6 @@ class JavascriptTerminalNode extends TerminalNode {
         })
     }
 
-
     eval(js) {
         let array = js.split("\n")
         if (!array[array.length - 1].startsWith("return ")) {
@@ -90,12 +96,23 @@ class JavascriptTerminalNode extends TerminalNode {
             }
         }.call(this);
     }
+
+    static ondrop() {
+        let node = createJavascriptTerminalNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the JS terminal icon');
+        return node;
+    }
 }
 
 class JavascriptObjectUtils extends ObjectTreeUtils {
     constructor(object) {
         super(object); // Set the root object (top-level Fields/Attributes)
     }
+
     async getTree(expressionPath, depth){
         if(expressionPath === "" && depth === -1) {
             return this.root;

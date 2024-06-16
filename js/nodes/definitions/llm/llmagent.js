@@ -15,7 +15,12 @@ class LLMAgentNode extends WindowedNode {
         'shouldAppendQuestion', 'shouldContinue', 'userHasScrolled', 'isLLM', 'isLLMNode'];
 
     // constructor(name = '', content = undefined, sx = undefined, sy = undefined, x = undefined, y = undefined){
-
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: "ai-icon-symbol",
+        name: "Generic LLM Agent Node",
+        defaultFavourite: -1
+    }
     constructor(configuration = LLMAgentNode.DEFAULT_CONFIGURATION){
         configuration = {...LLMAgentNode.DEFAULT_CONFIGURATION, ...configuration}
         let [ainodewrapperDiv, aiResponseTextArea, index] = configuration.content ? configuration.content : LLMAgentNode._getContentElement(configuration);

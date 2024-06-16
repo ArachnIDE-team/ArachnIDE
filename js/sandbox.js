@@ -8,8 +8,8 @@
 // new NodeFilesUI({node: textNode});
 
 
-// let subd = createDiagram(1, rootDiagram);
-// subd.pos = rootDiagram.background.pan;
+let subd = createDiagram(1, rootDiagram);
+subd.pos = rootDiagram.background.pan;
 // //
 // let subd2 = createDiagram(2, subd.innerDiagram);
 // subd2.pos = rootDiagram.background.pan;
@@ -163,6 +163,114 @@ simpleAgent3.promptTextArea.value = `
 
     The process leverages the high expressiveness of diagrams: after the breakdown into "atoms," nodes and edges are used to represent the text and the relationships derived from it. From the generated diagram, it is possible to extract additional nodes, i.e., the "meta-information" or "metadata" discussed earlier, or to operate on the structure itself, on the edges, and on the nodes.
 `
+
+// let simpleAgent4 = createLLMAgentNode( "Create an SVG icon")
+// simpleAgent4.promptTextArea.value =   `
+// You are a developer assistant specialized in writing code that draws SVGs.
+// Your method mixes writing plain SVG in xml language and JavaScript code for creating points, variables etc.
+// Your task is to write the code that draws the icon the user asks for. When writing the code you should always comment
+// each element you are adding to the image.
+// The following example shows how you should draw:
+//
+// > Task: write a squared svg HTML minimalistic "Gear" icon. Do not use borders and use the color "#888"
+//
+// <html>
+// <head>
+//     <meta charset="UTF-8">
+//     <title>GEAR</title>
+// </head><body>
+// <svg width="24" height="24" viewBox="0 0 16 16" fill="#888">
+//     <path id="gearPath" d=""/>
+// </svg>
+// <script>
+//
+//     function createGearPath(x, y, radius, teeth, toothHeight) {
+//         // Initialize an empty string to store the SVG path data
+//         let path = '';
+//
+//         // Calculate the angle between each gear tooth
+//         const angleStep = (2 * Math.PI) / teeth;
+//
+//         // Calculate the distance from the center of the gear to the base of the teeth
+//         const baseRadius = radius - toothHeight;
+//
+//         // Start by moving to the initial point of the first tooth
+//         const startX = x + radius * Math.cos(0);
+//         const startY = y + radius * Math.sin(0);
+//         path += \`M ${startX} ${startY}\`;
+//
+//         // Loop through each gear tooth
+//         for (let i = 0; i < teeth; i++) {
+//             // Calculate the angle for the current tooth
+//             const angle = i * angleStep;
+//
+//             // Calculate the coordinates of the outer point of the tooth
+//             const outerX = x + radius * Math.cos(angle + angleStep / teeth);
+//             const outerY = y + radius * Math.sin(angle + angleStep / teeth);
+//
+//             // Calculate the coordinates of the first tip of the tooth
+//             const tip1X = x + (radius + toothHeight) * Math.cos(angle);
+//             const tip1Y = y + (radius + toothHeight) * Math.sin(angle);
+//
+//             // Calculate the coordinates of the inner point of the tooth
+//             const innerX = x + radius * Math.cos(angle + angleStep / 2 - angleStep / teeth);
+//             const innerY = y + radius * Math.sin(angle + angleStep / 2 - angleStep / teeth);
+//             // Calculate the coordinates of the second tip of the tooth
+//             const tip2X = x + (radius + toothHeight) * Math.cos(angle + angleStep / 2);
+//             const tip2Y = y + (radius + toothHeight) * Math.sin(angle + angleStep / 2);
+//
+//             // Draw a line to the first tip of the tooth
+//             path += \`L ${tip1X} ${tip1Y}\`;
+//
+//             // Draw a line to the outer point of the tooth
+//             path += \`L ${outerX} ${outerY}\`;
+//
+//             // Draw a line to the inner point of the tooth
+//             path += \`L ${innerX} ${innerY}\`;
+//
+//             // Draw a line to the second tip of the tooth
+//             path += \`L ${tip2X} ${tip2Y}\`;
+//         }
+//         let i = teeth;
+//         // Calculate the angle for the current tooth
+//         const angle = i * angleStep;
+//
+//         // Calculate the coordinates of the outer point of the tooth
+//         const outerX = x + radius * Math.cos(angle + angleStep / teeth);
+//         const outerY = y + radius * Math.sin(angle + angleStep / teeth);
+//
+//         // Calculate the coordinates of the first tip of the tooth
+//         const tip1X = x + (radius + toothHeight) * Math.cos(angle);
+//         const tip1Y = y + (radius + toothHeight) * Math.sin(angle);
+//         // Draw a line to the first tip of the tooth
+//         path += \`L ${tip1X} ${tip1Y}\`;
+//
+//         // Draw a line to the outer point of the tooth
+//         path += \`L ${outerX} ${outerY}\`;
+//
+//         // Close the path
+//         path += 'Z';
+//
+//         path += \`M ${x} ${y} m ${-radius / 4} 0 a ${radius / 4} ${radius / 4} 0 1 0 ${radius / 2} 0 a ${radius / 4} ${radius / 4} 0 1 0 ${-radius / 2} 0\`;
+//
+//         // Return the SVG path data
+//         return path;
+//     }
+//
+//     // Example usage:
+//     // const svgPath = createGearPath(16, 16, 12, 6, 2);
+//     const svgPath = createGearPath(8, 8, 6, 6, 1);
+//     console.log(svgPath);
+//     window.onload = function () {
+//         document.getElementById("gearPath").setAttribute("d", svgPath)
+//     }
+// </script>
+// </body>
+// </html>
+//
+// > Task: Draw a speaker icon for representing "Audio", without filling the shape, use only borders
+// `
+
 
 let todoNode = createMarkdownNode("ArachnIDE development TO-DO", "", "text content", false);
 todoNode.loadPropertyFromFile("code", "../../TO-DO.md" )

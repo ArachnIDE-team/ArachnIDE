@@ -40,6 +40,7 @@ class Diagram extends Node {
         coordinateContainer: undefined,
         diagram: null,
         background: {
+            // type: "mandelbrot",
             type: "grid",
             svg_element: undefined,
             svg_bg_element: undefined,
@@ -137,6 +138,8 @@ class Diagram extends Node {
         this.nodes = [];
         this.edges = [];
 
+
+        this.movingNodes = [];
         this.movingNode = undefined;
         this.NodeUUID = 0;
         this.nodeMap = {};
@@ -629,28 +632,70 @@ class Diagram extends Node {
     }
 
     onMouseDown(event){
-        this.autopilot.speed = 0;
-        this.mouseDownPos = this.background.mousePos.scale(1);
-        this.mouseDown = true;
+        let mouseDownPos = this.background.mousePos.scale(1);
+        if(event.button === 0 && !this.movingNode && !window.diagramWhereSelecting) {// left is 0
+            // Selection area
+            window.diagramWhereSelecting = this;
+            document.body.style.cursor = "";
+            if(this.diagram !== null){
+                let bounds = this.background.svg.getBoundingClientRect();
+                mouseDownPos = mouseDownPos.minus(new vec2(bounds.x, bounds.y));
+            }
+            this.mouseDownPos = mouseDownPos;
+
+        } else {  // if right (2) or middle (1) click
+            this.autopilot.speed = 0;
+            this.mouseDownPos = mouseDownPos;
+            this.mouseDown = true;
+            document.body.style.cursor = "move"
+            this.background.clearSelectionRectangle();
+        }
         cancel(event);
     }
 
     onMouseUp(event) {
-        this.mouseDown = false;
-        if (this.movingNode !== undefined) {
-            this.movingNode.onmouseup(event);
+        if(event.button === 0 && !this.movingNode && window.diagramWhereSelecting === this) { // left is 0
+            // Selection area
+            window.diagramWhereSelecting = null;
+            document.body.style.cursor = "";
+            this.background.clearSelectionRectangle();
+        } else {  // if right (2) or middle (1) click
+            this.mouseDown = false;
+            if (this.movingNode !== undefined) {
+                this.movingNode.onmouseup(event);
+            }
+            document.body.style.cursor = "move"
+            isDraggingIcon = false; // Reset the flag
         }
-        isDraggingIcon = false; // Reset the flag
     }
 
     onMouseMove(event) {
-        if (this.mouseDown) {
-            this.autopilot.speed = 0;
-            this.coordsLive = true;
-            let delta = this.background.mousePos.minus(this.mouseDownPos);
-            this.background.pan = this.background.pan.minus(this.background.toDZ(delta));
-            this.background.regenAmount += delta.mag() * 0.25;
-            this.mouseDownPos = this.background.mousePos.scale(1);
+        // left is 1
+        if(event.buttons === 1 && !this.movingNode && window.diagramWhereSelecting === this) {
+            document.body.style.cursor = ""
+            let mouseDownPos = this.background.mousePos.scale(1);
+            // console.log(this.diagram === null ? "ROOT" : "D0","pos:", this.mouseDownPos)
+            if(this.diagram !== null){
+                let bounds = this.background.svg.getBoundingClientRect();
+                mouseDownPos = mouseDownPos.minus(new vec2(bounds.x, bounds.y));
+            }
+            let point1 = this.background.toZ(this.mouseDownPos);
+            let point2 = this.background.toZ(mouseDownPos);
+            this.background.drawSelectionRectangle(point1, point2)
+            // Selection area
+        } else if(event.buttons === 2 || event.buttons === 4) {  // if right (2) or middle (4) click
+            if (this.mouseDown) {
+                this.autopilot.speed = 0;
+                this.coordsLive = true;
+                let delta = this.background.mousePos.minus(this.mouseDownPos);
+                this.background.pan = this.background.pan.minus(this.background.toDZ(delta));
+                this.background.regenAmount += delta.mag() * 0.25;
+                this.mouseDownPos = this.background.mousePos.scale(1);
+                this.background.clearSelectionRectangle();
+            }
+        } else {
+            document.body.style.cursor = "";
+            this.background.clearSelectionRectangle();
         }
     }
 
@@ -846,6 +891,7 @@ class Diagram extends Node {
 }
 
 window.rootDiagram = null;
+window.diagramWhereSelecting = null;
 //
 // function createMainDiagram(){
 //     window.rootDiagram = new Diagram({
@@ -874,6 +920,14 @@ class WindowedDiagram extends WindowedNode {
         parent: undefined,
     }
     static SAVE_PROPERTIES = [];
+
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "diagram-icon-symbol",
+        name: "Inner Diagram Node",
+        defaultFavourite: -1
+    }
+
     // constructor(title, content, pos, scale, iscale, link) {
     constructor(configuration= WindowedDiagram.DEFAULT_CONFIGURATION) {
         let {diagramContainer, diagram} = WindowedDiagram._getContentElement(configuration.id, configuration.parent);
@@ -967,6 +1021,17 @@ class WindowedDiagram extends WindowedNode {
         this.diagramContainer.style.height = `${newHeight - 65}px`;
 
 
+    }
+
+    static ondrop() {
+        let node = createDiagram();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the Diagram icon');
+
+        return node;
     }
 }
 

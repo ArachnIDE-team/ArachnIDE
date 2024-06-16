@@ -13,6 +13,13 @@ class LinkNode extends WindowedNode {
     }
     static SAVE_PROPERTIES = ['linkText', 'linkUrl', 'isLink'];
     // constructor(name = '', content = undefined, text = '', link = '', sx = undefined, sy = undefined, x = undefined, y = undefined){
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "link-icon-symbol",
+        name: "Web Link Node",
+        defaultFavourite: 4
+    }
+
 
     constructor(configuration = LinkNode.DEFAULT_CONFIGURATION) {
         configuration = {...LinkNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -312,6 +319,13 @@ class LinkNode extends WindowedNode {
                 iframe.setAttribute("src", "");
             }
         });
+    }
+
+    static ondrop(){
+        let linkUrl = prompt("Enter a Link or Search Query", "");
+        if (linkUrl) {
+            processLinkInput(linkUrl);
+        }
     }
 
 }

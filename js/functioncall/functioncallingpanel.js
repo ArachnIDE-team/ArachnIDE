@@ -1,19 +1,4 @@
 
-// Function to handle various events on the node panel
-function handlePanelEvent(event) {
-    cancel(event); // Prevents the event from bubbling up to parent elements
-}
-
-function handlePanelMouseMove(event) {
-    // Check if the event target is inside the functionCallPanel
-    if (functionCallPanel.contains(event.target)) {
-        // If the event is inside functionCallPanel, don't stop its propagation
-        return;
-    }
-
-    // For all other elements, stop propagation
-    cancel(event);
-}
 //
 // // Add event listeners to the node panel for different types of events
 // dropdown.nodePanel.addEventListener('click', handlePanelEvent);
@@ -105,41 +90,6 @@ arachnideFunctionCM.on("change", function () {
         var scrollInfo = arachnideFunctionCM.getScrollInfo();
         arachnideFunctionCM.scrollTo(null, scrollInfo.height);
     }
-});
-
-
-// Function to toggle the visibility of the function call panel
-function toggleFunctionCallPanel() {
-    console.log('Toggle function called');
-
-    if (functionCallPanel.classList.contains('hidden')) {
-        // Expand the panel
-        functionCallPanel.style.display = 'block'; // Temporarily display it to calculate height
-        const height = functionCallPanel.scrollHeight + 'px';
-        functionCallPanel.style.height = '0px'; // Reset before animation
-        setTimeout(() => {
-            functionCallPanel.style.height = height;
-            functionCallPanel.classList.remove('hidden');
-        }, 10); // Start the expand animation
-    } else {
-        // Start collapse animation
-        functionCallPanel.style.height = '0px';
-        // Update the class immediately
-        functionCallPanel.classList.add('hidden');
-
-        // Wait for transition to complete before setting display: none
-        functionCallPanel.addEventListener('transitionend', () => {
-            if (functionCallPanel.classList.contains('hidden')) {
-                functionCallPanel.style.display = 'none'; // Hide after animation
-            }
-        }, { once: true });
-    }
-}
-
-// Initialize the function call panel as hidden on startup
-document.addEventListener('DOMContentLoaded', () => {
-    functionCallPanel.style.height = '0px'; // Set initial height to 0
-    functionCallPanel.classList.add('hidden');
 });
 
 // Global log collector

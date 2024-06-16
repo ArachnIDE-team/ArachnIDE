@@ -17,6 +17,13 @@ class Node {
     // The SAVE_PROPERTIES array, for each Node type, defines the properties saved as JSON and restored on load.
     // This happens in the Node constructor that follows, usage of restored properties must follow "super" constructor call.
     static SAVE_PROPERTIES = ['scale', 'intrinsicScale', 'removed', 'createdAt', 'uuid', 'type', 'files'];
+    // Interface configuration
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,// Plain Node objects cannot be inserted in the diagram
+        iconID: null,// The id of the HTML element containing the icon for the Node graphic object
+        name: "Plain Node", // The name that will be displayed when hovering over the icon
+        defaultFavourite: -1// Whenever to add the "insert icon" to the favourite toolbar (-1 not favourite)
+    }
 
     // constructor(pos, content, scale = 1, intrinsicScale = 1, createEdges = true) {
     constructor(configuration=Node.DEFAULT_CONFIGURATION) {
@@ -298,6 +305,9 @@ class Node {
     onmousedown(event) {
         this.mouseAnchor = this.diagram.background.toZ(new vec2(event.clientX, event.clientY)).minus(this.pos);
         this.followingMouse = 1;
+        // for(let node of this.diagram.getSelectedNodes()){
+        //     node.followingMouse = 1;
+        // }
         window.draggedNode = this;
         this.diagram.movingNode = this;
         if (nodeMode) {
@@ -330,6 +340,9 @@ class Node {
 
     stopFollowingMouse() {
         this.followingMouse = 0;
+        // for(let node of this.diagram.getSelectedNodes()){
+        //     node.followingMouse = 0;
+        // }
         this.diagram.movingNode = undefined;
         // Remove the event listener to clean up
         window.removeEventListener('mouseup', this.stopFollowingMouse);
@@ -338,6 +351,9 @@ class Node {
     onmouseup(event) {
         if (this === window.draggedNode) {
             this.followingMouse = 0;
+            // for(let node of this.diagram.getSelectedNodes()){
+            //     node.followingMouse = 0;
+            // }
             window.draggedNode = undefined;
         }
     }

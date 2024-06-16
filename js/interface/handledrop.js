@@ -6,14 +6,12 @@ let initialMousePosition = null;
 
 function makeIconDraggable(iconDiv) {
     iconDiv.addEventListener('mousedown', function (event) {
-        if (!iconDiv.classList.contains('edges-icon')) {
-            iconDiv.dataset.draggable = 'true';  // Set to draggable immediately on mousedown
-            rootDiagram.mouseDown = true;
-        }
+        iconDiv.dataset.draggable = 'true';  // Set to draggable immediately on mousedown
+        rootDiagram.mouseDown = true;
     });
 
     iconDiv.addEventListener('mousemove', function (event) {
-        if (rootDiagram.mouseDown && !isDraggingIcon && !iconDiv.classList.contains('edges-icon')) {
+        if (rootDiagram.mouseDown && !isDraggingIcon) {
             iconDiv.setAttribute('draggable', 'true');
             isDraggingIcon = true;
         }
@@ -35,7 +33,9 @@ function makeIconDraggable(iconDiv) {
 
         const draggableData = {
             type: 'icon',
-            iconName: iconDiv.classList[1]
+            // iconName: iconDiv.querySelector("use").getAttribute("href").substring(1)
+            ondrop: iconDiv.parentNode.getAttribute("data-ondrop")
+            // iconName: iconDiv.classList[1]
         };
         event.dataTransfer.setData('text/plain', JSON.stringify(draggableData));
     });
@@ -48,65 +48,74 @@ function makeIconDraggable(iconDiv) {
     });
 }
 
-const icons = document.querySelectorAll('.panel-icon');
-icons.forEach(icon => {
-    makeIconDraggable(icon);
-});
+// // const icons = document.querySelectorAll('.panel-icon');
+// const icons = document.querySelectorAll('.panel-icon.add-node-icon');
+// icons.forEach(icon => {
+//     makeIconDraggable(icon);
+// });
 
-function makeEdgesIconNotDraggable(iconDiv) {
+function makeMouseToolsIconNotDraggable(iconDiv) {
     iconDiv.addEventListener('dragstart', function (event) {
         event.preventDefault();
     });
 }
 
-const edgesIcons = document.querySelectorAll('.edges-icon');
+const edgesIcons = document.querySelectorAll('.mouse-tool-icon');
 edgesIcons.forEach(icon => {
-    makeEdgesIconNotDraggable(icon);
+    makeMouseToolsIconNotDraggable(icon);
 });
 
 
-function handleIconDrop(event, iconName) {
+function handleIconDrop(event, ondrop) {
 
-    console.log(`Dropped icon: ${iconName}`);
+    // console.log(`Dropped icon: ${iconName}`);
     let node;
-    switch (iconName) {
-        case 'note-icon':
-            // Default plain text node
-            node = createNodeFromWindow(null, ``, ``, true); // The last parameter sets followMouse to true
-            console.log('Handle drop for the note icon');
-            break;
-        case 'ai-icon':
-            node = createLLMNode('', undefined, undefined, undefined, undefined);
-            node.followingMouse = 1;
-            node.draw();
-            node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
-            console.log('Handle drop for the ai icon');
-            break;
-        case 'link-icon':
-            let linkUrl = prompt("Enter a Link or Search Query", "");
-
-            if (linkUrl) {
-                processLinkInput(linkUrl);
-            }
-            break;
-        case 'code-icon':
-            node = createEditorNode();
-            node.followingMouse = 1;
-            node.draw();
-            node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
-            console.log('Handle drop for the code icon');
-            break;
-        case 'edges-icon':
-            console.log('Handle drop for the edges icon');
-            break;
-        default:
-            console.warn(`No handler defined for icon: ${iconName}`);
-            break;
-    }
-
+    node = eval(ondrop);
+    node();
     event.stopPropagation();
     event.preventDefault();
 }
+// function handleIconDrop(event, iconName) {
+//
+//     console.log(`Dropped icon: ${iconName}`);
+//     let node;
+//     switch (iconName) {
+//         case 'note-icon-symbol':
+//             // Default plain text node
+//             node = createNodeFromWindow(null, ``, ``, true); // The last parameter sets followMouse to true
+//             console.log('Handle drop for the note icon');
+//             break;
+//         case 'ai-icon-symbol':
+//             node = createLLMNode('', undefined, undefined, undefined, undefined);
+//             node.followingMouse = 1;
+//             node.draw();
+//             node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+//             console.log('Handle drop for the ai icon');
+//             break;
+//         case 'link-icon-symbol':
+//             let linkUrl = prompt("Enter a Link or Search Query", "");
+//             if (linkUrl) {
+//                 processLinkInput(linkUrl);
+//             }
+//             break;
+//         case 'webpage-editor-icon-symbol':
+//             node = createEditorNode();
+//             node.followingMouse = 1;
+//             node.draw();
+//             node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+//             console.log('Handle drop for the code icon');
+//             break;
+//         case 'mouse-tool-icon':
+//             console.log('Handle drop for the mouse tool icon');
+//             break;
+//         default:
+//             console.warn(`No handler defined for icon: ${iconName}`);
+//             break;
+//     }
+//
+//     event.stopPropagation();
+//     event.preventDefault();
+// }
 
 function uploadHandler(file, contentType){
     let ev = {
@@ -264,9 +273,10 @@ function dropHandler(ev) {
     if (data && isJSON(data)) {
         const parsedData = JSON.parse(data);
 
-        if (parsedData.type === 'icon') {
+        if (parsedData.type === 'icon' && parsedData.ondrop) {
             // Handle the icon drop
-            handleIconDrop(ev, parsedData.iconName);
+            // handleIconDrop(ev, parsedData.iconName);
+            handleIconDrop(ev, parsedData.ondrop);
             return;  // Exit the handler early
         }
 

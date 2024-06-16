@@ -13,6 +13,13 @@ class WebEditorNode extends WindowedNode {
     }
     static SAVE_PROPERTIES = ['editorSaveData', 'isEditorNode'];
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "webpage-editor-icon-symbol",
+        name: "Webpage Editor Node (Shift + ALT/Option + Double Click)",
+        defaultFavourite: 3
+    }
+
     constructor(configuration = WebEditorNode.DEFAULT_CONFIGURATION){
         configuration = {...WebEditorNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.content = [WebEditorNode._getContentElement()];
@@ -511,6 +518,16 @@ class WebEditorNode extends WindowedNode {
         return htmlContent + iframeScript;
     }
 
+    static ondrop() {
+        let node = createEditorNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the Webpage Editor icon');
+
+        return node;
+    }
 }
 
 // DONE WebEditorNode._getContentElement

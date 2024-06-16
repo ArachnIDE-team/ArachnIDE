@@ -15,6 +15,13 @@ class TerminalNode extends WindowedNode {
 
     static SAVE_PROPERTIES = ['settings'];
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: "terminal-icon-symbol",
+        name: "Terminal Node",
+        defaultFavourite: -1
+    }
+
     constructor(configuration = TerminalNode.DEFAULT_CONFIGURATION){
         configuration = {...TerminalNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.index = configuration.saved ? configuration.saveData.json.index : generateUUID();

@@ -2140,13 +2140,20 @@ label[for^="node-max-context"]:not(:first-child) {
 
 .icon-row {
     display: flex;
-    flex-direction: row;
+    flex-direction: row!important;
+    flex-flow: row wrap;
     align-items: center;
     justify-content: flex-start; /* Align icons to the start */
     margin-bottom: 10px;
 }
 
 .function-call-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+}
+.other-nodes-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2457,13 +2464,15 @@ div.language-md {
     flex-shrink: 0;
     width: 49px;
     height: 33px;
-    margin-inline: 5px;
+    margin: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 15%;
 }
-
+.icon-row.toggle-panel-inner-container > .icon-content {
+    margin-top: 20px
+}
 
 .panel-icon {
     width: 100%;
@@ -2510,7 +2519,7 @@ div.language-md {
         background-color: #929292;
     }
 
-    .panel-icon.edges-icon:hover {
+    .panel-icon.mouse-tool-icon:hover {
         cursor: pointer; /* button click event cursor */
     }
 

@@ -5,6 +5,13 @@ class WindowedUI extends WindowedNode {
         content: undefined,
         scaleProportions: undefined,
     }
+
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: null,
+        name: "User Interface window Node",
+        defaultFavourite: -1
+    }
     // constructor(title, content, scaleProportions) {
     constructor(configuration = WindowedUI.DEFAULT_CONFIGURATION) {
         configuration = {...WindowedUI.DEFAULT_CONFIGURATION, ...configuration};

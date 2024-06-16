@@ -85,116 +85,149 @@
             <div class="menu-icon" id="menu-icon"></div>
         </div>
 
-        <div class="node-panel">
+        <div id="nodePanel" class="node-panel">
+            <div class="icon-content hidden">
+                <div class="panel-icon add-node-icon" title="Freeze and Connect Nodes (Hold Shift)">
+                    <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" style="transform: translateX(-1px);" aria-hidden="true">
+                        <use xlink:href="#edges-icon-symbol"></use>
+                    </svg>
+                </div>
+            </div>
             <div class="icon-row">
                 <div class="icon-content">
-                    <div class="panel-icon edges-icon" title="Freeze and Connect Nodes (Hold Shift)">
+                    <div class="panel-icon mouse-tool-icon" title="Cursor (nothing)">
+                        <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" aria-hidden="true">
+                            <use xlink:href="#default-cursor-icon-symbol"></use>
+                        </svg>
+                    </div>
+                </div>
+                <div class="icon-content">
+                    <div class="panel-icon mouse-tool-icon" title="Select nodes (Left click)">
+                        <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" aria-hidden="true">
+                            <use xlink:href="#select-cursor-icon-symbol"></use>
+                        </svg>
+                    </div>
+                </div>
+                <div class="icon-content">
+                    <div class="panel-icon mouse-tool-icon" title="Move (Right click)">
+                        <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" aria-hidden="true">
+                            <use xlink:href="#move-cursor-icon-symbol"></use>
+                        </svg>
+                    </div>
+                </div>
+                <div class="icon-content">
+                    <div class="panel-icon mouse-tool-icon" title="Zoom (Mouse wheel)">
+                        <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" aria-hidden="true">
+                            <use xlink:href="#zoom-cursor-icon-symbol"></use>
+                        </svg>
+                    </div>
+                </div>
+                <div class="icon-content">
+                    <div id="edgesIcon" class="panel-icon mouse-tool-icon" title="Freeze and Connect Nodes (Click + Shift)">
                         <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" style="transform: translateX(-1px);" aria-hidden="true">
-                            <use xlink:href="#edges-icon-symbol"></use>
-                        </svg>
-                    </div>
-                </div>
-                <div class="icon-content">
-                    <div class="panel-icon note-icon" title="Create Note (Shift + Double Click)">
-                        <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" aria-hidden="true">
-                            <use xlink:href="#note-icon-symbol"></use>
-                        </svg>
-                    </div>
-                </div>
-                <div class="icon-content">
-                    <div class="panel-icon ai-icon" title="Ai Note (ALT/Option + Double Click)">
-                        <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" aria-hidden="true">
-                            <use xlink:href="#ai-icon-symbol"></use>
-                        </svg>
-                    </div>
-                </div>
-                <div class="icon-content">
-                    <div class="panel-icon link-icon" title="Display Link">
-                        <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" aria-hidden="true">
-                            <use xlink:href="#link-icon-symbol"></use>
-                        </svg>
-                    </div>
-                </div>
-                <div class="icon-content">
-                    <div class="panel-icon code-icon" title="Create Code Editor (Shift + ALT/Option + Double Click)">
-                        <svg class="w-[42px] h-[42px] text-gray-800 dark:text-white" aria-hidden="true">
-                            <use xlink:href="#code-icon-symbol"></use>
+                            <use xlink:href="#edge-cursor-icon-symbol"></use>
                         </svg>
                     </div>
                 </div>
             </div>
 
             <!-- New container for the function call panel and its toggle button -->
-            <div class="function-call-container">
-
+            <div class="other-nodes-container">
+                <label for="otherNodesPanel" class="button-label">Add nodes</label>
                 <!-- Sub-dropdown for function calls -->
-                <div class="function-call-panel hidden">
-                    <!-- Function call list -->
-                    <div class="function-call-list custom-scrollbar">
-                        <!-- Function call items will be added here dynamically -->
+                <div id="otherNodesPanel" class="toggle-panel-container">
+                    <div class="icon-row toggle-panel-inner-container hidden">
+
                     </div>
-
-                    <!-- Function prompt wrapper -->
-                    <div class="function-prompt-wrapper">
-                        <!-- Function prompt input -->
-                        <div style="display: flex;">
-                            <!-- Run function button -->
-                            <button id="function-run-button" class="function-button">
-                                <svg width="18" height="18">
-                                    <use xlink:href="#function-button"></use>
+                    <!-- Toggle button for function call panel -->
+                    <div class="toggle-panel" style="padding-top: 15px;">
+                        <div class="bar left-bar"></div>
+                        <div class="icon-wrapper">
+                            <!-- Wrapper for the icon only -->
+                            <div class="toggle-icon">
+                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                                 </svg>
-                            </button>
+                            </div>
+                        </div>
+                        <div class="bar right-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="function-call-container">
+                <label for="functionCallPanel" class="button-label">AI Diagram Task</label>
+                <!-- Sub-dropdown for function calls -->
+                <div id="functionCallPanel" class="toggle-panel-container">
+                    <div class="toggle-panel-inner-container hidden">
+                        <!-- Function call list -->
+                        <div class="function-call-list custom-scrollbar">
+                            <!-- Function call items will be added here dynamically -->
+                        </div>
+
+                        <!-- Function prompt wrapper -->
+                        <div class="function-prompt-wrapper">
+                            <!-- Function prompt input -->
+                            <div style="display: flex;">
+                                <!-- Run function button -->
+                                <button id="function-run-button" class="function-button">
+                                    <svg width="18" height="18">
+                                        <use xlink:href="#function-button"></use>
+                                    </svg>
+                                </button>
 
 
 
-                            <div class="input-group" style="display: flex; position: relative; width: 60%;">
-                                <textarea id="function-prompt" class="custom-scrollbar function-prompt-textarea" rows="1" oninput="dropdown.aiTab.autoGrow(event);" placeholder="Set Task..." required></textarea>
+                                <div class="input-group" style="display: flex; position: relative; width: 60%;">
+                                    <textarea id="function-prompt" class="custom-scrollbar function-prompt-textarea" rows="1" oninput="dropdown.aiTab.autoGrow(event);" placeholder="Set Task..." required></textarea>
 
-                                <div class="status-icons-container" style="position: absolute; right: 42px; top: 50%; transform: translateY(-50%);">
-                                    <!-- Status icons here -->
-                                    <div class="loader" id="functionLoadingIcon" style="display:none;"></div>
+                                    <div class="status-icons-container" style="position: absolute; right: 42px; top: 50%; transform: translateY(-50%);">
+                                        <!-- Status icons here -->
+                                        <div class="loader" id="functionLoadingIcon" style="display:none;"></div>
 
-                                    <div class="error-icon-css" id="functionErrorIcon" style="display:none;">
-                                        <div class="error-x-mark">
-                                            <span class="error-x-mark-left"></span>
-                                            <span class="error-x-mark-right"></span>
+                                        <div class="error-icon-css" id="functionErrorIcon" style="display:none;">
+                                            <div class="error-x-mark">
+                                                <span class="error-x-mark-left"></span>
+                                                <span class="error-x-mark-right"></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <button id="function-send-button" class="function-button">
+                                    <svg width="18" height="18" class="function-send-svg">
+                                        <use xlink:href="#play-icon"></use>
+                                    </svg>
+                                </button>
+
+                                <!-- Regenerate button -->
+                                <button id="function-regen-button" class="function-button">
+                                    <svg width="18" height="18">
+                                        <use xlink:href="#refresh-icon"></use>
+                                    </svg>
+                                </button>
                             </div>
-
-                            <button id="function-send-button" class="function-button">
-                                <svg width="18" height="18" class="function-send-svg">
-                                    <use xlink:href="#play-icon"></use>
-                                </svg>
-                            </button>
-
-                            <!-- Regenerate button -->
-                            <button id="function-regen-button" class="function-button">
-                                <svg width="18" height="18">
-                                    <use xlink:href="#refresh-icon"></use>
-                                </svg>
-                            </button>
                         </div>
-                    </div>
 
-                    <!-- CodeMirror container -->
-                    <div class="function-codemirror-container">
-                        <textarea id="arachnide-function-cm"></textarea>
-                    </div>
-                </div>
-                <!-- Toggle button for function call panel -->
-                <div class="toggle-panel" onclick="toggleFunctionCallPanel()">
-                    <div class="bar left-bar"></div>
-                    <div class="icon-wrapper">
-                        <!-- Wrapper for the icon only -->
-                        <div class="toggle-icon">
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
-                            </svg>
+                        <!-- CodeMirror container -->
+                        <div class="function-codemirror-container">
+                            <textarea id="arachnide-function-cm"></textarea>
                         </div>
+
                     </div>
-                    <div class="bar right-bar"></div>
+                    <!-- Toggle button for function call panel -->
+                    <div class="toggle-panel" style="padding-top: 15px;">
+                        <div class="bar left-bar"></div>
+                        <div class="icon-wrapper">
+                            <!-- Wrapper for the icon only -->
+                            <div class="toggle-icon">
+                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="bar right-bar"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -215,7 +248,7 @@
                     <button class="tablink" onclick="dropdown.openTab('tab3', this)">?</button>
                 </div>
                 <div class="tabs">
-                    <button class="tablink" onclick="dropdown.openTab('tab7', this)">Project</button>
+                    <button class="tablink" onclick="dropdown.openTab('tab7', this)">Workspace</button>
                     <button class="tablink" onclick="dropdown.openTab('tab8', this)">Tools</button>
                     <button class="tablink" onclick="dropdown.openTab('tab9', this)">Nodes</button>
                     <button class="tablink" onclick="dropdown.openTab('tab10', this)">Properties</button>
@@ -945,24 +978,177 @@ not agree on the policy but this way, we all get the free bonus for Gemini. If y
     <!--icon svgs -->
 
     <svg style="display: none;">
+
+
+        <symbol id="default-cursor-icon-symbol" viewBox="0 0 24 24">
+            <path xmlns="http://www.w3.org/2000/svg" d="M8.85355339,19.8535534 C8.58780599,20.1193008 8.13485879,20.0078536 8.02276001,19.6491375 L3.02276001,3.6491375 C2.90244119,3.26411727 3.26411727,2.90244119 3.6491375,3.02276001 L19.6491375,8.02276001 C20.0078536,8.13485879 20.1193008,8.58780599 19.8535534,8.85355339 L16.2071068,12.5 L20.8535534,17.1464466 C21.0488155,17.3417088 21.0488155,17.6582912 20.8535534,17.8535534 L17.8535534,20.8535534 C17.6582912,21.0488155 17.3417088,21.0488155 17.1464466,20.8535534 L12.5,16.2071068 L8.85355339,19.8535534 Z M4.26195703,4.26195703 L8.73076159,18.5621316 L12.1464466,15.1464466 C12.3417088,14.9511845 12.6582912,14.9511845 12.8535534,15.1464466 L17.5,19.7928932 L19.7928932,17.5 L15.1464466,12.8535534 C14.9511845,12.6582912 14.9511845,12.3417088 15.1464466,12.1464466 L18.5621316,8.73076159 L4.26195703,4.26195703 Z" stroke="#686868"/>
+        </symbol>
+
+        <symbol id="select-cursor-icon-symbol" viewBox="0 0 24 24">
+            <path xmlns="http://www.w3.org/2000/svg" d="M18.2848192,17.5777124 L20.8535534,20.1464466 C21.0488155,20.3417088 21.0488155,20.6582912 20.8535534,20.8535534 C20.6582912,21.0488155 20.3417088,21.0488155 20.1464466,20.8535534 L17.5777124,18.2848192 L15.9160251,20.7773501 C15.6899572,21.116452 15.1749357,21.0571624 15.0318354,20.6755617 L12.0318354,12.6755617 C11.8811067,12.2736185 12.2736185,11.8811067 12.6755617,12.0318354 L20.6755617,15.0318354 C21.0571624,15.1749357 21.116452,15.6899572 20.7773501,15.9160251 L18.2848192,17.5777124 L18.2848192,17.5777124 Z M17.2312404,17.0782479 L19.4104716,15.6254271 L13.3544004,13.3544004 L15.6254271,19.4104716 L17.0782479,17.2312404 C17.0974475,17.2011742 17.1201804,17.1727128 17.1464466,17.1464466 C17.1727128,17.1201804 17.2011742,17.0974475 17.2312404,17.0782479 L17.2312404,17.0782479 Z M5.5,3 C5.77614237,3 6,3.22385763 6,3.5 C6,3.77614237 5.77614237,4 5.5,4 C4.67157288,4 4,4.67157288 4,5.5 C4,5.77614237 3.77614237,6 3.5,6 C3.22385763,6 3,5.77614237 3,5.5 C3,4.11928813 4.11928813,3 5.5,3 Z M8.5,4 C8.22385763,4 8,3.77614237 8,3.5 C8,3.22385763 8.22385763,3 8.5,3 L10.5,3 C10.7761424,3 11,3.22385763 11,3.5 C11,3.77614237 10.7761424,4 10.5,4 L8.5,4 Z M13.5,4 C13.2238576,4 13,3.77614237 13,3.5 C13,3.22385763 13.2238576,3 13.5,3 L15.5,3 C15.7761424,3 16,3.22385763 16,3.5 C16,3.77614237 15.7761424,4 15.5,4 L13.5,4 Z M8.5,21 C8.22385763,21 8,20.7761424 8,20.5 C8,20.2238576 8.22385763,20 8.5,20 L10.5,20 C10.7761424,20 11,20.2238576 11,20.5 C11,20.7761424 10.7761424,21 10.5,21 L8.5,21 Z M3,8.5 C3,8.22385763 3.22385763,8 3.5,8 C3.77614237,8 4,8.22385763 4,8.5 L4,10.5 C4,10.7761424 3.77614237,11 3.5,11 C3.22385763,11 3,10.7761424 3,10.5 L3,8.5 Z M3,13.5 C3,13.2238576 3.22385763,13 3.5,13 C3.77614237,13 4,13.2238576 4,13.5 L4,15.5 C4,15.7761424 3.77614237,16 3.5,16 C3.22385763,16 3,15.7761424 3,15.5 L3,13.5 Z M3,18.5 C3,18.2238576 3.22385763,18 3.5,18 C3.77614237,18 4,18.2238576 4,18.5 C4,19.3284271 4.67157288,20 5.5,20 C5.77614237,20 6,20.2238576 6,20.5 C6,20.7761424 5.77614237,21 5.5,21 C4.11928813,21 3,19.8807119 3,18.5 Z M21,10.5 C21,10.7761424 20.7761424,11 20.5,11 C20.2238576,11 20,10.7761424 20,10.5 L20,8.5 C20,8.22385763 20.2238576,8 20.5,8 C20.7761424,8 21,8.22385763 21,8.5 L21,10.5 Z M21,5.5 C21,5.77614237 20.7761424,6 20.5,6 C20.2238576,6 20,5.77614237 20,5.5 C20,4.67157288 19.3284271,4 18.5,4 C18.2238576,4 18,3.77614237 18,3.5 C18,3.22385763 18.2238576,3 18.5,3 C19.8807119,3 21,4.11928813 21,5.5 Z" stroke="#686868"/>
+        </symbol>
+
+        <symbol id="move-cursor-icon-symbol" viewBox="0 0 24 24">
+            <path xmlns="http://www.w3.org/2000/svg" d="M13,21.2928932 L15.1464466,19.1464466 C15.3417088,18.9511845 15.6582912,18.9511845 15.8535534,19.1464466 C16.0488155,19.3417088 16.0488155,19.6582912 15.8535534,19.8535534 L12.8535534,22.8535534 C12.6582912,23.0488155 12.3417088,23.0488155 12.1464466,22.8535534 L9.14644661,19.8535534 C8.95118446,19.6582912 8.95118446,19.3417088 9.14644661,19.1464466 C9.34170876,18.9511845 9.65829124,18.9511845 9.85355339,19.1464466 L12,21.2928932 L12,15.5 C12,15.2238576 12.2238576,15 12.5,15 C12.7761424,15 13,15.2238576 13,15.5 L13,21.2928932 L13,21.2928932 Z M3.70710678,13 L5.85355339,15.1464466 C6.04881554,15.3417088 6.04881554,15.6582912 5.85355339,15.8535534 C5.65829124,16.0488155 5.34170876,16.0488155 5.14644661,15.8535534 L2.14644661,12.8535534 C1.95118446,12.6582912 1.95118446,12.3417088 2.14644661,12.1464466 L5.14644661,9.14644661 C5.34170876,8.95118446 5.65829124,8.95118446 5.85355339,9.14644661 C6.04881554,9.34170876 6.04881554,9.65829124 5.85355339,9.85355339 L3.70710678,12 L9.5,12 C9.77614237,12 10,12.2238576 10,12.5 C10,12.7761424 9.77614237,13 9.5,13 L3.70710678,13 Z M21.2928932,12 L19.1464466,9.85355339 C18.9511845,9.65829124 18.9511845,9.34170876 19.1464466,9.14644661 C19.3417088,8.95118446 19.6582912,8.95118446 19.8535534,9.14644661 L22.8535534,12.1464466 C23.0488155,12.3417088 23.0488155,12.6582912 22.8535534,12.8535534 L19.8535534,15.8535534 C19.6582912,16.0488155 19.3417088,16.0488155 19.1464466,15.8535534 C18.9511845,15.6582912 18.9511845,15.3417088 19.1464466,15.1464466 L21.2928932,13 L15.5,13 C15.2238576,13 15,12.7761424 15,12.5 C15,12.2238576 15.2238576,12 15.5,12 L21.2928932,12 L21.2928932,12 Z M13,3.70710678 L13,9.5 C13,9.77614237 12.7761424,10 12.5,10 C12.2238576,10 12,9.77614237 12,9.5 L12,3.70710678 L9.85355339,5.85355339 C9.65829124,6.04881554 9.34170876,6.04881554 9.14644661,5.85355339 C8.95118446,5.65829124 8.95118446,5.34170876 9.14644661,5.14644661 L12.1464466,2.14644661 C12.3417088,1.95118446 12.6582912,1.95118446 12.8535534,2.14644661 L15.8535534,5.14644661 C16.0488155,5.34170876 16.0488155,5.65829124 15.8535534,5.85355339 C15.6582912,6.04881554 15.3417088,6.04881554 15.1464466,5.85355339 L13,3.70710678 Z" stroke="#686868"/>
+        </symbol>
+
+        <symbol id="zoom-cursor-icon-symbol" viewBox="0 0 24 24">
+            <path xmlns="http://www.w3.org/2000/svg" d="M4.70710678,20 L7.5,20 C7.77614237,20 8,20.2238576 8,20.5 C8,20.7761424 7.77614237,21 7.5,21 L3.5,21 C3.22385763,21 3,20.7761424 3,20.5 L3,16.5 C3,16.2238576 3.22385763,16 3.5,16 C3.77614237,16 4,16.2238576 4,16.5 L4,19.2928932 L9.14644661,14.1464466 C9.34170876,13.9511845 9.65829124,13.9511845 9.85355339,14.1464466 C10.0488155,14.3417088 10.0488155,14.6582912 9.85355339,14.8535534 L4.70710678,20 Z M19.2928932,4 L16.5,4 C16.2238576,4 16,3.77614237 16,3.5 C16,3.22385763 16.2238576,3 16.5,3 L20.5,3 C20.7761424,3 21,3.22385763 21,3.5 L21,7.53112887 C21,7.80727125 20.7761424,8.03112887 20.5,8.03112887 C20.2238576,8.03112887 20,7.80727125 20,7.53112887 L20,4.70710678 L14.8535534,9.85355339 C14.6582912,10.0488155 14.3417088,10.0488155 14.1464466,9.85355339 C13.9511845,9.65829124 13.9511845,9.34170876 14.1464466,9.14644661 L19.2928932,4 L19.2928932,4 Z" stroke="#686868"/>
+        </symbol>
+
+        <symbol id="edge-cursor-icon-symbol" viewBox="0 0 24 24">
+            <path xmlns="http://www.w3.org/2000/svg" d="M13.7071068,5 L14.5,5 C16.9852814,5 19,7.01471863 19,9.5 L19,10.0354444 C20.6961471,10.2780593 22,11.736764 22,13.5 C22,15.4329966 20.4329966,17 18.5,17 C16.5670034,17 15,15.4329966 15,13.5 C15,11.736764 16.3038529,10.2780593 18,10.0354444 L18,9.5 C18,7.56700338 16.4329966,6 14.5,6 L13.7071068,6 L14.8535534,7.14644661 C15.0488155,7.34170876 15.0488155,7.65829124 14.8535534,7.85355339 C14.6582912,8.04881554 14.3417088,8.04881554 14.1464466,7.85355339 L12.1464466,5.85355339 C11.9511845,5.65829124 11.9511845,5.34170876 12.1464466,5.14644661 L14.1464466,3.14644661 C14.3417088,2.95118446 14.6582912,2.95118446 14.8535534,3.14644661 C15.0488155,3.34170876 15.0488155,3.65829124 14.8535534,3.85355339 L13.7071068,5 Z M6,15.0354444 L6,8.96455557 C4.30385293,8.72194074 3,7.26323595 3,5.5 C3,3.56700338 4.56700338,2 6.5,2 C8.43299662,2 10,3.56700338 10,5.5 C10,7.26323595 8.69614707,8.72194074 7,8.96455557 L7,15.0354444 C8.69614707,15.2780593 10,16.736764 10,18.5 C10,20.4329966 8.43299662,22 6.5,22 C4.56700338,22 3,20.4329966 3,18.5 C3,16.736764 4.30385293,15.2780593 6,15.0354444 L6,15.0354444 Z M4,18.5 C4,19.8807119 5.11928813,21 6.5,21 C7.88071187,21 9,19.8807119 9,18.5 C9,17.1192881 7.88071187,16 6.5,16 C5.11928813,16 4,17.1192881 4,18.5 Z M4,5.5 C4,6.88071187 5.11928813,8 6.5,8 C7.88071187,8 9,6.88071187 9,5.5 C9,4.11928813 7.88071187,3 6.5,3 C5.11928813,3 4,4.11928813 4,5.5 Z M18.5,16 C19.8807119,16 21,14.8807119 21,13.5 C21,12.1192881 19.8807119,11 18.5,11 C17.1192881,11 16,12.1192881 16,13.5 C16,14.8807119 17.1192881,16 18.5,16 Z" stroke="#686868"/>
+        </symbol>
+
+
+<!--        <symbol id="move-cursor-icon-symbol" viewBox="0 0 24 24">-->
+<!--            <path xmlns="http://www.w3.org/2000/svg" d="M6,7 L3.70710678,7 L3.85355339,7.14644661 C4.04881554,7.34170876 4.04881554,7.65829124 3.85355339,7.85355339 C3.65829124,8.04881554 3.34170876,8.04881554 3.14644661,7.85355339 L2.14644661,6.85355339 C1.95118446,6.65829124 1.95118446,6.34170876 2.14644661,6.14644661 L3.14644661,5.14644661 C3.34170876,4.95118446 3.65829124,4.95118446 3.85355339,5.14644661 C4.04881554,5.34170876 4.04881554,5.65829124 3.85355339,5.85355339 L3.70710678,6 L6,6 L6,3.70710678 L5.85355339,3.85355339 C5.65829124,4.04881554 5.34170876,4.04881554 5.14644661,3.85355339 C4.95118446,3.65829124 4.95118446,3.34170876 5.14644661,3.14644661 L6.14644661,2.14644661 C6.34170876,1.95118446 6.65829124,1.95118446 6.85355339,2.14644661 L7.85355339,3.14644661 C8.04881554,3.34170876 8.04881554,3.65829124 7.85355339,3.85355339 C7.65829124,4.04881554 7.34170876,4.04881554 7.14644661,3.85355339 L7,3.70710678 L7,6 L9.29289322,6 L9.14644661,5.85355339 C8.95118446,5.65829124 8.95118446,5.34170876 9.14644661,5.14644661 C9.34170876,4.95118446 9.65829124,4.95118446 9.85355339,5.14644661 L10.8535534,6.14644661 C11.0488155,6.34170876 11.0488155,6.65829124 10.8535534,6.85355339 L9.85355339,7.85355339 C9.65829124,8.04881554 9.34170876,8.04881554 9.14644661,7.85355339 C8.95118446,7.65829124 8.95118446,7.34170876 9.14644661,7.14644661 L9.29289322,7 L7,7 L7,9.29289322 L7.14644661,9.14644661 C7.34170876,8.95118446 7.65829124,8.95118446 7.85355339,9.14644661 C8.04881554,9.34170876 8.04881554,9.65829124 7.85355339,9.85355339 L6.85355339,10.8535534 C6.65829124,11.0488155 6.34170876,11.0488155 6.14644661,10.8535534 L5.14644661,9.85355339 C4.95118446,9.65829124 4.95118446,9.34170876 5.14644661,9.14644661 C5.34170876,8.95118446 5.65829124,8.95118446 5.85355339,9.14644661 L6,9.29289322 L6,7 Z M14,9.5 L14,12.0474376 C14,12.3783481 13.8839855,12.698786 13.6721417,12.9529985 C13.1720143,13.5531514 12.2800608,13.6342381 11.6799078,13.1341106 L10.7560738,12.3642489 C10.4736449,12.1288916 10.11764,12 9.75,12 C9.48363526,12 9.24082605,12.1526146 9.12532205,12.3926334 L9.08962348,12.4668155 C8.95447865,12.7476481 8.99541029,13.0814869 9.19439734,13.321352 L13.607865,18.6414804 C14.3217788,19.502054 15.3818498,20 16.5,20 C18.9852814,20 21,17.9852814 21,15.5 L21,11.5 C21,11.2238576 20.7761424,11 20.5,11 C20.2238576,11 20,11.2238576 20,11.5 L20,12.5 C20,12.7761424 19.7761424,13 19.5,13 C19.2238576,13 19,12.7761424 19,12.5 L19,10.5 C19,10.2238576 18.7761424,10 18.5,10 C18.2238576,10 18,10.2238576 18,10.5 L18,12.5 C18,12.7761424 17.7761424,13 17.5,13 C17.2238576,13 17,12.7761424 17,12.5 L17,9.5 C17,9.22385763 16.7761424,9 16.5,9 C16.2238576,9 16,9.22385763 16,9.5 L16,12.5 C16,12.7761424 15.7761424,13 15.5,13 C15.2238576,13 15,12.7761424 15,12.5 L15,5.5 C15,5.22385763 14.7761424,5 14.5,5 C14.2238576,5 14,5.22385763 14,5.5 L14,9.5 Z M13,9.49999997 L13,5.5 C13,4.67157288 13.6715729,4 14.5,4 C15.3284271,4 16,4.67157288 16,5.5 L16,8.08535285 C16.1563895,8.03007711 16.3246823,8 16.5,8 C17.191734,8 17.7741062,8.46823386 17.9474595,9.10504462 C18.1184541,9.03725677 18.3048761,9 18.5,9 C19.191734,9 19.7741062,9.46823386 19.9474595,10.1050446 C20.1184541,10.0372568 20.3048761,10 20.5,10 C21.3284271,10 22,10.6715729 22,11.5 L22,15.5 C22,18.5375661 19.5375661,21 16.5,21 C15.0842933,21 13.7421216,20.3695431 12.8382246,19.279958 L8.42475695,13.9598296 C7.97611908,13.4190278 7.88383427,12.6663521 8.18853292,12.0331845 L8.2242315,11.9590024 C8.50634865,11.3727595 9.09940726,11 9.75,11 C10.3515765,11 10.9341143,11.2109078 11.3962582,11.5960277 L12.3200922,12.3658894 C12.4959683,12.5124527 12.7573571,12.4886901 12.9039205,12.3128141 C12.9660017,12.2383166 13,12.1444116 13,12.0474376 L13,9.5 Z" stroke="#686868"/>-->
+<!--        </symbol>-->
+
+<!--        <symbol id="zoom-cursor-icon-symbol" viewBox="0 0 24 24">-->
+<!--            <path xmlns="http://www.w3.org/2000/svg" d="M5,17.7071068 L5,21.5 C5,21.7761424 4.77614237,22 4.5,22 C4.22385763,22 4,21.7761424 4,21.5 L4,17.7071068 L2.85355339,18.8535534 C2.65829124,19.0488155 2.34170876,19.0488155 2.14644661,18.8535534 C1.95118446,18.6582912 1.95118446,18.3417088 2.14644661,18.1464466 L4.14644661,16.1464466 C4.34170876,15.9511845 4.65829124,15.9511845 4.85355339,16.1464466 L6.85355339,18.1464466 C7.04881554,18.3417088 7.04881554,18.6582912 6.85355339,18.8535534 C6.65829124,19.0488155 6.34170876,19.0488155 6.14644661,18.8535534 L5,17.7071068 Z M5,12.2928932 L6.14644661,11.1464466 C6.34170876,10.9511845 6.65829124,10.9511845 6.85355339,11.1464466 C7.04881554,11.3417088 7.04881554,11.6582912 6.85355339,11.8535534 L4.85355339,13.8535534 C4.65829124,14.0488155 4.34170876,14.0488155 4.14644661,13.8535534 L2.14644661,11.8535534 C1.95118446,11.6582912 1.95118446,11.3417088 2.14644661,11.1464466 C2.34170876,10.9511845 2.65829124,10.9511845 2.85355339,11.1464466 L4,12.2928932 L4,8.5 C4,8.22385763 4.22385763,8 4.5,8 C4.77614237,8 5,8.22385763 5,8.5 L5,12.2928932 Z M10.1715729,8.08578644 L11.9728833,9.88709683 C12.2068723,10.1210859 12.3514215,10.4297043 12.3813807,10.7592559 C12.4521094,11.5372716 11.87874,12.2253149 11.1136785,12.2946956 L10.17209,12.4049185 C9.80595984,12.4382031 9.46308625,12.5987965 9.20312553,12.8587572 C9.01477721,13.0471055 8.95100003,13.3267124 9.03904525,13.578105 L9.0662572,13.6558023 C9.16927404,13.9499428 9.43427674,14.1570594 9.75563276,14.1871167 L16.6819496,14.9878682 C17.7952804,15.0915722 18.8969648,14.6940899 19.6876164,13.9034383 C21.4449757,12.146079 21.4449757,9.29683657 19.6979083,7.54947792 L17.1463229,5.14003158 C16.9510608,4.94476944 16.6344783,4.94476944 16.4392161,5.14003158 C16.243954,5.33529373 16.243954,5.65187622 16.4392161,5.84713836 C16.4687913,5.87671351 16.4938869,5.9090719 16.5145029,5.94337042 L16.5360692,5.96500225 C16.7310353,6.16056005 16.7305556,6.47714218 16.5349978,6.67210822 C16.3394399,6.86707425 16.0228578,6.86659453 15.8278918,6.67103672 L14.3175771,5.15613701 C14.1223149,4.96087487 13.8057324,4.96087487 13.6104703,5.15613701 C13.4152081,5.35139916 13.4152081,5.66798165 13.6104703,5.86324379 C13.6161301,5.86890366 13.621626,5.87466546 13.6269577,5.88052329 L15.1217682,7.37912809 C15.3167827,7.57463758 15.3163814,7.89121981 15.1208719,8.0862343 C14.9253624,8.28124878 14.6087802,8.2808475 14.4137657,8.08533801 L12.4868898,6.15357052 C12.2916277,5.95830838 11.9750452,5.95830838 11.779783,6.15357052 C11.5845209,6.34883267 11.5845209,6.66541516 11.779783,6.8606773 L12.4868898,7.56778409 C12.5044294,7.58532369 12.5203935,7.60384219 12.5347821,7.62316373 L13.7067147,8.7925016 C13.9021932,8.98754722 13.902544,9.30412952 13.7074984,9.49960795 C13.5124528,9.69508638 13.1958705,9.69543724 13.0003921,9.50039162 L7.85015213,4.3615544 C7.65488998,4.16629225 7.33830749,4.16629225 7.14304535,4.3615544 C6.9477832,4.55681654 6.9477832,4.87339903 7.14237791,5.067995 L10.1709054,8.08512026 Z M9.46479946,8.79322659 L6.43593857,5.77576796 C5.85015213,5.18998152 5.85015213,4.24023405 6.43593857,3.65444762 C7.021725,3.06866118 7.97147247,3.06866118 8.55686686,3.654056 L10.7758153,5.86809151 C10.8476249,5.71552433 10.9465785,5.57256145 11.0726762,5.44646374 C11.4680114,5.05112856 12.0291171,4.92259694 12.5323807,5.06100671 C12.602341,4.83711881 12.7260019,4.62639185 12.9033635,4.44903023 C13.4891499,3.86324379 14.4388974,3.86324379 15.0252192,4.44956638 L15.4332437,4.85882939 C15.5052122,4.70465702 15.6048341,4.56020009 15.7321093,4.4329248 C16.3178958,3.84713836 17.2676433,3.84713836 17.8431378,4.42292414 L20.3947231,6.83237048 C22.5426067,8.98025408 22.5426067,12.4626615 20.3947231,14.6105451 C19.3936674,15.6116009 17.9988083,16.1148592 16.5781629,15.9824058 L9.65184597,15.1816543 C8.95220648,15.1164846 8.35472919,14.6495178 8.12246657,13.9863462 L8.09525462,13.9086488 C7.88020519,13.2946255 8.03598021,12.611689 8.49601875,12.1516504 C8.92139756,11.7262716 9.48244832,11.4634895 10.0685999,11.4103733 L11.0101885,11.3001504 C11.2381876,11.2794232 11.4062147,11.0777907 11.3854875,10.8497916 C11.3767079,10.7532159 11.3343475,10.6627746 11.2657765,10.5942036 L9.46479946,8.79322659 Z" stroke="#686868"/>-->
+<!--        </symbol>-->
+
+
+
+
         <symbol id="note-icon-symbol" viewBox="0 0 20 20">
-            <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.7" d="M15 17v1a.97.97 0 0 1-.933 1H1.933A.97.97 0 0 1 1 18V5.828a2 2 0 0 1 .586-1.414l2.828-2.828A2 2 0 0 1 5.828 1h8.239A.97.97 0 0 1 15 2M6 1v4a1 1 0 0 1-1 1H1m13.14.772 2.745 2.746M18.1 5.612a2.086 2.086 0 0 1 0 2.953l-6.65 6.646-3.693.739.739-3.692 6.646-6.646a2.087 2.087 0 0 1 2.958 0Z" />
+            <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M15 17v1a.97.97 0 0 1-.933 1H1.933A.97.97 0 0 1 1 18V5.828a2 2 0 0 1 .586-1.414l2.828-2.828A2 2 0 0 1 5.828 1h8.239A.97.97 0 0 1 15 2M6 1v4a1 1 0 0 1-1 1H1m13.14.772 2.745 2.746M18.1 5.612a2.086 2.086 0 0 1 0 2.953l-6.65 6.646-3.693.739.739-3.692 6.646-6.646a2.087 2.087 0 0 1 2.958 0Z" />
         </symbol>
 
         <symbol id="ai-icon-symbol" viewBox="0 0 20 18">
-            <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.7" d="M4.109 17H1v-2a4 4 0 0 1 4-4h.87M10 4.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Zm7.95 2.55a2 2 0 0 1 0 2.829l-6.364 6.364-3.536.707.707-3.536 6.364-6.364a2 2 0 0 1 2.829 0Z" />
+            <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M4.109 17H1v-2a4 4 0 0 1 4-4h.87M10 4.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Zm7.95 2.55a2 2 0 0 1 0 2.829l-6.364 6.364-3.536.707.707-3.536 6.364-6.364a2 2 0 0 1 2.829 0Z" />
         </symbol>
 
         <symbol id="link-icon-symbol" viewBox="0 0 19 19">
-            <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.7" d="M11.013 7.962a3.519 3.519 0 0 0-4.975 0l-3.554 3.554a3.518 3.518 0 0 0 4.975 4.975l.461-.46m-.461-4.515a3.518 3.518 0 0 0 4.975 0l3.553-3.554a3.518 3.518 0 0 0-4.974-4.975L10.3 3.7" />
+            <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M11.013 7.962a3.519 3.519 0 0 0-4.975 0l-3.554 3.554a3.518 3.518 0 0 0 4.975 4.975l.461-.46m-.461-4.515a3.518 3.518 0 0 0 4.975 0l3.553-3.554a3.518 3.518 0 0 0-4.974-4.975L10.3 3.7" />
         </symbol>
 
-        <symbol id="code-icon-symbol" viewBox="0 0 20 16">
+<!--        <symbol id="code-icon-symbol" viewBox="0 0 20 16">-->
+<!--            <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8" d="M5 4 1 8l4 4m10-8 4 4-4 4M11 1 9 15" />-->
+<!--        </symbol>-->
+
+        <symbol id="edges-icon-symbol" viewBox="0 0 18 18">
+            <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="m5.953 7.467 6.094-2.612m.096 8.114L5.857 9.676m.305-1.192a2.581 2.581 0 1 1-5.162 0 2.581 2.581 0 0 1 5.162 0ZM17 3.84a2.581 2.581 0 1 1-5.162 0 2.581 2.581 0 0 1 5.162 0Zm0 10.322a2.581 2.581 0 1 1-5.162 0 2.581 2.581 0 0 1 5.162 0Z" />
+        </symbol>
+
+        <!-- NEW ICONS-->
+        <symbol id="audio-icon-symbol" viewBox="0 0 24 24">
+            <path d="M3 16V8H6L11 4V20L6 16H3Z" fill="none" stroke="#686868" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 9C13 9 15 9.5 15 12C15 14.5 13 15 13 15" fill="none" stroke="#686868" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15 7C15 7 18 7.83333 18 12C18 16.1667 15 17 15 17" fill="none" stroke="#686868" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17 5C17 5 21 6.16667 21 12C21 17.8333 17 19 17 19" fill="none" stroke="#686868" stroke-linecap="round" stroke-linejoin="round"/>
+        </symbol>
+
+        <symbol id="video-icon-symbol" viewBox="0 0 24 24">
+            <path d="M5 18H15C16.1046 18 17 17.1046 17 16V8.57143V8C17 6.89543 16.1046 6 15 6H5C3.89543 6 3 6.89543 3 8V16C3 17.1046 3.89543 18 5 18Z" fill="none" stroke="#686868" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="6.5" cy="9.5" r="0.5" fill="none" stroke="#686868" stroke-linejoin="round"/>
+            <path d="M17 10L21 7V17L17 14" fill="none" stroke="#686868" stroke-linejoin="round"/>
+        </symbol>
+
+        <symbol id="image-icon-symbol" viewBox="0 0 24 24">
+            <path d="M21 16V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V18M21 16V4C21 3.44772 20.5523 3 20 3H4C3.44772 3 3 3.44772 3 4V18M21 16L15.4829 12.3219C15.1843 12.1228 14.8019 12.099 14.4809 12.2595L3 18" fill="none" stroke="#686868" stroke-linejoin="round"/>
+            <circle cx="8" cy="9" r="2" fill="none" stroke="#686868" stroke-linejoin="round"/>
+        </symbol>
+
+        <symbol id="module-icon-symbol" viewBox="0 0 15 15">
+            <path xmlns="http://www.w3.org/2000/svg" d="M0.5 3.49805L7.5 0.5L14.5 3.49805M0.5 3.49805L7.5 6.49609M0.5 3.49805V3.5M14.5 3.49805L7.5 6.49609M14.5 3.49805V11.5L7.5 14.5M14.5 3.49805L7.5 6.5V14.5M7.5 6.49609V14.5M7.5 6.49609L0.5 3.5M7.5 14.5L0.5 11.5V3.5" stroke="#686868" stroke-linejoin="round" fill="none" stroke-width="0.5"/>
+        </symbol>
+
+        <symbol id="project-icon-symbol" viewBox="0 0 15 15">
+            <path xmlns="http://www.w3.org/2000/svg" d="M1.5 10.5V4.5M1.5 10.5L7.5 14M1.5 10.5L5 9M1.5 4.5L7.5 1M1.5 4.5L7.5 7.5M7.5 1L13.5 4.5M7.5 1V4.5M13.5 4.5V10.5M13.5 4.5L7.5 7.5M13.5 10.5L7.5 14M13.5 10.5L10 9M7.5 14V7.5M7.5 4.5L5 6V9M7.5 4.5L10 6V9M5 9L7.5 10.5L10 9" stroke="#686868" fill="none" stroke-width="0.5"/>
+        </symbol>
+
+<!--        <symbol id="explorer-icon-symbol" viewBox="0 0 15 15">-->
+<!--            <path xmlns="http://www.w3.org/2000/svg" d="M4.5 10.5L4.05279 10.2764C3.95654 10.4689 3.99427 10.7014 4.14645 10.8536C4.29863 11.0057 4.53111 11.0435 4.72361 10.9472L4.5 10.5ZM6.5 6.5L6.27639 6.05279C6.17963 6.10117 6.10117 6.17963 6.05279 6.27639L6.5 6.5ZM10.5 4.5L10.9472 4.72361C11.0435 4.53111 11.0057 4.29863 10.8536 4.14645C10.7014 3.99427 10.4689 3.95654 10.2764 4.05279L10.5 4.5ZM8.5 8.5L8.72361 8.94721C8.82037 8.89883 8.89883 8.82037 8.94721 8.72361L8.5 8.5ZM7.5 14C3.91015 14 1 11.0899 1 7.5H0C0 11.6421 3.35786 15 7.5 15V14ZM14 7.5C14 11.0899 11.0899 14 7.5 14V15C11.6421 15 15 11.6421 15 7.5H14ZM7.5 1C11.0899 1 14 3.91015 14 7.5H15C15 3.35786 11.6421 0 7.5 0V1ZM7.5 0C3.35786 0 0 3.35786 0 7.5H1C1 3.91015 3.91015 1 7.5 1V0ZM4.94721 10.7236L6.94721 6.72361L6.05279 6.27639L4.05279 10.2764L4.94721 10.7236ZM6.72361 6.94721L10.7236 4.94721L10.2764 4.05279L6.27639 6.05279L6.72361 6.94721ZM10.0528 4.27639L8.05279 8.27639L8.94721 8.72361L10.9472 4.72361L10.0528 4.27639ZM8.27639 8.05279L4.27639 10.0528L4.72361 10.9472L8.72361 8.94721L8.27639 8.05279Z" fill="#686868" stroke="none"/>-->
+<!--        </symbol>-->
+
+        <symbol id="explorer-icon-symbol" viewBox="0 0 24 24">
+            <path d="M14.1214 14.1213L16.5165 8.13347C16.6798 7.72532 16.2747 7.32028 15.8666 7.48354L9.87872 9.87868M14.1214 14.1213L8.13351 16.5165C7.72536 16.6797 7.32032 16.2747 7.48358 15.8665L9.87872 9.87868M14.1214 14.1213L9.87872 9.87868" stroke="#686868" stroke-linecap="round" fill="none" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="9" stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </symbol>
+
+<!--        <symbol id="nodejs-module-icon-symbol" viewBox="0 0 15 15">-->
+<!--            <path xmlns="http://www.w3.org/2000/svg" d="M4.5 10.5V12.5H6.5V10.5H14.5V4.5H0.5V10.5H4.5ZM4.5 10.5V4.5M8.5 4.5V10.5M6.5 6V9M2.5 6V10.5M10.5 6V10.5M12.5 6V10.5" stroke="#686868" stroke-linecap="round" fill="none" stroke-width="0.5"/>-->
+<!--        </symbol>-->
+
+        <symbol id="nodejs-icon-symbol" viewBox="0 0 15 15">
+            <path xmlns="http://www.w3.org/2000/svg" d="M11.5 6V5.83333C11.5 5.09695 10.903 4.5 10.1667 4.5H9C8.17157 4.5 7.5 5.17157 7.5 6C7.5 6.82843 8.17157 7.5 9 7.5H10C10.8284 7.5 11.5 8.17157 11.5 9C11.5 9.82843 10.8284 10.5 10 10.5H9C8.17157 10.5 7.5 9.82843 7.5 9M5.5 4V9.26393C5.5 10.0215 5.072 10.714 4.39443 11.0528L3.5 11.5M1.5 10.5V4.5L7.5 1L13.5 4.5V10.5L7.5 14L1.5 10.5Z" fill="none" stroke="#686868" stroke-width="0.5"/>
+        </symbol>
+
+        <symbol id="js-icon-symbol" viewBox="0 0 15 15">
+            <path xmlns="http://www.w3.org/2000/svg" d="M12.5 8V7.83333C12.5 7.09695 11.903 6.5 11.1667 6.5H10C9.17157 6.5 8.5 7.17157 8.5 8C8.5 8.82843 9.17157 9.5 10 9.5H11C11.8284 9.5 12.5 10.1716 12.5 11C12.5 11.8284 11.8284 12.5 11 12.5H10C9.17157 12.5 8.5 11.8284 8.5 11M6.5 6V11C6.5 11.8284 5.82843 12.5 5 12.5C4.17157 12.5 3.5 11.8284 3.5 11M0.5 0.5H14.5V14.5H0.5V0.5Z" stroke="#686868" stroke-width="0.5" fill="none"/>
+        </symbol>
+
+            <!-- SVG EDITORS ARE EVIL-->
+<!--        <symbol id="html-icon-symbol"  viewBox="242.4781 258.184 14.9997 14.9995" width="14.9997" height="14.9995">-->
+<!--            <path xmlns="http://www.w3.org/2000/svg" d="M 242.978 258.684 L 242.978 258.184 C 242.838 258.184 242.705 258.242 242.61 258.345 C 242.515 258.448 242.468 258.586 242.48 258.725 L 242.978 258.684 Z M 256.978 258.684 L 257.476 258.725 C 257.488 258.586 257.441 258.448 257.346 258.345 C 257.251 258.242 257.118 258.184 256.978 258.184 L 256.978 258.684 Z M 255.978 270.684 L 256.136 271.158 C 256.326 271.095 256.46 270.924 256.476 270.725 L 255.978 270.684 Z M 249.978 272.684 L 249.82 273.158 C 249.923 273.192 250.033 273.192 250.136 273.158 L 249.978 272.684 Z M 243.978 270.684 L 243.48 270.725 C 243.496 270.924 243.63 271.095 243.82 271.158 L 243.978 270.684 Z M 242.978 259.184 L 256.978 259.184 L 256.978 258.184 L 242.978 258.184 L 242.978 259.184 Z M 256.48 258.642 L 255.48 270.642 L 256.476 270.725 L 257.476 258.725 L 256.48 258.642 Z M 255.82 270.209 L 249.82 272.209 L 250.136 273.158 L 256.136 271.158 L 255.82 270.209 Z M 250.136 272.209 L 244.136 270.209 L 243.82 271.158 L 249.82 273.158 L 250.136 272.209 Z M 244.476 270.642 L 243.476 258.642 L 242.48 258.725 L 243.48 270.725 L 244.476 270.642 Z" fill="#000000" transform="matrix(1, 0, 0, 1, 0, 0)"/>-->
+<!--            <text style="font-family: Arial, sans-serif; font-size: 28px; white-space: pre;" x="241.094" y="301.614" transform="matrix(0.4453479647636414, 0, 0, 0.3649800121784211, 138.114501953125, 158.9302215576172)">H</text>-->
+<!--        </symbol>-->
+
+        <!-- WHEN YOU HAVE 4 HOURS OF YOUR LIFE TO WASTE REPLACE CSS AND HTML -->
+        <symbol id="css-icon-symbol" viewBox="0 0 15 15">
+            <path xmlns="http://www.w3.org/2000/svg" d="M0.5 0.5V0C0.360174 0 0.226736 0.0585498 0.132059 0.161445C0.0373814 0.264341 -0.00988477 0.40218 0.00172713 0.541523L0.5 0.5ZM14.5 0.5L14.9983 0.541523C15.0099 0.40218 14.9626 0.264341 14.8679 0.161445C14.7733 0.0585498 14.6398 0 14.5 0V0.5ZM13.5 12.5L13.6581 12.9743C13.8479 12.9111 13.9817 12.7408 13.9983 12.5415L13.5 12.5ZM7.5 14.5L7.34189 14.9743C7.44452 15.0086 7.55548 15.0086 7.65811 14.9743L7.5 14.5ZM1.5 12.5L1.00173 12.5415C1.01834 12.7408 1.15214 12.9111 1.34189 12.9743L1.5 12.5ZM10.5 3.5H11V3H10.5V3.5ZM10.5 9.5L10.6581 9.97434L11 9.86038V9.5H10.5ZM7.5 10.5L7.34189 10.9743L7.5 11.027L7.65811 10.9743L7.5 10.5ZM4.5 9.5H4V9.86038L4.34189 9.97434L4.5 9.5ZM0.5 1H14.5V0H0.5V1ZM14.0017 0.458477L13.0017 12.4585L13.9983 12.5415L14.9983 0.541523L14.0017 0.458477ZM13.3419 12.0257L7.34189 14.0257L7.65811 14.9743L13.6581 12.9743L13.3419 12.0257ZM7.65811 14.0257L1.65811 12.0257L1.34189 12.9743L7.34189 14.9743L7.65811 14.0257ZM1.99827 12.4585L0.998273 0.458477L0.00172713 0.541523L1.00173 12.5415L1.99827 12.4585ZM10.5 3H4V4H10.5V3ZM6 7H10.5V6H6V7ZM10 6.5V9.5H11V6.5H10ZM10.3419 9.02566L7.34189 10.0257L7.65811 10.9743L10.6581 9.97434L10.3419 9.02566ZM7.65811 10.0257L4.65811 9.02566L4.34189 9.97434L7.34189 10.9743L7.65811 10.0257ZM5 9.5V8H4V9.5H5ZM10 3.5V6.5H11V3.5H10Z" fill="#686868" stroke-width="0.5" stroke="none"/>
+        </symbol>
+
+<!--        <symbol id="html-icon-symbol" viewBox="0 0 15 15">-->
+<!--            <path xmlns="http://www.w3.org/2000/svg" d="M0.5 0.5V0C0.360174 0 0.226736 0.0585498 0.132059 0.161445C0.0373814 0.264341 -0.00988477 0.40218 0.00172713 0.541523L0.5 0.5ZM14.5 0.5L14.9983 0.541523C15.0099 0.40218 14.9626 0.264341 14.8679 0.161445C14.7733 0.0585498 14.6398 0 14.5 0V0.5ZM13.5 12.5L13.6581 12.9743C13.8479 12.9111 13.9817 12.7408 13.9983 12.5415L13.5 12.5ZM7.5 14.5L7.34189 14.9743C7.44452 15.0086 7.55548 15.0086 7.65811 14.9743L7.5 14.5ZM1.5 12.5L1.00173 12.5415C1.01834 12.7408 1.15214 12.9111 1.34189 12.9743L1.5 12.5ZM4.5 3.5V3H4V3.5H4.5ZM4.5 6.5H4V7H4.5V6.5ZM10.5 6.5H11V6H10.5V6.5ZM10.5 9.5L10.6581 9.97434L11 9.86038V9.5H10.5ZM7.5 10.5L7.34189 10.9743L7.5 11.027L7.65811 10.9743L7.5 10.5ZM4.5 9.5H4V9.86038L4.34189 9.97434L4.5 9.5ZM0.5 1H14.5V0H0.5V1ZM14.0017 0.458477L13.0017 12.4585L13.9983 12.5415L14.9983 0.541523L14.0017 0.458477ZM13.3419 12.0257L7.34189 14.0257L7.65811 14.9743L13.6581 12.9743L13.3419 12.0257ZM7.65811 14.0257L1.65811 12.0257L1.34189 12.9743L7.34189 14.9743L7.65811 14.0257ZM1.99827 12.4585L0.998273 0.458477L0.00172713 0.541523L1.00173 12.5415L1.99827 12.4585ZM11 3H4.5V4H11V3ZM4 3.5V6.5H5V3.5H4ZM4.5 7H10.5V6H4.5V7ZM10 6.5V9.5H11V6.5H10ZM10.3419 9.02566L7.34189 10.0257L7.65811 10.9743L10.6581 9.97434L10.3419 9.02566ZM7.65811 10.0257L4.65811 9.02566L4.34189 9.97434L7.34189 10.9743L7.65811 10.0257ZM5 9.5V8H4V9.5H5Z" fill="#686868" stroke-width="0.5" stroke="none"/>-->
+<!--        </symbol>-->
+
+        <symbol id="html-icon-symbol" viewBox="0 0 20 16">
             <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8" d="M5 4 1 8l4 4m10-8 4 4-4 4M11 1 9 15" />
         </symbol>
 
-        <symbol id="edges-icon-symbol" viewBox="0 0 18 18">
-            <path stroke="#686868" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.7" d="m5.953 7.467 6.094-2.612m.096 8.114L5.857 9.676m.305-1.192a2.581 2.581 0 1 1-5.162 0 2.581 2.581 0 0 1 5.162 0ZM17 3.84a2.581 2.581 0 1 1-5.162 0 2.581 2.581 0 0 1 5.162 0Zm0 10.322a2.581 2.581 0 1 1-5.162 0 2.581 2.581 0 0 1 5.162 0Z" />
+        <symbol id="webpage-editor-icon-symbol" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" stroke="#686868" stroke-width="0.5" fill="none" stroke-linejoin="round"/>
+            <path d="M12 3C12 3 8.5 6 8.5 12C8.5 18 12 21 12 21" stroke="#686868" stroke-width="0.5" fill="none" stroke-linejoin="round"/>
+            <path d="M12 3C12 3 15.5 6 15.5 12C15.5 18 12 21 12 21" stroke="#686868" stroke-width="0.5" fill="none" stroke-linejoin="round"/>
+            <path d="M3 12H21" stroke="#686868" stroke-width="0.5" fill="none" stroke-linejoin="round"/>
+            <path d="M19.5 7.5H4.5" stroke="#686868" stroke-width="0.5" fill="none" stroke-linejoin="round"/>
+            <g filter="url(#filter0_d_15_556)">
+                <path d="M19.5 16.5H4.5" stroke="#686868" stroke-width="0.5" fill="none" stroke-linejoin="round"/>
+            </g>
+            <defs>
+                <filter id="filter0_d_15_556" x="3.5" y="16" width="17" height="3" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                    <feOffset dy="1"/>
+                    <feGaussianBlur stdDeviation="0.5"/>
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_15_556"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_15_556" result="shape"/>
+                </filter>
+            </defs>
+        </symbol>
+
+        <symbol id="json-icon-symbol" viewBox="0 0 15 15">
+            <path xmlns="http://www.w3.org/2000/svg" d="M0 7.5H2M15 7.5H13M5 14.5H3.5C2.39543 14.5 1.5 13.6046 1.5 12.5V2.5C1.5 1.39543 2.39543 0.5 3.5 0.5H5M10 14.5H11.5C12.6046 14.5 13.5 13.6046 13.5 12.5V2.5C13.5 1.39543 12.6046 0.5 11.5 0.5H10" stroke="#686868" stroke-width="0.5" fill="none"/>
+        </symbol>
+
+        <symbol id="python-icon-symbol" viewBox="0 0 15 15">
+            <path xmlns="http://www.w3.org/2000/svg" d="M6 2.5H7M4.5 4V1.5C4.5 0.947715 4.94772 0.5 5.5 0.5H9.5C10.0523 0.5 10.5 0.947715 10.5 1.5V6.5C10.5 7.05228 10.0523 7.5 9.5 7.5H5.5C4.94772 7.5 4.5 7.94772 4.5 8.5V13.5C4.5 14.0523 4.94772 14.5 5.5 14.5H9.5C10.0523 14.5 10.5 14.0523 10.5 13.5V11M8 4.5H1.5C0.947715 4.5 0.5 4.94772 0.5 5.5V10.5C0.5 11.0523 0.947715 11.5 1.5 11.5H4.5M7 10.5H13.5C14.0523 10.5 14.5 10.0523 14.5 9.5V4.5C14.5 3.94772 14.0523 3.5 13.5 3.5H10.5M8 12.5H9" stroke="#686868" fill="none" stroke-width="0.5"/>
+        </symbol>
+
+        <symbol id="markdown-icon-symbol" viewBox="0 0 15 15">
+            <path xmlns="http://www.w3.org/2000/svg" d="M2.5 5.5L2.85355 5.14645C2.71055 5.00345 2.4955 4.96067 2.30866 5.03806C2.12182 5.11545 2 5.29777 2 5.5H2.5ZM4.5 7.5L4.14645 7.85355L4.5 8.20711L4.85355 7.85355L4.5 7.5ZM6.5 5.5H7C7 5.29777 6.87818 5.11545 6.69134 5.03806C6.5045 4.96067 6.28945 5.00345 6.14645 5.14645L6.5 5.5ZM10.5 9.5L10.1464 9.85355L10.5 10.2071L10.8536 9.85355L10.5 9.5ZM1.5 3H13.5V2H1.5V3ZM14 3.5V11.5H15V3.5H14ZM13.5 12H1.5V13H13.5V12ZM1 11.5V3.5H0V11.5H1ZM1.5 12C1.22386 12 1 11.7761 1 11.5H0C0 12.3284 0.671574 13 1.5 13V12ZM14 11.5C14 11.7761 13.7761 12 13.5 12V13C14.3284 13 15 12.3284 15 11.5H14ZM13.5 3C13.7761 3 14 3.22386 14 3.5H15C15 2.67157 14.3284 2 13.5 2V3ZM1.5 2C0.671573 2 0 2.67157 0 3.5H1C1 3.22386 1.22386 3 1.5 3V2ZM3 10V5.5H2V10H3ZM2.14645 5.85355L4.14645 7.85355L4.85355 7.14645L2.85355 5.14645L2.14645 5.85355ZM4.85355 7.85355L6.85355 5.85355L6.14645 5.14645L4.14645 7.14645L4.85355 7.85355ZM6 5.5V10H7V5.5H6ZM10 5V9.5H11V5H10ZM8.14645 7.85355L10.1464 9.85355L10.8536 9.14645L8.85355 7.14645L8.14645 7.85355ZM10.8536 9.85355L12.8536 7.85355L12.1464 7.14645L10.1464 9.14645L10.8536 9.85355Z" fill="#686868"/>
+        </symbol>
+
+        <symbol id="terminal-icon-symbol" viewBox="0 0 15 15">
+            <path xmlns="http://www.w3.org/2000/svg" d="M3.5 4.5L6.5 7.5L3.5 10.5M8 10.5H12M1.5 1.5H13.5C14.0523 1.5 14.5 1.94772 14.5 2.5V12.5C14.5 13.0523 14.0523 13.5 13.5 13.5H1.5C0.947716 13.5 0.5 13.0523 0.5 12.5V2.5C0.5 1.94772 0.947715 1.5 1.5 1.5Z" stroke="#686868" fill="none"  stroke-width="0.5"/>
+        </symbol>
+
+        <symbol id="diagram-icon-symbol" viewBox="0 0 15 15">
+            <path d="M2.5 9.5C2.5 6.73858 4.73858 4.5 7.5 4.5C10.2614 4.5 12.5 6.73858 12.5 9.5C12.5 12.2614 10.2614 14.5 7.5 14.5C4.73858 14.5 2.5 12.2614 2.5 9.5Z" stroke="#686868" fill="none"  stroke-width="0.5"/>
+            <path d="M0.5 5.5C0.5 2.73858 2.73858 0.5 5.5 0.5C8.26142 0.5 10.5 2.73858 10.5 5.5C10.5 8.26142 8.26142 10.5 5.5 10.5C2.73858 10.5 0.5 8.26142 0.5 5.5Z" stroke="#686868" fill="none"  stroke-width="0.5"/>
+            <path d="M4.5 5.5C4.5 2.73858 6.73858 0.5 9.5 0.5C12.2614 0.5 14.5 2.73858 14.5 5.5C14.5 8.26142 12.2614 10.5 9.5 10.5C6.73858 10.5 4.5 8.26142 4.5 5.5Z" stroke="#686868" fill="none"  stroke-width="0.5"/>
+        </symbol>
+
+
+
+        <!-- UNUSED-->
+        <symbol id="plus-icon-symbol" viewBox="0 0 32 32">
+            <line x1="4" y1="16" x2="28" y2="16" stroke="#686868" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="16" y1="4" x2="16" y2="28" stroke="#686868" stroke-width="2" stroke-linecap="round"></line>
         </symbol>
     </svg>
 
@@ -1053,6 +1239,9 @@ not agree on the policy but this way, we all get the free bonus for Gemini. If y
     <!-- TO-DO: as BE service (better python - flask) -->
     <!-- Done as Node.JS-->
 
+    <script src="js/interface/bundlecode.js"></script>
+    <script src="js/interface/handledrop.js"></script>
+
     <script src="js/dropdown/diagramfile.js"></script>
     <script src="js/dropdown/tabs/notes.js"></script>
     <script src="js/dropdown/tabs/ai.js"></script>
@@ -1060,6 +1249,7 @@ not agree on the policy but this way, we all get the free bonus for Gemini. If y
     <script src="js/dropdown/tabs/edit.js"></script>
     <script src="js/dropdown/tabs/tools.js" type="module"></script>
     <script src="js/dropdown/tabs/nodes.js"></script>
+    <script src="js/dropdown/nodepanel.js"></script>
     <script src="js/dropdown/dropdown_v2_0_1.js"></script>
     <script src="js/dropdown/displaysavedcoords.js"></script>
 
@@ -1100,8 +1290,8 @@ not agree on the policy but this way, we all get the free bonus for Gemini. If y
 
     <script src="js/nodes/togglenodestate.js"></script>
 
-    <script src="js/interface/bundlecode.js"></script>
-    <script src="js/interface/handledrop.js"></script>
+<!--    <script src="js/interface/bundlecode.js"></script>-->
+<!--    <script src="js/interface/handledrop.js"></script>-->
 
 
     <script src="js/nodes/definitions/languages/editornode.js"></script>

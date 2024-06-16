@@ -45,6 +45,12 @@ class JavascriptNode extends CodeNode {
 
     static SAVE_PROPERTIES = [];
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "js-icon-symbol",
+        name: "JavaScript Code Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = JavascriptNode.DEFAULT_CONFIGURATION){
         configuration = {...JavascriptNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -187,7 +193,16 @@ class JavascriptNode extends CodeNode {
     //     }.call(this);
     // }
 
+    static ondrop() {
+        let node = createJavascriptNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the JavaScript Editor icon');
 
+        return node;
+    }
 }
 
 

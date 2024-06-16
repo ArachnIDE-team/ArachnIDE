@@ -15,8 +15,14 @@ class JavascriptFrontendModuleNode extends ModuleNode {
 
     static SAVE_PROPERTIES = [];
 
-    static OBSERVERS = {}
+    static OBSERVERS = {};
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "js-icon-symbol",
+        name: "JS Frontend Module Node",
+        defaultFavourite: -1
+    }
     // constructor(name = '', content = undefined, text = '', sx = undefined, sy = undefined, x = undefined, y = undefined, addCodeButton = false){
 
     constructor(configuration = JavascriptFrontendModuleNode.DEFAULT_CONFIGURATION) {
@@ -25,6 +31,16 @@ class JavascriptFrontendModuleNode extends ModuleNode {
         super(configuration);
     }
 
+    static ondrop() {
+        let node = createJavascriptFrontendModuleNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the JS Frontend Module icon');
+
+        return node;
+    }
 }
 
 

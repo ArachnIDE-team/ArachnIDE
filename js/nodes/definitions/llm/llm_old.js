@@ -15,7 +15,12 @@ class LLMOldNode extends WindowedNode {
         'shouldAppendQuestion', 'shouldContinue', 'userHasScrolled', 'isLLM', 'isLLMNode'];
 
     // constructor(name = '', content = undefined, sx = undefined, sy = undefined, x = undefined, y = undefined){
-
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "ai-icon-symbol",
+        name: "Old LLM Agent Node",
+        defaultFavourite: -1
+    }
     constructor(configuration = LLMOldNode.DEFAULT_CONFIGURATION){
         configuration = {...LLMOldNode.DEFAULT_CONFIGURATION, ...configuration}
         let [ainodewrapperDiv, aiResponseTextArea, index] = LLMOldNode._getContentElement(configuration);
@@ -1412,6 +1417,17 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
             }
         }
         return [remainingTokens, totalTokenCount, false];
+    }
+
+    static ondrop() {
+        let node = createLLMOldNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the (old) LLM Agent icon');
+
+        return node;
     }
 }
 

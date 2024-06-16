@@ -45,6 +45,12 @@ class HTMLEditorNode extends CodeNode {
 
     static SAVE_PROPERTIES = [];
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "html-icon-symbol",
+        name: "HTML Code Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = HTMLEditorNode.DEFAULT_CONFIGURATION){
         configuration = {...HTMLEditorNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -62,6 +68,7 @@ class HTMLEditorNode extends CodeNode {
     onClickRun(){
         this.eval(this.code);
     }
+
     onClickReset(){
         this.editorWrapperDiv.classList.remove("hidden")
         this.htmlView.classList.add('hidden');
@@ -106,6 +113,16 @@ class HTMLEditorNode extends CodeNode {
             this.htmlView.style.width = `${newWidth}px`;
             this.htmlView.style.height = `${newHeight - 60}px`;
         }
+    }
+
+    static ondrop() {
+        let node = createHTMLEditorNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the HTML Editor icon');
+        return node;
     }
 }
 

@@ -19,6 +19,13 @@ class TextNode extends WindowedNode {
             'remove': function (callback) { this.contentEditableDiv.removeEventListener("input", callback) }
         }}
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "note-icon-symbol",
+        name: "Raw Text Node (Shift + Double Click)",
+        defaultFavourite: 1
+    }
+
     constructor(configuration = TextNode.DEFAULT_CONFIGURATION){
         configuration = {...TextNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.content = [TextNode._getContentElement()];
@@ -235,6 +242,12 @@ class TextNode extends WindowedNode {
                 button.style.display = "block";
             }
         }
+    }
+
+    static ondrop() {
+        let node = createNodeFromWindow(null, ``, ``, true); // The last parameter sets followMouse to true
+        console.log('Handle drop for the note icon');
+        return node;
     }
 
 }

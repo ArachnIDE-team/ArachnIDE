@@ -9,6 +9,15 @@ class FilePicker extends WindowedUI {
         selectFiles: true,
         selectFolders: true
     }
+
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: null,
+        name: "File Tree Picker Interface window Node",
+        defaultFavourite: -1
+    }
+
+
     constructor(configuration= FilePicker.DEFAULT_CONFIGURATION) {
         configuration = {...FilePicker.DEFAULT_CONFIGURATION, ...configuration};
         const title = configuration.title ? configuration.title : "Pick a " + configuration.pickFolders ? "folder" : "file";

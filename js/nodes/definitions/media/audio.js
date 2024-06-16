@@ -14,7 +14,12 @@ class AudioNode extends WindowedNode {
     }
     static SAVE_PROPERTIES = ['audioUrl', 'audioBlob'];
     // constructor(name = '', content = undefined, imageSrc = '', sx = undefined, sy = undefined, x = undefined, y = undefined, isUrl = false){
-
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "audio-icon-symbol",
+        name: "Audio Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = AudioNode.DEFAULT_CONFIGURATION){
         configuration = {...AudioNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -70,7 +75,6 @@ class AudioNode extends WindowedNode {
         return [ audio ];
     }
 
-
     _initialize(audioUrl, blob, saved){
         this.draw();
         if(!saved){
@@ -91,6 +95,17 @@ class AudioNode extends WindowedNode {
 
     afterInit() {
         super.afterInit();
+    }
+
+    static ondrop() {
+        let node = createAudioNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the Audio icon');
+
+        return node;
     }
 
 }

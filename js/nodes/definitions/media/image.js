@@ -13,7 +13,12 @@ class ImageNode extends WindowedNode {
     }
     static SAVE_PROPERTIES = ['imageUrl', 'imageBlob', 'isImageNode'];
     // constructor(name = '', content = undefined, imageSrc = '', sx = undefined, sy = undefined, x = undefined, y = undefined, isUrl = false){
-
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "image-icon-symbol",
+        name: "Image Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = ImageNode.DEFAULT_CONFIGURATION){
         configuration = {...ImageNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -124,7 +129,16 @@ class ImageNode extends WindowedNode {
         super.afterInit();
     }
 
+    static ondrop() {
+        let node = createImageNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the Image icon');
 
+        return node;
+    }
 }
 
 function createImageNode(imageSrc, title, isUrl = false) {

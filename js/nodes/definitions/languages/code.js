@@ -22,6 +22,13 @@ class CodeNode extends WindowedNode {
             'remove': function (callback) { this.removeEventListener("change", callback) }
         }}
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: null,
+        name: "Generic Code Node",
+        defaultFavourite: -1
+    }
+
     constructor(configuration = CodeNode.DEFAULT_CONFIGURATION) {
         configuration = {...CodeNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.settings =  {...CodeNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}

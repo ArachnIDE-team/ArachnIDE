@@ -12,7 +12,12 @@ class WolframNode extends WindowedNode {
     }
     static SAVE_PROPERTIES = ['wolframData'];
     // constructor(name = '', content = undefined, imageSrc = '', sx = undefined, sy = undefined, x = undefined, y = undefined, isUrl = false){
-
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: null,
+        name: "Wolfram Alpha Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = WolframNode.DEFAULT_CONFIGURATION){
         configuration = {...WolframNode.DEFAULT_CONFIGURATION, ...configuration}

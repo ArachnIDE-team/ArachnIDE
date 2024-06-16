@@ -1,6 +1,14 @@
 class NodeFilesUI extends WindowedUI {
+
     static DEFAULT_CONFIGURATION = {
         node: undefined,
+    }
+
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: null,
+        name: "File Tree User Interface window Node",
+        defaultFavourite: -1
     }
 
     constructor(configuration = NodeFilesUI.DEFAULT_CONFIGURATION) {

@@ -45,6 +45,12 @@ class PythonNode extends CodeNode {
 
     static SAVE_PROPERTIES = [];
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "python-icon-symbol",
+        name: "Python Code Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = PythonNode.DEFAULT_CONFIGURATION){
         configuration = {...PythonNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -88,6 +94,7 @@ class PythonNode extends CodeNode {
             })
         }
     }
+
     onResize(newWidth, newHeight) {
         super.onResize(newWidth, newHeight);
         if (this.pythonView) {
@@ -97,8 +104,16 @@ class PythonNode extends CodeNode {
         }
     }
 
+    static ondrop() {
+        let node = createPythonNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the Python Editor icon');
 
-
+        return node;
+    }
 }
 
 

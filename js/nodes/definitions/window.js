@@ -15,6 +15,12 @@ class WindowedNode extends Node {
         saved: undefined,
         saveData: undefined
     }
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: null,
+        name: "Plain Windowed Node",
+        defaultFavourite: -1
+    }
     static SAVE_PROPERTIES = ['title', 'addCloseButton', 'addFullScreenButton', 'addCollapseButton', 'addSettingsButton', 'addFileButton', 'width', 'height'];
     // constructor(title, content, pos, scale, iscale, link) {
     constructor(configuration= WindowedNode.DEFAULT_CONFIGURATION) {

@@ -1,5 +1,5 @@
 
-const edgesIcon = document.querySelector('.edges-icon');
+const edgesIcon = document.querySelector('#edgesIcon');
 let lockedNodeMode = false;
 
 function toggleNodeModeState() {

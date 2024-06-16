@@ -108,7 +108,12 @@ class LLMNode extends LLMAgentNode {
         saveData: undefined,
     }
     static SAVE_PROPERTIES = [ 'savedCheckboxStates' ];
-
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "ai-icon-symbol",
+        name: "Default LLM Agent Node (ALT/Option + Double Click)",
+        defaultFavourite: 2
+    }
     // constructor(name = '', content = undefined, sx = undefined, sy = undefined, x = undefined, y = undefined){
 
     constructor(configuration = LLMNode.DEFAULT_CONFIGURATION){
@@ -734,8 +739,15 @@ Take INITIATIVE to DECLARE the TOPIC of FOCUS.`
         return [remainingTokens, totalTokenCount, false];
     }
 
-
-
+    static ondrop() {
+        let node = createLLMNode('', undefined, undefined, undefined, undefined);
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the ai icon');
+        return node;
+    }
 }
 
 function createLLMNode(name = '', sx = undefined, sy = undefined, x = undefined, y = undefined) {

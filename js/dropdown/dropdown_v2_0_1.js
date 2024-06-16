@@ -34,7 +34,6 @@
         // Get the menu button and dropdown content elements
         this.menuButton = document.querySelector(".menu-button");
         this.dropdownContent = document.querySelector(".dropdown-content");
-        this.nodePanel = document.querySelector(".node-panel");
 
 
         // Get the first tabcontent element
@@ -73,7 +72,7 @@
         });
 
         this.toolsTab = new ToolsTab();
-        this.nodesTab = new NodesTab();
+        this.nodesTab = new NodesTab(); // Get rid of this (replaced with the new Node panel)
 
         const buttonLabels = document.querySelectorAll(".button-label");
         buttonLabels.forEach(function(label) {
@@ -114,6 +113,8 @@
                 }
             }
         })
+
+        this.nodePanel = new NodePanel()
 
     }
 
@@ -170,7 +171,7 @@
         // Toggle the "open" class on the menu button and dropdown content
         this.menuButton.classList.toggle("open");
         this.dropdownContent.classList.toggle("open");
-        this.nodePanel.classList.toggle("open");
+        this.nodePanel.onMenuButtonClick(event);
 
         // If the dropdown is opened, manually set the first tab to active and display its content
         if (this.dropdownContent.classList.contains("open")) {

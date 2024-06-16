@@ -13,7 +13,12 @@ class VideoNode extends WindowedNode {
     }
     static SAVE_PROPERTIES = ['videoUrl', 'videoBlob'];//, 'videoBlob'
     // constructor(name = '', content = undefined, imageSrc = '', sx = undefined, sy = undefined, x = undefined, y = undefined, isUrl = false){
-
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "video-icon-symbol",
+        name: "Video Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = VideoNode.DEFAULT_CONFIGURATION){
         configuration = {...VideoNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -129,6 +134,16 @@ class VideoNode extends WindowedNode {
         super.afterInit();
     }
 
+    static ondrop() {
+        let node = createVideoNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the Video icon');
+
+        return node;
+    }
 }
 
 function createVideoNode(name, blob=undefined, url=undefined){

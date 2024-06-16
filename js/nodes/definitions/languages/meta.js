@@ -16,6 +16,14 @@ class MetaNode extends WindowedNode {
             'remove': function (callback) { this.contentEditableDiv.removeEventListener("input", callback) }
         }}
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: false,
+        iconID: null,
+        name: "Meta Node",
+        defaultFavourite: -1
+    }
+
+
     constructor(configuration = MetaNode.DEFAULT_CONFIGURATION){
         configuration = {...MetaNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.settings =  {...MetaNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}

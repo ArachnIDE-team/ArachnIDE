@@ -45,13 +45,18 @@ class JSONNode extends CodeNode {
 
     static SAVE_PROPERTIES = [];
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "json-icon-symbol",
+        name: "JSON Code Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = JSONNode.DEFAULT_CONFIGURATION){
         configuration = {...JSONNode.DEFAULT_CONFIGURATION, ...configuration}
         configuration.settings =  {...JSONNode.DEFAULT_CONFIGURATION.settings, ...configuration.settings}
         super(configuration);
     }
-
 
     onClickRun(){
         this.eval(this.code);
@@ -70,7 +75,16 @@ class JSONNode extends CodeNode {
         }
     }
 
+    static ondrop() {
+        let node = createJSONNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the JSON Editor icon');
 
+        return node;
+    }
 }
 
 

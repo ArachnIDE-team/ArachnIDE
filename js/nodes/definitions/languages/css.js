@@ -45,6 +45,12 @@ class CSSNode extends CodeNode {
 
     static SAVE_PROPERTIES = [];
 
+    static INTERFACE_CONFIGURATION = {
+        insertable: true,
+        iconID: "css-icon-symbol",
+        name: "CSS Code Node",
+        defaultFavourite: -1
+    }
 
     constructor(configuration = CSSNode.DEFAULT_CONFIGURATION){
         configuration = {...CSSNode.DEFAULT_CONFIGURATION, ...configuration}
@@ -62,6 +68,7 @@ class CSSNode extends CodeNode {
     onClickRun(){
         this.eval(this.code);
     }
+
     onClickReset(){
         this.editorWrapperDiv.classList.remove("hidden")
         this.htmlView.classList.add('hidden');
@@ -98,6 +105,7 @@ class CSSNode extends CodeNode {
         this.codeButton.removeEventListener("click", this.onClickRun.bind(this))
         this.codeButton.addEventListener("click", this.onClickReset.bind(this))
     }
+
     onResize(newWidth, newHeight) {
         super.onResize(newWidth, newHeight);
         if (this.htmlView) {
@@ -105,6 +113,17 @@ class CSSNode extends CodeNode {
             this.htmlView.style.width = `${newWidth}px`;
             this.htmlView.style.height = `${newHeight - 60}px`;
         }
+    }
+
+    static ondrop() {
+        let node = createCSSNode();
+        node.followingMouse = 1;
+        node.draw();
+        // Set the dragging point on the header bar
+        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+        console.log('Handle drop for the CSS Editor icon');
+
+        return node;
     }
 
 }

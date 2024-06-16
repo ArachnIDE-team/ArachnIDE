@@ -34,8 +34,6 @@ class GridBG extends Background {
         this.colorPickerG = configuration.colorPickerG;
         this.colorPickerB = configuration.colorPickerB;
         this.mousePath = "";
-        this.SVGzoom = 8192;
-        this.SVGpan = new vec2(0, 0);
         this.old_rotation = 0;
         // Imported/moved from Diagram (as it's background resp. to keep track of those values)
         this.mousePathPos = undefined;
@@ -48,30 +46,6 @@ class GridBG extends Background {
 
         this.svg_bg.setAttribute("stroke-width", "1px")
         this.svg_bg.setAttribute("vector-effect", "non-scaling-stroke")
-    }
-
-    toZ(c) {
-        let { scale, offset } = this.windowScaleAndOffset();
-        return c.minus(offset).unscale(scale).minus(new vec2(.5, .5)).scale(2).cmult(this.zoom).cadd(this.pan);
-    }
-
-    toS(c) {
-        let { scale } = this.windowScaleAndOffset();
-        return c.unscale(scale).scale(2);
-    }
-
-    toDZ(c) {
-        let { scale } = this.windowScaleAndOffset();
-        return c.unscale(scale).scale(2).cmult(this.zoom);
-    }
-
-    fromZ(z) {
-        let { scale, offset } = this.windowScaleAndOffset();
-        return z.csub(this.pan).cdiv(this.zoom).unscale(2).plus(new vec2(.5, .5)).scale(scale).plus(offset);
-    }
-
-    fromZtoUV(z) {
-        return z.csub(this.pan).cdiv(this.zoom).unscale(2).plus(new vec2(.5, .5));
     }
 
     updateViewbox() {
@@ -120,10 +94,6 @@ class GridBG extends Background {
 
         this.svg_viewmat.setAttribute("transform", "matrix(" + t.x + " " + (t.y) + " " + (-t.y) + " " + (t.x) + " " + (p.x) + " " + (p.y) + ")");
 
-    }
-
-    toSVG(coords) {
-        return coords.minus(this.SVGpan).scale(this.SVGzoom);
     }
 
     col(i, r = null, c = null, s = null) {
