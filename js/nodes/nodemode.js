@@ -1,13 +1,44 @@
 
+const selectIcon = document.querySelector('#selectIcon');
+const moveIcon = document.querySelector('#moveIcon');
+const zoomIcon = document.querySelector('#zoomIcon');
 const edgesIcon = document.querySelector('#edgesIcon');
 let lockedNodeMode = false;
 
 function toggleNodeModeState() {
     if (nodeMode) {
-        edgesIcon.classList.add('edges-active');
+        edgesIcon.classList.add('cursor-icon-active');
     } else {
-        edgesIcon.classList.remove('edges-active');
+        edgesIcon.classList.remove('cursor-icon-active');
     }
+}
+
+function toggleSelectIconState(active) {
+    if (active) {
+        selectIcon.classList.add('cursor-icon-active');
+    } else {
+        selectIcon.classList.remove('cursor-icon-active');
+    }
+}
+
+function toggleMoveIconState(active) {
+    if (active) {
+        moveIcon.classList.add('cursor-icon-active');
+    } else {
+        moveIcon.classList.remove('cursor-icon-active');
+    }
+}
+
+let zoomIconTimeout = -1;
+function activateZoomIcon() {
+    if(zoomIconTimeout !== -1){
+        clearTimeout(zoomIconTimeout);
+    }
+    zoomIconTimeout = setTimeout(() => {
+        zoomIcon.classList.remove('cursor-icon-active');
+        zoomIconTimeout = -1;
+    }, 300)
+    zoomIcon.classList.add('cursor-icon-active');
 }
 
 function toggleNodeMode() {

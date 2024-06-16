@@ -2515,7 +2515,7 @@ div.language-md {
         cursor: grab;
     }
 
-    .panel-icon.edges-active {
+    .panel-icon.cursor-icon-active {
         background-color: #929292;
     }
 

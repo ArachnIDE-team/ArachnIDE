@@ -608,6 +608,7 @@ class Diagram extends Node {
             let amount = Math.exp(event.wheelDelta * settings.zoomSpeed);
             this.background.zoom = this.background.zoom.scale(amount);
             this.background.pan = dest.scale(1 - amount).plus(this.background.pan.scale(amount));
+            activateZoomIcon()
             cancel(event);
         } else if (settings.scroll === "pan") {
             this.autopilot.speed = 0;
@@ -636,6 +637,7 @@ class Diagram extends Node {
         if(event.button === 0 && !this.movingNode && !window.diagramWhereSelecting) {// left is 0
             // Selection area
             window.diagramWhereSelecting = this;
+            toggleSelectIconState(true)
             document.body.style.cursor = "";
             if(this.diagram !== null){
                 let bounds = this.background.svg.getBoundingClientRect();
@@ -647,6 +649,7 @@ class Diagram extends Node {
             this.autopilot.speed = 0;
             this.mouseDownPos = mouseDownPos;
             this.mouseDown = true;
+            toggleMoveIconState(true);
             document.body.style.cursor = "move"
             this.background.clearSelectionRectangle();
         }
@@ -657,6 +660,7 @@ class Diagram extends Node {
         if(event.button === 0 && !this.movingNode && window.diagramWhereSelecting === this) { // left is 0
             // Selection area
             window.diagramWhereSelecting = null;
+            toggleSelectIconState(false)
             document.body.style.cursor = "";
             this.background.clearSelectionRectangle();
         } else {  // if right (2) or middle (1) click
@@ -664,6 +668,7 @@ class Diagram extends Node {
             if (this.movingNode !== undefined) {
                 this.movingNode.onmouseup(event);
             }
+            toggleMoveIconState(false);
             document.body.style.cursor = "move"
             isDraggingIcon = false; // Reset the flag
         }
