@@ -12,7 +12,7 @@ class AiCursor {
     }
 
     calculateViewboxCenter(diagram) {
-        let svgbb = diagram.background.svg.getBoundingClientRect();
+        let svgbb = diagram.background.getBoundingBox();
         return new vec2(svgbb.width / 2, svgbb.height / 2);
     }
 

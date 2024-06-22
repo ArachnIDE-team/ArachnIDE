@@ -640,7 +640,7 @@ class Diagram extends Node {
             toggleSelectIconState(true)
             document.body.style.cursor = "";
             if(this.diagram !== null){
-                let bounds = this.background.svg.getBoundingClientRect();
+                let bounds = this.background.getBoundingBox();
                 mouseDownPos = mouseDownPos.minus(new vec2(bounds.x, bounds.y));
             }
             this.mouseDownPos = mouseDownPos;
@@ -681,7 +681,7 @@ class Diagram extends Node {
             let mouseDownPos = this.background.mousePos.scale(1);
             // console.log(this.diagram === null ? "ROOT" : "D0","pos:", this.mouseDownPos)
             if(this.diagram !== null){
-                let bounds = this.background.svg.getBoundingClientRect();
+                let bounds = this.background.getBoundingBox();
                 mouseDownPos = mouseDownPos.minus(new vec2(bounds.x, bounds.y));
             }
             let point1 = this.background.toZ(this.mouseDownPos);
@@ -693,7 +693,9 @@ class Diagram extends Node {
                 this.autopilot.speed = 0;
                 this.coordsLive = true;
                 let delta = this.background.mousePos.minus(this.mouseDownPos);
-                this.background.pan = this.background.pan.minus(this.background.toDZ(delta));
+                let deltaPan = this.background.toDZ(delta);
+                this.background.pan = this.background.pan.minus(deltaPan);
+                this.moveWindowedUI(deltaPan);
                 this.background.regenAmount += delta.mag() * 0.25;
                 this.mouseDownPos = this.background.mousePos.scale(1);
                 this.background.clearSelectionRectangle();
@@ -702,6 +704,12 @@ class Diagram extends Node {
             document.body.style.cursor = "";
             this.background.clearSelectionRectangle();
         }
+    }
+
+    moveWindowedUI(deltaPan){
+        this.nodes.filter((n) => n instanceof WindowedUI).forEach((n) => {
+            n.pos = n.pos.minus(deltaPan)
+        });
     }
 
     onTouchStart(ev){

@@ -84,7 +84,7 @@ class NodePanel {
                         // pass, no problem
                     }
                 }
-                console.log("NODE PANEL LOADED: ", nodeExtendingClasses)
+                // console.log("NODE PANEL LOADED: ", nodeExtendingClasses)
 
                 this.addNodeIconsToPanel(nodeExtendingClasses);
 
@@ -95,11 +95,11 @@ class NodePanel {
     addNodeIconsToPanel(nodeExtendingClasses){
         for(let nodeClass of nodeExtendingClasses) {
             if(!nodeClass.INTERFACE_CONFIGURATION) {
-                console.log("Node Class: ", nodeClass.name, "has no interface configuration")
+                console.error("Node Class: ", nodeClass.name, "has no interface configuration")
                 continue;
             }
             if(nodeClass.INTERFACE_CONFIGURATION.insertable){
-                console.log("Adding: ", nodeClass.INTERFACE_CONFIGURATION);
+                // console.log("Adding: ", nodeClass.INTERFACE_CONFIGURATION);
                 let icon = this.nodeIconTemplate.cloneNode(true)
                 let panel = icon.querySelector(".panel-icon");
                 panel.setAttribute("title", nodeClass.INTERFACE_CONFIGURATION.name)

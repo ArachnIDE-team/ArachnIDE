@@ -2,6 +2,7 @@
 class FilePicker extends WindowedUI {
     static DEFAULT_CONFIGURATION = {
         title: "",
+        text: "",
         home: "",
         onSelect:() => {},
         onCancel:() => {},
@@ -20,10 +21,10 @@ class FilePicker extends WindowedUI {
 
     constructor(configuration= FilePicker.DEFAULT_CONFIGURATION) {
         configuration = {...FilePicker.DEFAULT_CONFIGURATION, ...configuration};
-        const title = configuration.title ? configuration.title : "Pick a " + configuration.pickFolders ? "folder" : "file";
+        const title = configuration.title ? configuration.title : "Pick a " + configuration.selectFolders ? "folder" : "file";
         configuration.index = generateUUID();
-        const content = FilePicker._getContentElement(configuration.home, configuration.index);
-        super({title: title, content,scaleProportions:  new vec2(0.8,0.8)});
+        const content = FilePicker._getContentElement(configuration.text, configuration.home, configuration.index);
+        super({title, content});
         this.innerContent.style.width = "100%";
         this.multiple = configuration.multiple;
         this.selectFolders = configuration.selectFolders;
@@ -39,7 +40,7 @@ class FilePicker extends WindowedUI {
         super.onDelete();
     }
 
-    static _getContentElement(root, index){
+    static _getContentElement(text, root, index){
         // Create the section container
         let sectionContainer = document.createElement('div')
         sectionContainer.className = 'header-content-footer';
@@ -48,13 +49,19 @@ class FilePicker extends WindowedUI {
         rootContainer.innerText = root;
         rootContainer.className = "content-sticky-header"
         // Create a div element to host the filesystem tree
+        const textContainer = document.createElement('div');
+        textContainer.innerText = text;
+        textContainer.className = "metadata-container";
         const treeContainer = document.createElement('div');
-        treeContainer.id = `workspaceExplorerContainer-${index}`;
-        treeContainer.style.height = "100%";
+        treeContainer.id = `filePickerTreeContainer-${index}`;
+        const mainContainer = document.createElement('div');
+        mainContainer.style.height = "100%";
+        mainContainer.id = `filePickerMainContainer-${index}`;
+        mainContainer.append(textContainer, treeContainer)
         // Creates a div element for the footer
         const footerContainer = document.createElement('div');
         footerContainer.className = "content-sticky-footer"
-        sectionContainer.append(rootContainer, treeContainer, footerContainer)
+        sectionContainer.append(rootContainer, mainContainer, footerContainer)
         return sectionContainer;
     }
 
@@ -65,10 +72,6 @@ class FilePicker extends WindowedUI {
 
         this.draw();
         this.index = index;
-        // this.setMinSize(420);
-        // this.innerContent.style.minWidth = "400px"
-        // this.innerContent.style.minHeight = "600px"
-        // // this.windowDiv.style.height =  "600px";
 
         const footerContainer = this.innerContent.querySelector(".content-sticky-footer");
 
@@ -98,13 +101,15 @@ class FilePicker extends WindowedUI {
 
 
         this.mouseAnchor = this.diagram.background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
-        const elementID = `workspaceExplorerContainer-${this.index}`
-        let treeContainer = document.getElementById(elementID);
-        WindowedNode.makeContentScrollable(treeContainer, true)
+        const treeElementID = `filePickerTreeContainer-${this.index}`
+        const containerID = `filePickerMainContainer-${this.index}`
+        // let treeContainer = document.getElementById(treeElementID);
+        let mainContainer = document.getElementById(containerID);
+        WindowedNode.makeContentScrollable(mainContainer, true)
         this.innerContent.style.width = "100%";
         this.innerContent.style.height = "100%";
 
-        createFilePickerFSTree(elementID, home, this.multiple, this.selectFiles, this.selectFolders, function makeTreeScrollable(){
+        createFilePickerFSTree(treeElementID, home, this.multiple, this.selectFiles, this.selectFolders, function makeTreeScrollable(){
             for (let liElement of Object.values(this.liElementsById)) {
                 WindowedNode.makeContentScrollable(liElement);
                 let ulElement = liElement.querySelector("ul.treejs-nodes");
@@ -141,112 +146,3 @@ class FilePicker extends WindowedUI {
         super.afterInit();
     }
 }
-
-// class FilePicker extends WindowedUI {
-//     static DEFAULT_CONFIGURATION = {
-//         title: "",
-//         home: "",
-//         onSelect:() => {},
-//         pickFolders: true,
-//     }
-//     // constructor(title='', home='', onSelect=() => {}, pickFolders=true) {
-//     constructor(configuration= FilePicker.DEFAULT_CONFIGURATION) {
-//         super({title: configuration.title ? configuration.title : "Pick a " + configuration.pickFolders ? "folder" : "file", content: FilePicker._getContentElement(configuration.home),scaleProportions:  new vec2(0.8,0.8)});
-//         this.innerContent.style.width = "100%";
-//         this.pickFolders = configuration.pickFolders;
-//         this.onSelect = configuration.onSelect;
-//     }
-//     static _getContentElement(home){
-//         let content = document.createElement("div");
-//         WindowedNode.makeContentScrollable(content);
-//         let pathBarContainer = document.createElement("div");
-//         pathBarContainer.style.display = "flex";
-//
-//         let rootPathInput = document.createElement("input");
-//         rootPathInput.type = "text";
-//         rootPathInput.style.marginBottom = "5px";
-//         rootPathInput.value = home;
-//         rootPathInput.id = "rootPathInput";
-//         pathBarContainer.append(rootPathInput);
-//
-//         let rootPathButton = document.createElement("button");
-//         rootPathButton.style.marginBottom = "5px";
-//         rootPathButton.innerText = "GO";
-//         rootPathButton.className = "linkbuttons";
-//         rootPathButton.id = "rootPathButton";
-//
-//         pathBarContainer.append(rootPathButton);
-//         content.append(pathBarContainer)
-//
-//         let fsNodeContainer = document.createElement("div");
-//         WindowedNode.makeContentScrollable(fsNodeContainer);
-//         fsNodeContainer.id = "fsNodeContainer"
-//         content.append(fsNodeContainer)
-//
-//         return content;
-//     }
-//     afterInit() {
-//         super.afterInit();
-//         let rootPathButton = this.innerContent.querySelector("#rootPathButton");
-//         rootPathButton.addEventListener("click", this.fetchFSNodes.bind(this))
-//         this.fetchFSNodes();
-//     }
-//     fetchFSNodes(){
-//         let fsNodeContainer = this.innerContent.querySelector("#fsNodeContainer");
-//         let rootPathInput = this.innerContent.querySelector("#rootPathInput");
-//         this.home = rootPathInput.value.replace(/^[A-Z][:]\/[.][.]$/g, "");
-//         FileManagerAPI.getFSTree(this.home, 1).then((fsTree) => {
-//             let rootKey = Object.keys(fsTree)[0];
-//             rootPathInput.value = rootKey;
-//             this.home = rootKey;
-//             // console.log("FS TREE: ", fsTree, "root key: ", rootKey);
-//             fsNodeContainer.innerHTML = "";
-//             if(this.home !== ""){
-//                 fsNodeContainer.append(this.getFSNodeLine("DIR", ".."));
-//                 fsNodeContainer.append(this.getFSNodeLine("DIR", "."));
-//             }
-//             for(let node of Object.keys(fsTree[rootKey])){
-//                 let nodeElement = this.getFSNodeLine(fsTree[rootKey][node], node);
-//
-//                 fsNodeContainer.append(nodeElement)
-//             }
-//         })
-//     }
-//     getFSNodeLine(type, node){
-//         let nodeElement = document.createElement("div")
-//         if(type === "DIR"){
-//             nodeElement.innerHTML = "&#128193; ";
-//         }else{
-//             nodeElement.innerHTML = "&#128195; "
-//         }
-//         nodeElement.innerHTML += node;
-//         nodeElement.style.margin = "10px"
-//         nodeElement.style.padding = "3px"
-//         WindowedNode.makeContentScrollable(nodeElement)
-//         nodeElement.style.backgroundColor = "rgb(31,31,31)";
-//
-//         let selectButton = document.createElement("button");
-//         selectButton.className = "linkbuttons select-button";
-//         if (this.pickFolders && type !== "DIR") selectButton.disabled = true;
-//         selectButton.style.marginRight = "5px";
-//         selectButton.innerText = "select";
-//         nodeElement.prepend(selectButton)
-//
-//         selectButton.addEventListener("click", (event) => {
-//             this.onSelect(this._getUpdatedPath(node));
-//             this.onDelete();
-//             cancel(event);
-//         });
-//         nodeElement.addEventListener("click", (e) => {
-//             if(e.target.tagName.toLowerCase() !== 'button'){
-//                 this.innerContent.querySelector("#rootPathInput").value = this._getUpdatedPath(node);
-//                 this.fetchFSNodes();
-//             };
-//         });
-//         return nodeElement
-//     }
-//
-//     _getUpdatedPath(node) {
-//         return this.innerContent.querySelector("#rootPathInput").value + (this.home.endsWith("/") || this.home === "" ? "" : "/") + node + (this.home === "" ? "/" : "");
-//     }
-// }

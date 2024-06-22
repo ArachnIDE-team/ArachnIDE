@@ -90,8 +90,9 @@ class ModuleNodeHTML {
         metadataContainer.className = "metadata-container"
 
         let metadataGLOGContainer = document.createElement("div");
-        metadataGLOGContainer.innerText = "Includes:\n\t" + this.sources.includes.join("\n\t") + "\nExcludes:\n\t" +
-            this.sources.excludes.join("\n\t") + "\nType: " + this.moduleType;
+        metadataGLOGContainer.innerText = ModuleNodeHTML.getMetadataGLOGText(this.sources.includes, this.sources.excludes, this.moduleType)
+            // "Includes:\n\t" + this.sources.includes.join("\n\t") + "\nExcludes:\n\t" +
+            // this.sources.excludes.join("\n\t") + "\nType: " + this.moduleType;
         metadataGLOGContainer.className = "code";
 
 
@@ -123,6 +124,11 @@ class ModuleNodeHTML {
 
     setModuleType(moduleType){
         this.moduleType = moduleType;
+    }
+
+    static getMetadataGLOGText(includes, excludes, moduleType){
+        return "Includes:\n\t" + includes.join("\n\t") + "\nExcludes:\n\t" +
+        excludes.join("\n\t") + "\nType: " + moduleType;
     }
 }
 

@@ -256,7 +256,7 @@ class Node {
 
     zoom_to_fit(margin = 1) {
         let bb = this.content.getBoundingClientRect();
-        let svgbb = this.diagram.background.svg.getBoundingClientRect();
+        let svgbb = this.diagram.background.getBoundingBox();
         let aspect = svgbb.width / svgbb.height;
         let scale = bb.height * aspect > bb.width ? svgbb.height / (margin * bb.height) : svgbb.width / (margin * bb.width);
         this.zoom_by(1 / scale);

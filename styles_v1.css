@@ -2605,6 +2605,21 @@ div.language-md {
     height: 100%;
 }
 
+.content-container {
+    height: 100%;
+    margin: 5px;
+}
+.media-input-body-container {
+    display: flex;
+    flex-direction: column;
+}
+.media-input-drop-panel {
+    flex-grow: 1;
+    border: 3px #888 dashed;
+    margin: 15px;
+    text-align: center;
+    border-radius: 15px;
+}
 
 .node-file-container {
     margin: 5px;
@@ -2828,4 +2843,11 @@ svg.file-icon {
     background-position-x: 10px;
     background-position-y: 5px;
     padding-left: 30px !important;
+}
+
+.global-overlay {
+    background-color: rgba(0,0,0,0.5)!important;
+    position:absolute!important;
+    width: 100%!important;
+    height: 100%!important;
 }

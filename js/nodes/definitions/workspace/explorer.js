@@ -154,14 +154,16 @@ class WorkspaceExplorerNode extends WindowedNode {
     }
 
     static ondrop() {
+        if(!selectedWorkspacePath){
+            new BoolInput({title: "Cannot create node", message: "Please load a workspace before creating a WorkspaceExplorerNode", cancelButtons: {}})
+            return;
+        }
         let node = createWorkspaceExplorerNode();
         node.followingMouse = 1;
         node.draw();
         // Set the dragging point on the header bar
         node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
         console.log('Handle drop for the Workspace Explorer icon');
-
-        return node;
     }
 }
 

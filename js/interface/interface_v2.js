@@ -12,6 +12,7 @@ function isJSON(str) {
 // Check if the user's message is a URL
 const isUrl = (text) => {
     try {
+        if(text.startsWith("blob:")) text = text.substring("blob:".length)
         const url = new URL(text);
         return url.protocol === 'http:' || url.protocol === 'https:';
     } catch (_) {

@@ -41,41 +41,48 @@ async function requestFunctionCall() {
     let userMessage = functionPrompt.value.trim();
     // Update the most recent message
     updateMostRecentMessage(userMessage);
+    async function performRequestFunctionCall() {
+        functionPrompt.value = '';
+
+        // Dispatching the input event
+        const event = new Event('input', { bubbles: true, cancelable: true });
+        functionPrompt.dispatchEvent(event);
+
+        const neuralTelemetryPrompt = createTelemetryPrompt(neuralTelemetry, false);
+        let systemMessages = [
+            { role: "system", content: arachnideNeuralApiPrompt },
+            { role: "system", content: neuralTelemetryPrompt }
+        ];
+
+        const maxContextSize = document.getElementById('max-context-size-slider').value;
+
+        // Apply trimming to system messages, excluding the user message from the trimming process
+        systemMessages = trimSystemMessages(systemMessages, maxContextSize);
+
+        const requestMessages = systemMessages.concat({ role: "user", content: userMessage });
+
+        // Call the new function to handle the API call
+        await getFunctionResponse(requestMessages);
+    }
     // If the textarea is empty, prompt the user for input
     if (userMessage === '') {
-        userMessage = prompt("Enter message:");
-
-        // Check if the user provided input or cancelled the prompt
-        if (userMessage === null || userMessage.trim() === '') {
-            console.log("No input provided. Request cancelled.");
-            return;
-        }
-
-        // Optional: Set the textarea with the new message
-        functionPrompt.value = userMessage;
+        // userMessage = prompt("Enter message:");
+        new TextInput({title:"AI Diagram Task", message: "Enter a message:", multiline:true , onConfirm: async (userText) => {
+                userMessage = userText;
+                // Check if the user provided input or cancelled the prompt
+                if (userMessage === null || userMessage.trim() === '') {
+                    console.log("No input provided. Request cancelled.");
+                    return;
+                }
+                await performRequestFunctionCall()
+                // Optional: Set the textarea with the new message
+                functionPrompt.value = userMessage;
+            }})
+    } else {
+        await performRequestFunctionCall()
     }
 
-    functionPrompt.value = '';
 
-    // Dispatching the input event
-    const event = new Event('input', { bubbles: true, cancelable: true });
-    functionPrompt.dispatchEvent(event);
-
-    const neuralTelemetryPrompt = createTelemetryPrompt(neuralTelemetry, false);
-    let systemMessages = [
-        { role: "system", content: arachnideNeuralApiPrompt },
-        { role: "system", content: neuralTelemetryPrompt }
-    ];
-
-    const maxContextSize = document.getElementById('max-context-size-slider').value;
-
-    // Apply trimming to system messages, excluding the user message from the trimming process
-    systemMessages = trimSystemMessages(systemMessages, maxContextSize);
-
-    const requestMessages = systemMessages.concat({ role: "user", content: userMessage });
-
-    // Call the new function to handle the API call
-    await getFunctionResponse(requestMessages);
 }
 
 function trimSystemMessages(systemMessages, maxTokens) {

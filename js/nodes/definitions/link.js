@@ -322,10 +322,12 @@ class LinkNode extends WindowedNode {
     }
 
     static ondrop(){
-        let linkUrl = prompt("Enter a Link or Search Query", "");
-        if (linkUrl) {
-            processLinkInput(linkUrl);
-        }
+        // let linkUrl = prompt("Enter a Link or Search Query", "");
+        new TextInput({title:"Add link", message: "Enter a Link or Search Query:", multiline:false , onConfirm: (linkUrl) => {
+                if (linkUrl) {
+                    processLinkInput(linkUrl);
+                }
+            }})
     }
 
 }

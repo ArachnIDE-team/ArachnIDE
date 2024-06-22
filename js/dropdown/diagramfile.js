@@ -2,21 +2,23 @@
 function handleSaveConfirmation(title, saveData) { //, existingTitle) {
     FileManagerAPI.loadWorkspaces().then((workspaces) => {
         if (workspaces.hasOwnProperty(title)) {// && !existingTitle) {
-            let confirmMessage = `A save with the title "${title}" already exists. Click 'OK' to overwrite, or 'Cancel' to cancel save.`;
+            let confirmMessage = `A save with the title "${title}" already exists. Click \"OVERWRITE\" to save anyway, or 'Cancel' to cancel save.`;
 
-            if (confirm(confirmMessage)) {
-                // Overwrite logic - update all saves with the matching title
+            new BoolInput({message: confirmMessage, title: "Confirm overwrite", confirmButtons: {"OVERWRITE": () => {
                 FileManagerAPI.saveWorkspace(title, saveData).then(() => {
-                    console.log(`Updated all saves with title: ${title}`);
+                    new BoolInput({title: "Saved successfully", message: `Updated all saves with title: "${title}"`, cancelButtons: {}})
                 });
-            }
+            }}})
+
+
         } else {
             new FilePicker({title: "Choose the workspace folder for " + title, home: "", multiple: false, selectFiles: false, selectFolders: true,
                 onSelect: (folder) => {
                     console.log("Selected folder for save", folder[0]);
                     // Add new save
                     FileManagerAPI.createWorkspace(title, folder[0], saveData).then(() => {
-                        console.log(`Updated all saves with title: ${title}`);
+                        new BoolInput({title: "Saved successfully", message: `Updated all saves with title: "${title}"`, cancelButtons: {}})
+                        updateSavedNetworks();
                     });
                     console.log(`Created new save: ${title}`);
                 }
@@ -67,10 +69,17 @@ function savenet(existingTitle = null) {
     // let nodesJSON = nodes.map((n) => JSON.parse(n.json()));
     let saveData = { nodes: nodeList, zettelkastenSaveElement, additionalSaveData};
 
-    let title = existingTitle || prompt("Enter a title for this save:");
-    if (title) {
-        handleSaveConfirmation(title, saveData, existingTitle);
+    // let title = existingTitle || prompt("Enter a title for this save:");
+    let title = existingTitle;
+    if(!title) {
+        new TextInput({title:"Save title", message: "Enter a title for this save:", multiline:false , onConfirm: (textInput) => {
+                title = textInput;
+                if (title) {
+                    handleSaveConfirmation(title, saveData, existingTitle);
+                }
+            }})
     }
+
 }
 
 function savenetFile(){
@@ -147,22 +156,20 @@ function updateSavedNetworks() {
             deleteButton.textContent = "X";
             deleteButton.className = 'linkbuttons';
             deleteButton.addEventListener('click', function () {
-                let confirmMessage = `Click 'OK' to delete the save, or 'Cancel' to cancel.`;
-
-                if (confirm(confirmMessage)) {
-                    let softDeleteMessage = `Click 'OK' to remove the workspace from the list, or 'Cancel' to delete the .arachnIDE folder and saved files from the workspace.`;
-                    if (confirm(softDeleteMessage)) {
-                        // Overwrite logic - update all saves with the matching title
-                        FileManagerAPI.deleteWorkspace(titleInput.value).then(()=> {
-                            updateSavedNetworks();
-                        });
-                    }else{
-                        FileManagerAPI.deleteWorkspace(titleInput.value, false).then(()=> {
-                            updateSavedNetworks();
-                        });
-                    }
-
-                }
+                let confirmMessage = `Are you sure you want to delete this save? 
+Click "CLEAR ONLY SAVE" to remove the workspace from the list,
+or "CLEAR SAVE FILES" to delete the .arachnIDE folder and saved files from the workspace.`;
+                new BoolInput({message: confirmMessage,title: "Confirm delete", confirmButtons: {"CLEAR ONLY SAVE": () => {
+                    FileManagerAPI.deleteWorkspace(titleInput.value).then(()=> {
+                        new BoolInput({title: "Deleted successfully", message: `Successfully deleted "${titleInput.value}"`, cancelButtons: {}})
+                        updateSavedNetworks();
+                    });
+                }, "CLEAR SAVE FILES": () => {
+                    FileManagerAPI.deleteWorkspace(titleInput.value, false).then(()=> {
+                        new BoolInput({title: "Deleted successfully", message: `Successfully deleted "${titleInput.value}" and saved files`, cancelButtons: {}})
+                        updateSavedNetworks();
+                    });
+                }}})
             });
 
             addContentButton.textContent = "+";

@@ -259,7 +259,7 @@ class MandelbrotBG extends Background {
     }
 
     _random_screen_pt_z() {
-        let svgbb = this.svg.getBoundingClientRect();
+        let svgbb = this.getBoundingBox();
         return this.toZ(new vec2(Math.random() * svgbb.width, Math.random() * svgbb.height));
     }
 

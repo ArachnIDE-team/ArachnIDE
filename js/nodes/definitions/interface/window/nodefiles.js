@@ -17,7 +17,7 @@ class NodeFilesUI extends WindowedUI {
         const title = configuration.node.title + " [" + configuration.node.type + ": #" + configuration.node.uuid + "] - file configuration";
         // configuration.index = generateUUID();
         const content = NodeFilesUI._getContentElement(configuration.node);
-        super({title: title, content, scaleProportions: new vec2(0.2, 0.2)});
+        super({title, content});
         this.innerContent.style.width = "100%";
         this._initialize(configuration.node);
 

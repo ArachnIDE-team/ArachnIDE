@@ -75,6 +75,7 @@ function handleIconDrop(event, ondrop) {
     event.stopPropagation();
     event.preventDefault();
 }
+
 // function handleIconDrop(event, iconName) {
 //
 //     console.log(`Dropped icon: ${iconName}`);
@@ -141,20 +142,6 @@ function getFileBaseType(file) {
         return "text";
     }
 }
-
-// function getFileBaseType(file) {
-//     let baseType;
-//     if (file.type) {
-//         return file.type.split("/")[0];
-//     } else if (file.name.toLowerCase().endsWith(".txt")) {
-//         return "text";
-//     } else if (file.name.toLowerCase().endsWith(".md")) {
-//         return "markdown";
-//     } else {
-//         console.log("Unhandled file type:", file);
-//         return "unknown";
-//     }
-// }
 
 function createPDFNodeFromFile(content, file) {
     let url = URL.createObjectURL(new Blob([content], {type: 'application/pdf'}));
@@ -265,8 +252,32 @@ function createNodesFromFiles(files, callback=() => {}) {
     }
 }
 
+let getDroppedFiles = function (ev) {
+    let files = [];
+    if (ev.dataTransfer.items) {
+        // Use DataTransferItemList interface to access the file(s)
+        [...ev.dataTransfer.items].forEach((item, i) => {
+            // If dropped items aren't files, reject them
+            if (item.kind === 'file') {
+                const file = item.getAsFile();
+                files.push(file);
+                console.log(`� file[${i}].name = ${file.name}`);
+            }
+        });
+    } else {
+        // Use DataTransfer interface to access the file(s)
+        [...ev.dataTransfer.files].forEach((file, i) => {
+            files.push(file)
+            console.log(`� file[${i}].name = ${file.name}`);
+        });
+    }
+    console.log(files);
+    return files;
+};
+
 function dropHandler(ev) {
     ev.preventDefault();
+    editCursorOnDragging(false)
 
     const data = ev.dataTransfer.getData('text');
 
@@ -316,25 +327,7 @@ function dropHandler(ev) {
         let node = createNodeFromWindow(null, null, data, true); // Default plain text node
         return
     }
-    let files = [];
-    if (ev.dataTransfer.items) {
-        // Use DataTransferItemList interface to access the file(s)
-        [...ev.dataTransfer.items].forEach((item, i) => {
-            // If dropped items aren't files, reject them
-            if (item.kind === 'file') {
-                const file = item.getAsFile();
-                files.push(file);
-                console.log(`� file[${i}].name = ${file.name}`);
-            }
-        });
-    } else {
-        // Use DataTransfer interface to access the file(s)
-        [...ev.dataTransfer.files].forEach((file, i) => {
-            files.push(file)
-            console.log(`� file[${i}].name = ${file.name}`);
-        });
-    }
-    console.log(files);
+    let files = getDroppedFiles(ev);
     //https://stackoverflow.com/questions/3814231/loading-an-image-to-a-img-from-input-file
     if (FileReader && files && files.length) {
         createNodesFromFiles(files);
@@ -347,9 +340,19 @@ function dropHandler(ev) {
 
 
 function dragOverHandler(ev) {
+    if((ev.dataTransfer.items || ev.dataTransfer.files) || !isDraggingIcon) {
+        editCursorOnDragging(true)
+    }
     ev.preventDefault();
 }
 
+function editCursorOnDragging(dragging){
+    if(dragging) {
+        rootDiagram.background.svg.style.cursor = "grabbing"; // Not working, at least on Windows it has its own icon
+    } else {
+        rootDiagram.background.svg.style.cursor = ""
+    }
+}
 
 //Paste event listener...
 

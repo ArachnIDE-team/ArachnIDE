@@ -98,14 +98,31 @@ class AudioNode extends WindowedNode {
     }
 
     static ondrop() {
-        let node = createAudioNode();
-        node.followingMouse = 1;
-        node.draw();
-        // Set the dragging point on the header bar
-        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
-        console.log('Handle drop for the Audio icon');
+        new MediaInput({
+            title:"Add audio node",
+            message: "Enter a link, the file path or drop an audio file:",
+            image: false,
+            audio: true,
+            video: false,
+            onConfirm: (audioUrl) => {
+                if (audioUrl) {
+                    if(isUrl(audioUrl)) {
+                        let node = createAudioNode(audioUrl, undefined, audioUrl);
+                        node.followingMouse = 1;
+                        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+                    } else {
+                        FileManagerAPI.loadBinary(audioUrl).then((file) => {
+                            createNodesFromFiles([file], (node) => {
+                                node.setMainContentFile(audioUrl, audioUrl);
+                                node.followingMouse = 1;
+                                node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+                            })
+                        });
 
-        return node;
+                    }
+
+                }
+            }})
     }
 
 }

@@ -135,14 +135,31 @@ class VideoNode extends WindowedNode {
     }
 
     static ondrop() {
-        let node = createVideoNode();
-        node.followingMouse = 1;
-        node.draw();
-        // Set the dragging point on the header bar
-        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
-        console.log('Handle drop for the Video icon');
+        new MediaInput({
+            title:"Add audio node",
+            message: "Enter a link, the file path or drop an audio file:",
+            image: false,
+            audio: false,
+            video: true,
+            onConfirm: (videoUrl) => {
+                if (videoUrl) {
+                    if(isUrl(videoUrl)) {
+                        let node = createVideoNode(videoUrl, undefined, videoUrl);
+                        node.followingMouse = 1;
+                        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+                    } else {
+                        FileManagerAPI.loadBinary(videoUrl).then((file) => {
+                            createNodesFromFiles([file], (node) => {
+                                node.setMainContentFile(videoUrl, videoUrl);
+                                node.followingMouse = 1;
+                                node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+                            })
+                        });
 
-        return node;
+                    }
+
+                }
+            }})
     }
 }
 

@@ -246,9 +246,12 @@ class Background {
         return coords.minus(this.SVGpan).scale(this.SVGzoom);
     }
 
+    getBoundingBox(){
+        return this.svg.getBoundingClientRect()
+    }
 
     windowScaleAndOffset() {
-        let svgBoundingBox = this.svg.getBoundingClientRect();
+        let svgBoundingBox = this.getBoundingBox();
         let scale = Math.min(svgBoundingBox.width, svgBoundingBox.height); //Math.hypot(window.innerHeight,window.innerWidth)/2**.5;
         let difference = svgBoundingBox.width < svgBoundingBox.height ? svgBoundingBox.width: svgBoundingBox.height;
         let offset = new vec2(-(difference - svgBoundingBox.width) / 2, -(difference - svgBoundingBox.height) / 2);

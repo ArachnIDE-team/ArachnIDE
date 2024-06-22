@@ -130,14 +130,31 @@ class ImageNode extends WindowedNode {
     }
 
     static ondrop() {
-        let node = createImageNode();
-        node.followingMouse = 1;
-        node.draw();
-        // Set the dragging point on the header bar
-        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
-        console.log('Handle drop for the Image icon');
+        new MediaInput({
+            title:"Add image node",
+            message: "Enter a link, the file path or drop an image:",
+            image: true,
+            audio: false,
+            video: false,
+            onConfirm: (imageUrl) => {
+                if (imageUrl) {
+                    if(isUrl(imageUrl)) {
+                        let node = createImageNode(imageUrl, imageUrl, true);
+                        node.followingMouse = 1;
+                        node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+                    } else {
+                        FileManagerAPI.loadBinary(imageUrl).then((file) => {
+                            createNodesFromFiles([file], (node) => {
+                                node.setMainContentFile(imageUrl, imageUrl);
+                                node.followingMouse = 1;
+                                node.mouseAnchor = node.diagram.background.toDZ(new vec2(0, -node.content.offsetHeight / 2 + 6));
+                            })
+                        });
 
-        return node;
+                    }
+
+                }
+            }})
     }
 }
 

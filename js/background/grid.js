@@ -169,7 +169,7 @@ class GridBG extends Background {
     renderGrid(n) {
 
         let maxLines = dropdown.editTab.getMaxLines();
-        let svgBounds = this.svg.getBoundingClientRect();
+        let svgBounds = this.getBoundingBox();
         if(svgBounds.width === 0 || svgBounds.height === 0) return;
         let complexBotRight = this.toDZ(new vec2(svgBounds.width, svgBounds.height))
         let complexBounds = {...this.toDZ(new vec2(0,0)), width: complexBotRight.x, height: complexBotRight.y }
