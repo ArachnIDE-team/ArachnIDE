@@ -71,8 +71,16 @@ class ModuleNodeHTML {
     reloadModule(callback, forceFSTree=null, configuration=ModuleNodeHTML.DEFAULT_CONFIGURATION.fsTree) {
         configuration = {...ModuleNodeHTML.DEFAULT_CONFIGURATION.fsTree, ...configuration}
         const elementID = `moduleContainer-${this.index}`
+        let initLoaderContainer = document.createElement("div");
+        initLoaderContainer.className = "loader-container";
+        let initLoader = document.createElement("div");
+        initLoader.className = "loader";
+        initLoaderContainer.append(initLoader);
+        document.getElementById(elementID).append(initLoaderContainer);
         createModuleFSTree(elementID, this.sources.dir, this.sources.includes, this.sources.excludes, forceFSTree, configuration, () => {
+
         }).then((result) => {
+            initLoaderContainer.remove()
             this.fileSystemTree = result.fileSystemTree;
             let fsTree = result.fsTree;
             this.sources.files = this.getFilesFromFSTree(fsTree);

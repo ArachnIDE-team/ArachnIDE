@@ -2146,7 +2146,16 @@ label[for^="node-max-context"]:not(:first-child) {
     justify-content: flex-start; /* Align icons to the start */
     margin-bottom: 10px;
 }
-
+.loader-container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+}
+.loader-container > .loader {
+    height: 40px;
+    width: 40px;
+}
 .function-call-container {
     display: flex;
     flex-direction: column;

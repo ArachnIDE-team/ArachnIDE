@@ -1,11 +1,11 @@
 class NodePanel {
+    // TO-DO: split nodes into categories, show each category in a different toggle-panel
+
     constructor() {
         this.container = document.getElementById("nodePanel");
-        this.favouriteNodesContainer = this.container.querySelector(".icon-row");
-        this.otherNodesContainer = this.container.querySelector(".toggle-panel-inner-container");
+        this.nodeIconContainer = this.container.querySelector("#nodeIconContainer > .toggle-panel-inner-container");
+        this.nodeIconContainerLoader = this.container.querySelector("#nodeIconContainerLoader")
         this.nodeIconTemplate = this.container.querySelector(".icon-content.hidden");
-        // .toggle-panel-inner-container
-
         document.addEventListener('DOMContentLoaded', this.getTopLevelNodeClassDeclarations.bind(this));
     }
 
@@ -63,9 +63,9 @@ class NodePanel {
 
                 // console.log(fileObject)
                 for (let fileName of Object.keys(fileObject)) {
-                    let topLevelClassDeclartions = this.getTopLevelClassDeclarations(fileObject[fileName]);
-                    classDeclarations.push(...topLevelClassDeclartions)
-                    // console.log("Scanning: ", fileName, "Found: ", topLevelClassDeclartions)
+                    let topLevelClassDeclarations = this.getTopLevelClassDeclarations(fileObject[fileName]);
+                    classDeclarations.push(...topLevelClassDeclarations)
+                    // console.log("Scanning: ", fileName, "Found: ", topLevelClassDeclarations)
                 }
                 // console.log(classDeclarations)
                 let nodeExtendingClasses = [];
@@ -87,7 +87,8 @@ class NodePanel {
                 // console.log("NODE PANEL LOADED: ", nodeExtendingClasses)
 
                 this.addNodeIconsToPanel(nodeExtendingClasses);
-
+                this.nodeIconContainerLoader.remove()
+                this.nodeIconContainer.style.height =  this.nodeIconContainer.scrollHeight + 'px';
             });
         })
     }
@@ -117,11 +118,11 @@ class NodePanel {
                 // if(nodeClass.INTERFACE_CONFIGURATION.defaultFavourite > 0){
                 //     this.favouriteNodesContainer.append(icon)
                 // } else{
-                this.otherNodesContainer.append(icon)
-                if(this.otherNodesContainer.querySelectorAll(".icon-content").length % 5 === 0){
+                this.nodeIconContainer.append(icon)
+                if(this.nodeIconContainer.querySelectorAll(".icon-content").length % 5 === 0){
                     let lineBreak = document.createElement("div");
                     lineBreak.style.width = "100%";
-                    this.otherNodesContainer.append(lineBreak)
+                    this.nodeIconContainer.append(lineBreak)
                 }
                 // }
                 // height: auto;margin-top: 15px;

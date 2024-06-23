@@ -102,6 +102,13 @@ class WorkspaceExplorerNode extends WindowedNode {
         this.innerContent.style.width = "100%";
         this.innerContent.style.height = "100%";
 
+        let initLoaderContainer = document.createElement("div");
+        initLoaderContainer.className = "loader-container";
+        let initLoader = document.createElement("div");
+        initLoader.className = "loader";
+        initLoaderContainer.append(initLoader);
+        treeContainer.append(initLoaderContainer);
+
         createWorkspaceFSTree(elementID, function makeTreeScrollable(){
             for (let liElement of Object.values(this.liElementsById)) {
                 WindowedNode.makeContentScrollable(liElement);
@@ -109,6 +116,7 @@ class WorkspaceExplorerNode extends WindowedNode {
                 if(ulElement) WindowedNode.makeContentScrollable(ulElement);
             }
         }).then((fileSystemTree) => {
+            initLoaderContainer.remove()
             this.fileSystemTree = fileSystemTree;
             this.fileSystemTree.addValueListener((selected, newSelection) => {
                 console.log("Selected: ", selected, " newSelection: ", newSelection)

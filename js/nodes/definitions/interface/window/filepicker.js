@@ -103,11 +103,18 @@ class FilePicker extends WindowedUI {
         this.mouseAnchor = this.diagram.background.toDZ(new vec2(0, -this.content.offsetHeight / 2 + 6));
         const treeElementID = `filePickerTreeContainer-${this.index}`
         const containerID = `filePickerMainContainer-${this.index}`
-        // let treeContainer = document.getElementById(treeElementID);
+        let treeContainer = document.getElementById(treeElementID);
         let mainContainer = document.getElementById(containerID);
         WindowedNode.makeContentScrollable(mainContainer, true)
         this.innerContent.style.width = "100%";
         this.innerContent.style.height = "100%";
+
+        let initLoaderContainer = document.createElement("div");
+        initLoaderContainer.className = "loader-container";
+        let initLoader = document.createElement("div");
+        initLoader.className = "loader";
+        initLoaderContainer.append(initLoader);
+        treeContainer.append(initLoaderContainer);
 
         createFilePickerFSTree(treeElementID, home, this.multiple, this.selectFiles, this.selectFolders, function makeTreeScrollable(){
             for (let liElement of Object.values(this.liElementsById)) {
@@ -116,6 +123,7 @@ class FilePicker extends WindowedUI {
                 if(ulElement) WindowedNode.makeContentScrollable(ulElement);
             }
         }).then((fileSystemTree) => {
+            initLoaderContainer.remove()
             this.fileSystemTree = fileSystemTree;
             this.fileSystemTree.addValueListener((selected, newSelection) => {
                 console.log("Selected: ", selected, " newSelection: ", newSelection)

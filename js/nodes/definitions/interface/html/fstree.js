@@ -41,8 +41,8 @@ class FileSystemTreeHTML extends Tree {
             }
         });
 
-
     }
+
 
     onSwitcherClick(switcherElement) {
         let liElement = switcherElement.parentElement;
@@ -54,8 +54,12 @@ class FileSystemTreeHTML extends Tree {
         if(found) {
             if(liElement.classList.contains('treejs-node__close')) {
                 // console.log("Opening: ", found )
+                let loader = document.createElement("div")
+                loader.className = "loader"
+                liElement.append(loader)
                 this.reloadNode(found, liElement).then(() => {
                     super.onSwitcherClick(switcherElement);
+                    loader.remove()
                 });
             } else {
                 super.onSwitcherClick(switcherElement);
@@ -356,6 +360,7 @@ async function createModuleFSTree(elementID, path, includes, excludes, forceFSTr
     return {fileSystemTree, fsTree}
     // return new FileSystemTree("#" + elementID, fsTree, root, true)
 }
+
 async function createFilePickerFSTree(elementID, root, multiple, files, folders, afterInit){
     let tree = await FileSystemTree.getFSTree(root);
     return new FileSystemTree({
