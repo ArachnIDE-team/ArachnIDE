@@ -637,7 +637,7 @@ class LLMAgentNode extends WindowedNode {
                        this.content.querySelector("div.select-replacer").removeAttribute("title")
                        if(updateSliders) this._updateMaxTokensSliderMax(16000, 16000)
                    }
-                   console.log("Message token count: ", count, " for messages: ", messages)
+                   // console.log("Message token count: ", count, " for messages: ", messages)
                });
             });
             this.countTokenTimeout = -1;

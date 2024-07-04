@@ -105,7 +105,7 @@ class NodesTab {
             this.moduleNode.content.moduleContainer.querySelector(".metadata-container").remove();
             this.moduleNode.content.moduleContainer.append(this.constructionContainer);
             this.moduleNode.content.footerContainer.remove();
-            this.moduleNode.content.fileSystemTree.addValueListener(this.onNodeSelectionChange.bind(this))
+            this.moduleNode.content.fileSystemTree.addPropertyListener("value", this.onNodeSelectionChange.bind(this))
             this.setMaxSize(280,510)
         }, {fsTree: classMap, root: ""}, {selectFolders: true});
     }

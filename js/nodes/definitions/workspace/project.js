@@ -83,7 +83,7 @@ class ProjectNodeHTML {
             let fsTree = result.fsTree;
             this.sources.files = this.getFilesFromFSTree(fsTree);
             // console.log("Set source files for module: ", this, " Files: ",  this.sources.files )
-            this.fileSystemTree.addValueListener((selected, newSelection) => {
+            this.fileSystemTree.addPropertyListener("value", (selected, newSelection) => {
 
             })
             this.afterReload(callback);

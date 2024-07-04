@@ -797,6 +797,11 @@ input[type="text"i]:hover {
     position: relative;
 }
 
+.zet-message-container {
+    color: #D15050;
+}
+
+
 .zet-drag-handle-horiz {
     width: 6px; /* Increase the width */
     height: 100%;
@@ -1634,6 +1639,18 @@ input[type=range] {
     border-radius: 5px;
     padding: 2px;
 }
+
+
+/* Custom markdown CodeMirror */
+.cm-s-dracula .cm-string { /* Example for Dracula theme */
+    color: #f1fa8c;
+}
+.cm-s-dracula .cm-string::before {
+    /*content: attr(data-lang); // Add the language identifier before code blocks*/
+    opacity: 0.6;
+    margin-right: 5px;
+}
+/* End of custom markdown CodeMirror */
 
 .aiResponseEditor .CodeMirror-scroll {
     padding: 0 !important;

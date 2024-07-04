@@ -125,7 +125,7 @@ class FilePicker extends WindowedUI {
         }).then((fileSystemTree) => {
             initLoaderContainer.remove()
             this.fileSystemTree = fileSystemTree;
-            this.fileSystemTree.addValueListener((selected, newSelection) => {
+            this.fileSystemTree.addPropertyListener("value", (selected, newSelection) => {
                 console.log("Selected: ", selected, " newSelection: ", newSelection)
                 if(selected.length === 0){
                     confirmFileSelectionButton.disabled = true;

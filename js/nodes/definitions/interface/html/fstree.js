@@ -243,21 +243,28 @@ class FileSystemTreeHTML extends Tree {
         }
     }
 
-    addValueListener(callback){
-        this.eventListeners.value.push(callback);
+    addPropertyListener(target, callback) {
+        this.eventListeners[target].push(callback);
     }
+    removePropertyListener(target, callback) {
+        this.eventListeners[target].splice(this.eventListeners[target].indexOf(callback), 1)
 
-    removeValueListener(callback){
-        this.eventListeners.value.splice(this.eventListeners.value.indexOf(callback), 1)
     }
+    // addValueListener(callback){
+    //     this.eventListeners.value.push(callback);
+    // }
 
-    addSwitchListener(callback){
-        this.eventListeners.switcher.push(callback);
-    }
-
-    removeSwitchListener(callback){
-        this.eventListeners.switcher.splice(this.eventListeners.switcher.indexOf(callback), 1)
-    }
+    // removeValueListener(callback){
+    //     this.eventListeners.value.splice(this.eventListeners.value.indexOf(callback), 1)
+    // }
+    //
+    // addSwitchListener(callback){
+    //     this.eventListeners.switcher.push(callback);
+    // }
+    //
+    // removeSwitchListener(callback){
+    //     this.eventListeners.switcher.splice(this.eventListeners.switcher.indexOf(callback), 1)
+    // }
 
     static _build_tree(fsTree, currentPosition=""){
         let tree_root = [];

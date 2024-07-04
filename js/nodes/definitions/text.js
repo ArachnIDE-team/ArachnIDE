@@ -17,7 +17,8 @@ class TextNode extends WindowedNode {
     static OBSERVERS = { 'text': {
             'add': function (callback) { this.contentEditableDiv.addEventListener("input", callback) },
             'remove': function (callback) { this.contentEditableDiv.removeEventListener("input", callback) }
-        }}
+        }
+    }
 
     static INTERFACE_CONFIGURATION = {
         insertable: true,
@@ -171,6 +172,13 @@ class TextNode extends WindowedNode {
         codeNode.height = this.height;
         codeNode.scale = this.scale;
         this.onDelete();
+        codeNode.addAfterInitCallback(() => {
+            // this.contentEditableDiv.innerText = v;
+            restoreZettelkastenEvent = true;
+            addNodeTagToZettelkasten(codeNodeClass.DEFAULT_CONFIGURATION.settings.language, title, code)
+        })
+
+
     }
 
     afterInit() {

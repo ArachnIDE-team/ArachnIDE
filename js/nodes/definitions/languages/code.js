@@ -283,10 +283,11 @@ class CodeNode extends WindowedNode {
     convertNode(type){
         let codeNodeClass = eval(type);
         let codeNode;
+        let content = this.code;
         if(codeNodeClass === TextNode) {
-            codeNode = new TextNode({name: this.title, text: this.code})
+            codeNode = new TextNode({name: this.title, text: content})
         } else {
-             codeNode = new codeNodeClass({name: this.title, code: this.code})
+            codeNode = new codeNodeClass({name: this.title, code: content})
         }
         codeNode.pos.x = this.pos.x
         codeNode.pos.y = this.pos.y
@@ -294,6 +295,16 @@ class CodeNode extends WindowedNode {
         codeNode.height = this.height;
         codeNode.scale = this.scale;
         this.onDelete();
+        if (codeNodeClass === TextNode) {
+            restoreZettelkastenEvent = true;
+            addNodeTagToZettelkasten(null, this.title, content)
+        } else {
+            codeNode.addAfterInitCallback(() => {
+                restoreZettelkastenEvent = true;
+                addNodeTagToZettelkasten(codeNodeClass.DEFAULT_CONFIGURATION.settings.language, this.title, content)
+
+            });
+        }
     }
 
     // From editor

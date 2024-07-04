@@ -87,7 +87,7 @@ class ToolsTab {
             let footerPanels = this.moduleNode.content.footerContainer.children;//.querySelectorAll("button.footer-button");
             footerPanels[0].innerHTML = footerPanels[1].innerHTML = "";
             this._createToolButtons(footerPanels)
-            this.moduleNode.content.fileSystemTree.addValueListener(this.onToolSelectionChange.bind(this))
+            this.moduleNode.content.fileSystemTree.addPropertyListener("value", this.onToolSelectionChange.bind(this))
         });
     }
 

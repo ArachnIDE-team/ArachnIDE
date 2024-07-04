@@ -111,6 +111,7 @@ class Node {
     onDisconnect(index){
         // console.log("disconnected node: ", this, " removed edge: ", index)
     }
+
     onConnect(edge){
         // console.log("connected node: ", this, " new edge: ", edge)
     }

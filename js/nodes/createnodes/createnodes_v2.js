@@ -73,6 +73,8 @@ function addNodeTagToZettelkasten(language = null, title, content = null) {
     noteInput.setValue(currentZettelkastenValue);
     noteInput.refresh();
 
+    scrollToTitle(title, noteInput)
+
     // Reset processAll to false
     processAll = false;
 }
