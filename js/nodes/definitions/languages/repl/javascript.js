@@ -146,15 +146,42 @@ class JavascriptObjectUtils extends ObjectTreeUtils {
                 if(obj instanceof HTMLElement) return "<" + obj.tagName.toLowerCase() + "...>"
                 if(typeof obj === "function") return obj.toString();
                 let result = Array.isArray(obj) ? [] : {};
-                for (let key in obj) {
-                    if (obj.hasOwnProperty(key)) {
-                        // Recursively traverse the object tree
-                        result[key] = buildTree(obj[key], currentDepth + 1);
+                do {
+                    // console.log("Building tree from: ", expressionPath, "[" + depth + "]", "obj: ", obj ,"(", obj.constructor?.name,")")
+                    for (let key of Object.getOwnPropertyNames(obj)) {
+                    // for (let key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            if(Object.getOwnPropertyDescriptor(obj, key).get !== undefined) {
+                                // Getter defined property
+                                result.__defineGetter__(key, buildTree(Object.getOwnPropertyDescriptor(obj, key).get, currentDepth + 1));
+                                // result[key] = buildTree(Object.getOwnPropertyDescriptor(obj, key).get, currentDepth + 1);
+                                // result[key] = buildTree("get (...)", currentDepth + 1);
+                            } else {
+                                // Recursively traverse the object tree
+                                result[key] = buildTree(obj[key], currentDepth + 1);
+                            }
+                        }
                     }
-                }
+                } while((obj = Object.getPrototypeOf(obj)) && obj.constructor.name !== "Object" && obj !== true)
                 return result;
             };
             return buildTree(root, 0);
+        }
+    }
+
+    getProperty(expressionPath){
+        if(expressionPath === "" && depth === -1) {
+            return this.root;
+        } else {
+            // Get the starting point;
+            let expressions = expressionPath.split(".");
+            let root = this.root;
+            if (expressionPath !== "") {
+                for (let expression of expressions) {
+                    root = root[expression];
+                }
+            }
+            return root;
         }
     }
 }

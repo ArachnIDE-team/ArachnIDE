@@ -50,8 +50,8 @@ class ObjectTreeHTML extends Tree {
         if(found) {
             if(liElement.classList.contains('treejs-node__close')) {
                 // console.log("Opening: ", found )
-                this.reloadNode(found, liElement).then(() => {
-                    super.onSwitcherClick(switcherElement);
+                this.reloadNode(found, liElement).then((switchForReal) => {
+                    if(switchForReal) super.onSwitcherClick(switcherElement);
                 });
             } else {
                 super.onSwitcherClick(switcherElement);
@@ -66,11 +66,21 @@ class ObjectTreeHTML extends Tree {
 
     async reloadNode(rootPath, liElement){
         this.lastSelection = [...this.values];
-        // let {objTree, root} = await ObjectTreePanel.getFSTree(rootPath.length > 0 && rootPath.length < 3 && !rootPath.endsWith("/") ? rootPath + "/" :rootPath);
+
+        let nodeItem = this.nodesById[rootPath];
+        if(nodeItem?.attributes?.isGetter){
+            // opened getter property
+            let value = this.treeObject.getProperty(rootPath);
+            if(typeof value !== "object") {
+                this.addKeyValueLabel(liElement, nodeItem.attributes.key, value)//nodeItem.attributes.getter()
+                return false;
+            }
+        }
+
         let objTree = await this.treeObject.getTree(rootPath.length > 0 && rootPath.length < 3 && !rootPath.endsWith("/") ? rootPath + "/" : rootPath, 2);
         const treeData = ObjectTreeHTML._build_tree(objTree, rootPath);
         // Node data replacement
-        this.nodesById[rootPath].children = treeData;
+        nodeItem.children = treeData;
         const treeElement =  this.buildTree(treeData, 1);
         // console.log("reloaded: ", rootPath , " with data: ", treeData, "element:", liElement.querySelector("ul.treejs-node"), "with" , this.buildTree(treeData, 1))
         // HTML Node replacement
@@ -88,11 +98,11 @@ class ObjectTreeHTML extends Tree {
         Array.from(treeElement.getElementsByClassName('treejs-switcher')).forEach((switcher) => switcher.click());
         this.decorateNodes();
         this.values = this.lastSelection;
+        return true;
     }
 
     onChanged(){
-        console.log("Checkbox changed: ", this.values);
-
+        // console.log("Checkbox changed: ", this.values);
         let newSelection = [...this.values]
         for(let prevId of this.lastSelection){
             if(newSelection.includes(prevId)) newSelection.splice(newSelection.indexOf(prevId), 1)
@@ -162,6 +172,18 @@ class ObjectTreeHTML extends Tree {
         return !this.selection;
     }
 
+    addKeyValueLabel(liElement, key, value) {
+        let label = liElement.querySelector("span.treejs-label");
+        label.innerHTML = "";
+        let keySpan = document.createElement("span")
+        keySpan.className = "key"
+        let valueSpan = document.createElement("span")
+        valueSpan.className = "value"
+        keySpan.innerText = key + ": ";
+        valueSpan.innerText = value;
+        label.append(keySpan, valueSpan)
+    }
+
     decorateNodes(){
         for (let id of Object.keys(this.liElementsById)){
             let liElement = this.liElementsById[id];
@@ -170,16 +192,9 @@ class ObjectTreeHTML extends Tree {
                 console.log("Node not found for ID:" , id)
                 continue;
             }
-            if(!liElement.querySelector("span.treejs-label>span.key")){
-                let label = liElement.querySelector("span.treejs-label");
-                label.innerHTML = "";
-                let keySpan = document.createElement("span")
-                keySpan.className = "key"
-                let valueSpan = document.createElement("span")
-                valueSpan.className = "value"
-                keySpan.innerText = node.attributes.key + ": ";
-                valueSpan.innerText = node.attributes.value;
-                label.append(keySpan, valueSpan)
+            if(!liElement.querySelector("span.treejs-label>span.key") && node.attributes?.key !== undefined){
+            // if(!liElement.querySelector("span.treejs-label>span.key") && !node?.parent?.attributes?.isGetter){
+                this.addKeyValueLabel(liElement, node.attributes.key, node.attributes.value)
             }
             // let iconSpan = liElement.querySelector(".treejs-icons");
             // if(!iconSpan){
@@ -188,18 +203,18 @@ class ObjectTreeHTML extends Tree {
             //     let checkbox = liElement.querySelector(".treejs-checkbox")
             //     checkbox.after(iconSpan);
             // }
-            if(node.attributes.isObject){
-                // let folderIcon = document.getElementById("folderIcon").cloneNode(true);
-                // folderIcon.setAttribute('id', '');
-                // folderIcon.style.display = '';
-                // iconSpan.append(folderIcon);
-            }
-            if(!node.attributes.isObject){ // && !liElement.querySelector("svg.file-icon")
-                // let fileIcon = document.getElementById("fileIcon").cloneNode(true);
-                // fileIcon.setAttribute('id', '');
-                // fileIcon.style.display = '';
-                // iconSpan.append(fileIcon);
-            }
+            // if(node.attributes.isObject){
+            //     // let folderIcon = document.getElementById("folderIcon").cloneNode(true);
+            //     // folderIcon.setAttribute('id', '');
+            //     // folderIcon.style.display = '';
+            //     // iconSpan.append(folderIcon);
+            // }
+            // if(!node.attributes.isObject){ // && !liElement.querySelector("svg.file-icon")
+            //     // let fileIcon = document.getElementById("fileIcon").cloneNode(true);
+            //     // fileIcon.setAttribute('id', '');
+            //     // fileIcon.style.display = '';
+            //     // iconSpan.append(fileIcon);
+            // }
         }
         this.removeCheckboxes()
     }
@@ -262,54 +277,65 @@ class ObjectTreeHTML extends Tree {
 
     static _build_tree(objTree, currentPosition=""){
         let tree_root = [];
-        for(let node of Object.keys(objTree)){
-            const currentNode = currentPosition !== "" ? currentPosition + "." + node : node;
-            let text = node;
-            let key = node;
-            let value;
-            if(typeof objTree[node] === "object" || objTree[node] === "{...}" || objTree[node] === "[...]") {
-                if (objTree[node] !== "{...}" && objTree[node] !== "{ }" && (Array.isArray(objTree[node]) || objTree[node] === "[...]" || objTree[node] === "[ ]")){
-                    if((Array.isArray(objTree[node]) && objTree[node].length === 0) || objTree[node] === "[ ]"){
-                        text = text + ": [ ]";
-                        value = "[ ]"
+        // do {
+        //     console.log("Building tree from: ", currentPosition, "objTree: ", objTree ,"(", objTree.constructor?.name,")")
+            for (let node of Object.getOwnPropertyNames(objTree)) {
+                if(node === "__proto__") continue;
+                // for(let node of Object.keys(objTree)){
+                const currentNode = currentPosition !== "" ? currentPosition + "." + node : node;
+                let text = node;
+                let key = node;
+                let value;
+                if(Object.getOwnPropertyDescriptor(objTree, key).get !== undefined) {
+                    text = text + ": (...)";
+                    value = "get (...)"
+                }else if (typeof objTree[node] === "object" || objTree[node] === "{...}" || objTree[node] === "[...]") {
+                    if (objTree[node] !== "{...}" && objTree[node] !== "{ }" && (Array.isArray(objTree[node]) || objTree[node] === "[...]" || objTree[node] === "[ ]")) {
+                        if ((Array.isArray(objTree[node]) && objTree[node].length === 0) || objTree[node] === "[ ]") {
+                            text = text + ": [ ]";
+                            value = "[ ]"
+                        } else {
+                            text = text + ": [...]";
+                            value = "[...]"
+                        }
                     } else {
-                        text = text + ": [...]";
-                        value = "[...]"
+                        if (objTree[node] instanceof HTMLElement) {
+                            text = text + ": <" + objTree[node].tagName.toLowerCase() + "...>"
+                            value = "<" + objTree[node].tagName.toLowerCase() + "...>"
+                        } else if (node !== "__proto__" && Object.keys(objTree[node]).length === 0) {
+                            text = text + ": { }";
+                            value = "{ }"
+                        } else {
+                            text = text + ": {...}";
+                            value = "{...}"
+                        }
                     }
+                } else if (typeof objTree[node] === "function") {
+                    text = text + ": " + objTree[node].toString()
+                    value = objTree[node].toString()
                 } else {
-                    if(objTree[node] instanceof HTMLElement){
-                        text = text + ": <" + objTree[node].tagName.toLowerCase() + "...>"
-                        value = "<" + objTree[node].tagName.toLowerCase() + "...>"
-                    } else if(Object.keys(objTree[node]).length === 0){
-                        text = text + ": { }";
-                        value = "{ }"
-                    } else {
-                        text = text + ": {...}";
-                        value = "{...}"
-                    }
+                    text = text + ": " + objTree[node]
+                    value = objTree[node]
                 }
-            } else if(typeof objTree[node] === "function") {
-                text = text +  ": " + objTree[node].toString()
-                value = objTree[node].toString()
-            } else {
-                text = text +  ": " + objTree[node]
-                value = objTree[node]
+                let item = {
+                    id: currentNode,
+                    text,
+                };
+                if(Object.getOwnPropertyDescriptor(objTree, key).get !== undefined) {
+                    item.children = [{id: "get", text: ""}]; // dummy children object
+                    item.attributes = {isObject: true, isGetter: true, key, value}//, getter: Object.getOwnPropertyDescriptor(objTree, key).get};
+                } else if (typeof objTree[node] === "string") {
+                    item.children = [];
+                    item.attributes = {isObject: ObjectTreeHTML.isObject(objTree[node]), isGetter: false, key, value}
+                } else if (node !== "__proto__" && typeof objTree[node] === "object") {
+                    item.children = ObjectTreeHTML._build_tree(objTree[node], currentNode)
+                    item.attributes = {isObject: true, isGetter: false, key, value};
+                } else {
+                    item.attributes = {isObject: false, isGetter: false, key, value};
+                }
+                tree_root.push(item);
             }
-            let item = {
-                id: currentNode,
-                text,
-            };
-            if(typeof objTree[node] === "string"){
-                item.children = [];
-                item.attributes = {isObject: ObjectTreeHTML.isObject(objTree[node]), key, value}
-            } else if(typeof objTree[node] === "object") {
-                item.children = ObjectTreeHTML._build_tree(objTree[node], currentNode)
-                item.attributes = {isObject: true, key, value};
-            } else{
-                item.attributes = {isObject: false, key, value};
-            }
-            tree_root.push(item);
-        }
+        // } while(objTree.constructor.name !== "Object" && (objTree = Object.getPrototypeOf(objTree)) && objTree !== true)
         return tree_root;
     }
 
