@@ -160,6 +160,86 @@ myCodeMirror.getWrapperElement().style.resize = "vertical";
 
 // Custom parser for extended markdown
 
+// v0
+// CodeMirror.defineMode("customMarkdown", function(config) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//     let currentDepth = 0;
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     return CodeMirror.overlayMode(markdownMode, {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Nested Markdown (with depth calculation based on each backtick)
+//                 if ((match = stream.match(/(\\*`){3}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === currentDepth) {
+//                             currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                         }
+//                     } else {
+//                         currentDepth = backslashCount;
+//                         state.inBlock = true;
+//                         // state.innerMode = CodeMirror.getMode(config, "markdown");
+//                         let codeBlockInfo = match.input.substring(backslashCount * 3 + 3);
+//                         state.blockLanguage = codeBlockInfo.startsWith("javascript") ? "js" : codeBlockInfo.split(" ")[0];
+//                         state.innerMode ={
+//                             'html': htmlMixedMode,
+//                             'css': cssMode,
+//                             'js': jsMode,
+//                             'python': pythonMode,
+//                             'markdown': markdownMode
+//                         }[state.blockLanguage];
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                     }
+//                     return state.blockLanguage === "markdown" ? "node" : "string";
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     let token = state.innerMode.token(stream, state.subState);
+//                     if (token === "string") {
+//                         token += ` data-depth="${currentDepth}"`;
+//                     }
+//                     if (stream.eol()) {
+//                         return token;
+//                     }
+//                     return token || null;
+//                 }
+//             }
+//
+//             stream.next();
+//             return null;
+//         }
+//     });
+// });
+
+// v1
 // CodeMirror.defineMode("customMarkdown", function(config, parserConfig) {
 //     const markdownMode = CodeMirror.getMode(config, "markdown");
 //     const Prompt = `${PROMPT_IDENTIFIER}`;
@@ -274,9 +354,1253 @@ myCodeMirror.getWrapperElement().style.resize = "vertical";
 //         },
 //     });
 // });
+
+// v2
+// CodeMirror.defineMode("customMarkdown", function(config) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Nested Markdown (with depth calculation based on each backtick)
+//                 if ((match = stream.match(/(\\*`){3}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = match.input.substring(backslashCount * 3 + 3).trim();
+//                         state.blockLanguage = codeBlockInfo.startsWith("javascript") ? "js" : codeBlockInfo.split(" ")[0];
+//                         state.innerMode = {
+//                             'html': htmlMixedMode,
+//                             'css': cssMode,
+//                             'js': jsMode,
+//                             'python': pythonMode,
+//                             'markdown': markdownMode
+//                         }[state.blockLanguage] || markdownMode;
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                     }
+//                     return state.blockLanguage === "markdown" ? "node" : "string";
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     return state.innerMode.token(stream, state.subState) + ` depth-${state.currentDepth}`;
+//                 }
+//             }
+//
+//             return markdownMode.token(stream, state);
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v3
+// CodeMirror.defineMode("customMarkdown", function(config) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Nested Markdown (with depth calculation based on each backtick)
+//                 if ((match = stream.match(/(\\*`){3}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = match.input.substring(backslashCount * 3 + 3).trim();
+//                         state.blockLanguage = codeBlockInfo.startsWith("javascript") ? "js" : codeBlockInfo.split(" ")[0];
+//                         state.innerMode = {
+//                             'html': htmlMixedMode,
+//                             'css': cssMode,
+//                             'js': jsMode,
+//                             'python': pythonMode,
+//                             'markdown': markdownMode
+//                         }[state.blockLanguage] || markdownMode;
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                     }
+//                     return "node";
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     return state.innerMode.token(stream, state.subState) + ` depth-${state.currentDepth}`;
+//                 }
+//             }
+//
+//             return markdownMode.token(stream, state);
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v4
+// CodeMirror.defineMode("customMarkdown", function(config) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Nested Markdown (with depth calculation based on each backtick)
+//                 if ((match = stream.match(/(\\*`{3,})/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             return "node";
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = stream.string.substring(stream.start + backslashCount + 3).trim();
+//                         state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                         state.innerMode = {
+//                             'html': htmlMixedMode,
+//                             'css': cssMode,
+//                             'js': jsMode,
+//                             'python': pythonMode,
+//                             'markdown': markdownMode
+//                         }[state.blockLanguage] || markdownMode;
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                         return "node";
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     return state.innerMode.token(stream, state.subState) + ` depth-${state.currentDepth}`;
+//                 }
+//             }
+//
+//             return markdownMode.token(stream, state);
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v5
+// CodeMirror.defineMode("customMarkdown", function(config) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Match code block opening/closing with optional backslashes
+//                 if ((match = stream.match(/^(\\*)`{3,}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             stream.skipToEnd();
+//                             return "node depth-" + (state.currentDepth + 1);
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = stream.string.substring(stream.pos).trim();
+//                         state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                         state.innerMode = {
+//                             'html': htmlMixedMode,
+//                             'css': cssMode,
+//                             'js': jsMode,
+//                             'python': pythonMode,
+//                             'markdown': markdownMode
+//                         }[state.blockLanguage] || markdownMode;
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                         stream.skipToEnd();
+//                         return "node depth-" + state.currentDepth;
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     const token = state.innerMode.token(stream, state.subState);
+//                     return token + " depth-" + state.currentDepth;
+//                 }
+//             }
+//
+//             return markdownMode.token(stream, state);
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v6
+// CodeMirror.defineMode("customMarkdown", function(config) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//     const customMarkdownMode = CodeMirror.getMode(config, "customMarkdown");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: customMarkdownMode,
+//                 currentDepth: 0
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Match code block opening/closing with optional backslashes
+//                 if ((match = stream.match(/^(\\*)`{3,}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             stream.skipToEnd();
+//                             return "node depth-" + (state.currentDepth + 1);
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = stream.string.substring(stream.pos).trim();
+//                         state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                         state.innerMode = {
+//                             'html': htmlMixedMode,
+//                             'css': cssMode,
+//                             'js': jsMode,
+//                             'python': pythonMode,
+//                             'markdown': customMarkdownMode
+//                         }[state.blockLanguage] || customMarkdownMode;
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                         stream.skipToEnd();
+//                         return "node depth-" + state.currentDepth;
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     const token = state.innerMode.token(stream, state.subState);
+//                     return token + " depth-" + state.currentDepth;
+//                 }
+//             }
+//
+//             return markdownMode.token(stream, state);
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v7
+// CodeMirror.defineMode("customMarkdown", function(config, parserConfig) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Match code block opening/closing with optional backslashes
+//                 if ((match = stream.match(/^(\\*)`{3,}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             stream.skipToEnd();
+//                             return "node depth-" + (state.currentDepth + 1);
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = stream.string.substring(stream.pos).trim();
+//                         state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                         state.innerMode = {
+//                             'html': htmlMixedMode,
+//                             'css': cssMode,
+//                             'js': jsMode,
+//                             'python': pythonMode,
+//                             // 'markdown': markdownMode
+//                         }[state.blockLanguage] || CodeMirror.getMode(config, "customMarkdown");
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                         stream.skipToEnd();
+//                         return "node depth-" + state.currentDepth;
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     const token = state.innerMode.token(stream, state.subState);
+//                     return "node "  + token + " depth-" + state.currentDepth;
+//                 }
+//             }
+//
+//             return markdownMode.token(stream, state);
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v8
+// CodeMirror.defineMode("customMarkdown", function(config, parserConfig) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     const getInnerMode = (language) => {
+//         switch (language) {
+//             case 'html':
+//                 return htmlMixedMode;
+//             case 'css':
+//                 return cssMode;
+//             case 'javascript':
+//                 return jsMode;
+//             case 'python':
+//                 return pythonMode;
+//             default:
+//                 return markdownMode;
+//         }
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Match code block opening/closing with optional backslashes
+//                 if ((match = stream.match(/^(\\*)`{3,}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             stream.skipToEnd();
+//                             return "node depth-" + (state.currentDepth + 1);
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = stream.string.substring(stream.pos).trim();
+//                         state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                         state.innerMode = getInnerMode(state.blockLanguage);
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                         stream.skipToEnd();
+//                         return "node depth-" + state.currentDepth;
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     const token = state.innerMode.token(stream, state.subState);
+//                     return (token ? "node " + token : "node") + " depth-" + state.currentDepth;
+//                 }
+//             }
+//
+//             return markdownMode.token(stream, state);
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v9
+// CodeMirror.defineMode("customMarkdown", function(config, parserConfig) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     const getInnerMode = (language) => {
+//         switch (language) {
+//             case 'html':
+//                 return htmlMixedMode;
+//             case 'css':
+//                 return cssMode;
+//             case 'javascript':
+//                 return jsMode;
+//             case 'python':
+//                 return pythonMode;
+//             case 'markdown':
+//                 return CodeMirror.getMode(config, "customMarkdown");
+//             default:
+//                 return markdownMode;
+//         }
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0,
+//                 mdState: markdownMode.startState()
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth,
+//                 mdState: markdownMode.copyState(state.mdState)
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Match code block opening/closing with optional backslashes
+//                 if ((match = stream.match(/^(\\*)`{3,}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             stream.skipToEnd();
+//                             return "node depth-" + (state.currentDepth + 1);
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = stream.string.substring(stream.pos).trim();
+//                         state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                         state.innerMode = getInnerMode(state.blockLanguage);
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                         stream.skipToEnd();
+//                         return "node depth-" + state.currentDepth;
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     const token = state.innerMode.token(stream, state.subState);
+//                     return (token ? "node " + token : "node") + " depth-" + state.currentDepth;
+//                 }
+//             }
+//
+//             return markdownMode.token(stream, state.mdState);
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v10
+// CodeMirror.defineMode("customMarkdown", function(config, parserConfig) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     const getInnerMode = (language) => {
+//         switch (language) {
+//             case 'html':
+//                 return htmlMixedMode;
+//             case 'css':
+//                 return cssMode;
+//             case 'javascript':
+//                 return jsMode;
+//             case 'python':
+//                 return pythonMode;
+//             case 'markdown':
+//                 return CodeMirror.getMode(config, "customMarkdown");
+//             default:
+//                 return markdownMode;
+//         }
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0,
+//                 mdState: markdownMode.startState()
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth,
+//                 mdState: markdownMode.copyState(state.mdState)
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Match code block opening/closing with optional backslashes
+//                 if ((match = stream.match(/^(\\*)`{3,}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             stream.skipToEnd();
+//                             return "node markdown depth-" + (state.currentDepth + 1);
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = stream.string.substring(stream.pos).trim();
+//                         state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                         state.innerMode = getInnerMode(state.blockLanguage);
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                         if(state.blockLanguage === 'markdown') state.subState.currentDepth++;
+//                         stream.skipToEnd();
+//                         return "node markdown depth-" +  state.subState.currentDepth;
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     const token = state.innerMode.token(stream, state.subState);
+//                     return (token ? "node " + (state.blockLanguage !== "markdown" ? state.blockLanguage + "-" : "") + token : "node") + " depth-" + state.currentDepth;
+//                 }
+//             }
+//
+//             let defaultToken = markdownMode.token(stream, state.mdState);
+//             if(defaultToken) return "markdown-" + defaultToken;
+//             return "markdown-paragraph"
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v11
+// CodeMirror.defineMode("customMarkdown", function(config, parserConfig) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     const getInnerMode = (language) => {
+//         switch (language) {
+//             case 'html':
+//                 return htmlMixedMode;
+//             case 'css':
+//                 return cssMode;
+//             case 'javascript':
+//                 return jsMode;
+//             case 'python':
+//                 return pythonMode;
+//             case 'markdown':
+//                 return CodeMirror.getMode(config, "customMarkdown");
+//             default:
+//                 return markdownMode;
+//         }
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0,
+//                 mdState: markdownMode.startState()
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth,
+//                 mdState: CodeMirror.copyState(markdownMode, state.mdState)  // Ensure to copy the markdown mode state
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Match code block opening/closing with optional backslashes
+//                 if ((match = stream.match(/^(\\*)`{3,}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             stream.skipToEnd();
+//                             return "node depth-" + (state.currentDepth + 1);
+//                         }
+//                     } else {
+//                         state.currentDepth = backslashCount;
+//                         state.inBlock = true;
+//
+//                         let codeBlockInfo = stream.string.substring(stream.pos).trim();
+//                         state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                         state.innerMode = getInnerMode(state.blockLanguage);
+//                         state.subState = CodeMirror.startState(state.innerMode);
+//                         if(state.blockLanguage === 'markdown') state.subState.currentDepth++;
+//                         stream.skipToEnd();
+//                         return "node depth-" + state.currentDepth;
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     const token = state.innerMode.token(stream, state.subState);
+//                     return (token ? "node " + (state.blockLanguage !== "markdown" ? state.blockLanguage + "-" : "") + token : "node") + " depth-" + state.currentDepth;
+//                 }
+//             }
+//
+//             let defaultToken = markdownMode.token(stream, state.mdState);
+//             if(defaultToken) return "markdown-" + defaultToken;
+//             return "markdown-paragraph";
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v12
+// CodeMirror.defineMode("customMarkdown", function(config, parserConfig) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     const getInnerMode = (language) => {
+//         switch (language) {
+//             case 'html':
+//                 return htmlMixedMode;
+//             case 'css':
+//                 return cssMode;
+//             case 'javascript':
+//                 return jsMode;
+//             case 'python':
+//                 return pythonMode;
+//             case 'markdown':
+//                 return CodeMirror.getMode(config, "customMarkdown");
+//             default:
+//                 return markdownMode;
+//         }
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0,
+//                 mdState: markdownMode.startState()
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth,
+//                 mdState: CodeMirror.copyState(markdownMode, state.mdState)
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Match code block opening/closing with optional backslashes
+//                 if ((match = stream.match(/^(\\*)`{3,}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     // Determine if it's an escape sequence
+//                     const isEscapeSequence = backslashCount === state.currentDepth;
+//                     // const isEscapeSequence = backslashCount === state.currentDepth + 1;
+//
+//                     if (state.inBlock) {
+//                         if (isEscapeSequence) {
+//                         // if (!isEscapeSequence && backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             stream.skipToEnd();
+//                             return "node markdown depth-" + (state.currentDepth + 1);
+//                         }
+//                     } else {
+//                         if (isEscapeSequence) {
+//                         // if (!isEscapeSequence) {
+//                             state.currentDepth = backslashCount;
+//                             state.inBlock = true;
+//
+//                             let codeBlockInfo = stream.string.substring(stream.pos).trim();
+//                             state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                             state.innerMode = getInnerMode(state.blockLanguage);
+//                             state.subState = CodeMirror.startState(state.innerMode);
+//                             if (state.blockLanguage === 'markdown') state.subState.currentDepth = state.currentDepth + 1;
+//                             stream.skipToEnd();
+//                             return "node markdown depth-" + state.currentDepth;
+//                         }
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     const token = state.innerMode.token(stream, state.subState);
+//                     return (token ? "node " + (state.blockLanguage !== "markdown" ? state.blockLanguage + "-" : "") + token : "node") + " depth-" + state.currentDepth;
+//                 }
+//             }
+//
+//             let defaultToken = markdownMode.token(stream, state.mdState);
+//             if (defaultToken) return "markdown-" + defaultToken;
+//             return "markdown-paragraph";
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state};
+//         }
+//     };
+// });
+
+// v13
+// CodeMirror.defineMode("customMarkdown", function(config, parserConfig) {
+//     const markdownMode = CodeMirror.getMode(config, "markdown");
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     const countBackslashes = (text) => {
+//         let count = 0;
+//         while (text[count] === '\\') {
+//             count++;
+//         }
+//         return count;
+//     };
+//
+//     const getInnerMode = (language) => {
+//         switch (language) {
+//             case 'html':
+//                 return htmlMixedMode;
+//             case 'css':
+//                 return cssMode;
+//             case 'javascript':
+//                 return jsMode;
+//             case 'python':
+//                 return pythonMode;
+//             case 'markdown':
+//                 return CodeMirror.getMode(config, "customMarkdown");
+//             default:
+//                 return markdownMode;
+//         }
+//     };
+//
+//     return {
+//         startState: function() {
+//             return {
+//                 inBlock: false,
+//                 subState: null,
+//                 blockLanguage: "markdown",
+//                 innerMode: markdownMode,
+//                 currentDepth: 0,
+//                 mdState: markdownMode.startState()
+//             };
+//         },
+//         copyState: function(state) {
+//             return {
+//                 inBlock: state.inBlock,
+//                 subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+//                 blockLanguage: state.blockLanguage,
+//                 innerMode: state.innerMode,
+//                 currentDepth: state.currentDepth,
+//                 mdState: CodeMirror.copyState(markdownMode, state.mdState)
+//             };
+//         },
+//         token: function(stream, state) {
+//             if (stream.sol()) {
+//                 let match;
+//
+//                 // Match code block opening/closing with optional backslashes
+//                 if ((match = stream.match(/^((\\*)`){3,}/))) {
+//                     const backslashCount = countBackslashes(match[1]);
+//
+//                     if (state.inBlock) {
+//                         if (backslashCount === state.currentDepth) {
+//                             state.currentDepth--;
+//                             state.inBlock = false;
+//                             state.subState = null;
+//                             stream.skipToEnd();
+//                             return "node markdown depth-" + (state.currentDepth + 1);
+//                         }
+//                     } else {
+//                         if (backslashCount <= state.currentDepth) {
+//                             state.currentDepth++;
+//                             state.inBlock = true;
+//
+//                             let codeBlockInfo = stream.string.substring(stream.pos).trim();
+//                             state.blockLanguage = codeBlockInfo.split(" ")[0];
+//                             state.innerMode = getInnerMode(state.blockLanguage);
+//                             state.subState = CodeMirror.startState(state.innerMode);
+//                             stream.skipToEnd();
+//                             return "node markdown depth-" + state.currentDepth;
+//                         }
+//                     }
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 if (state.subState && state.innerMode) {
+//                     const token = state.innerMode.token(stream, state.subState);
+//                     return (token ? "node " + (state.blockLanguage !== "markdown" ? state.blockLanguage + "-" : "") + token : "node") + " depth-" + state.currentDepth;
+//                 }
+//             }
+//
+//             let defaultToken = markdownMode.token(stream, state.mdState);
+//             if (defaultToken) return "markdown-" + defaultToken;
+//             return "markdown-paragraph";
+//         },
+//         innerMode: function(state) {
+//             return state.inBlock ? {mode: state.innerMode, state: state.subState} : {mode: markdownMode, state: state.mdState};
+//         }
+//     };
+// });
+
+// v14
+CodeMirror.defineMode("customMarkdown", function(config, parserConfig) {
+    const markdownMode = CodeMirror.getMode(config, "markdown");
+
+    const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+    const cssMode = CodeMirror.getMode(config, "css");
+    const jsMode = CodeMirror.getMode(config, "javascript");
+    const pythonMode = CodeMirror.getMode(config, "python");
+
+    const countBackslashes = (text) => {
+        let lengthMap = text.trim().split("`").map(escapeSequence => escapeSequence.length);
+        lengthMap.splice(3, 1);
+        return lengthMap;
+    };
+
+    const getInnerMode = (language) => {
+        switch (language) {
+            case 'html':
+                return htmlMixedMode;
+            case 'css':
+                return cssMode;
+            case 'javascript':
+                return jsMode;
+            case 'python':
+                return pythonMode;
+            case 'markdown':
+                return CodeMirror.getMode(config, "customMarkdown");
+            default:
+                return markdownMode;
+        }
+    };
+
+    return {
+        startState: function() {
+            return {
+                root: true,
+                subState: null,
+                blockLanguage: "markdown",
+                innerMode: markdownMode,
+                currentDepth: 0,
+                mdState: markdownMode.startState(),
+                stateStack: []
+            };
+        },
+        copyState: function(state) {
+            return {
+                root: state.root,
+                subState: state.subState && CodeMirror.copyState(state.innerMode, state.subState),
+                blockLanguage: state.blockLanguage,
+                innerMode: state.innerMode,
+                currentDepth: state.currentDepth,
+                mdState: CodeMirror.copyState(markdownMode, state.mdState),
+                stateStack: [...state.stateStack]
+            };
+        },
+        token: function(stream, state) {
+            if (stream.sol()) {
+                let match;
+
+                // Match code block opening/closing with optional backslashes
+                if ((match = stream.match(/^\s*((\\*)`){3,}/))) {
+                    const backslashCount = countBackslashes(match[0]);
+                    const sameCount = backslashCount[0] === backslashCount[1] &&
+                        backslashCount[1] === backslashCount[2];
+                    const codeBlockInfo = stream.string.substring(stream.pos).trim();
+                    const codeBlockClosing = codeBlockInfo.length === 0;
+
+                    console.log("Stream: ", stream, "bs count: ", backslashCount[0], "same count: ", sameCount, " info: ", codeBlockInfo)
+                    if (backslashCount[0] + 1 === state.currentDepth && codeBlockClosing) {
+                        console.log("<<< Exiting nested codeblock, current depth: ", state.currentDepth, "stack: ", state.stateStack, " - ", state.stateStack[state.stateStack.length - 1])
+                        state.currentDepth--;
+                        state.blockLanguage = "markdown";
+                        state.innerMode = CodeMirror.getMode(config, "customMarkdown");
+                        state.subState = state.stateStack.pop();
+                        stream.skipToEnd();
+                        return "node markdown depth-" + (state.currentDepth + 1);
+                    } else if (backslashCount[0] === state.currentDepth && !codeBlockClosing) {
+                        console.log(">>> Entering nested codeblock, current depth: ", state.currentDepth, "stack: ", state.stateStack, " + ", state.subState)
+                        state.stateStack.push(state.subState)
+                        state.currentDepth++;
+                        state.blockLanguage = codeBlockInfo.split(" ")[0];
+                        state.innerMode = getInnerMode(state.blockLanguage);
+                        state.subState = CodeMirror.startState(state.innerMode);
+                        if(state.blockLanguage === "markdown") state.subState.root = false;
+                        stream.skipToEnd();
+                        return "node markdown depth-" + state.currentDepth;
+                    }
+                }
+            }
+            if (state.currentDepth > 0) {
+                const token = state.innerMode.token(stream, state.subState);
+                return (token ?
+                            "node " + (state.blockLanguage !== "markdown" ?
+                                        state.blockLanguage + "-" :
+                                        "")
+                            + token :
+                            "node")
+                    + " depth-" + state.currentDepth;
+            }
+
+            let defaultToken = markdownMode.token(stream, state.mdState); // Defaults to Markdown
+            if (defaultToken) return "markdown-" + defaultToken + (state.root ? " depth-" + state.currentDepth : "");
+            return "markdown-paragraph" + (state.root ? " depth-" + state.currentDepth : ""); // If no markdown token defaults to markdown-paragraph
+        }
+    };
+});
+
+
+// v0.1 (not working)
 // CodeMirror.defineMode("customMarkdown", function(config) {
 //     const markdownMode = CodeMirror.getMode(config, "markdown");
 //     let currentDepth = 0;
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
 //
 //     const countBackslashes = (text) => {
 //         let count = 0;
@@ -291,6 +1615,7 @@ myCodeMirror.getWrapperElement().style.resize = "vertical";
 //             return {
 //                 inBlock: false,
 //                 subState: null,
+//                 blockLanguage: "markdown",
 //                 innerMode: markdownMode
 //             };
 //         },
@@ -310,11 +1635,23 @@ myCodeMirror.getWrapperElement().style.resize = "vertical";
 //                         }
 //                     } else {
 //                         currentDepth = backslashCount;
-//                         state.inBlock = true;
-//                         state.innerMode = CodeMirror.getMode(config, "markdown");
-//                         state.subState = CodeMirror.startState(state.innerMode);
+//                         // state.innerMode = CodeMirror.getMode(config, "markdown");
+//                         let codeBlockInfo = match.input.substring(backslashCount * 3 + 3);
+//
+//                         state.blockLanguage = codeBlockInfo.startsWith("javascript") ? "js" : codeBlockInfo.split(" ")[0];
+//                         state.inBlock = state.blockLanguage !== "markdown";
+//                         if(state.inBlock){
+//                             state.innerMode ={
+//                                 'html': htmlMixedMode,
+//                                 'css': cssMode,
+//                                 'js': jsMode,
+//                                 'python': pythonMode,
+//                                 // 'markdown': markdownMode
+//                             }[state.blockLanguage];
+//                             state.subState = CodeMirror.startState(state.innerMode);
+//                         }
 //                     }
-//                     return "string";
+//                     return state.blockLanguage === "markdown" ? "node" : "string";
 //                 }
 //             }
 //
@@ -337,118 +1674,119 @@ myCodeMirror.getWrapperElement().style.resize = "vertical";
 //     });
 // });
 
-
-CodeMirror.defineMode("custom", function (config, parserConfig) {
-    const Prompt = `${PROMPT_IDENTIFIER}`;
-    // var node = parserConfig.node || "";
-    var ref = parserConfig.ref || "";
-
-    const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
-    const cssMode = CodeMirror.getMode(config, "css");
-    const jsMode = CodeMirror.getMode(config, "javascript");
-    const pythonMode = CodeMirror.getMode(config, "python");
-
-    return {
-        startState: function () {
-            return {
-                inBlock: null,
-                subState: null
-            };
-        },
-        token: function (stream, state) {
-            // if (stream.sol()) {
-            //     let match = stream.match(/```(html|css|(js|javascript)|python)/, false);
-            //     if (match && match[1]) {
-            //         state.inBlock = match[1] === "javascript" ? "js" : match[1];
-            //         state.subState = CodeMirror.startState({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]);
-            //         stream.skipToEnd();
-            //         return "string";
-            //     }
-            //
-            //     match = stream.match(/```/, false);
-            //     if (match) {
-            //         state.inBlock = null;
-            //         state.subState = null;
-            //         stream.skipToEnd();
-            //         return "string";
-            //     }
-            // }
-            //
-            // if (state.inBlock) {
-            //     return ({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]).token(stream, state.subState);
-            // }
-
-
-            if (stream.match(Prompt)) {
-                return "Prompt";
-            }
-
-            // if (stream.match(node)) {
-            //     return "node";
-            // }
-            if (stream.match(nodeTagRegex.start, false)) {  // Check for the opening bracket
-                stream.match(nodeTagRegex.start);  // Consume the opening bracket
-                return "node";
-            }
-            if (stream.match(nodeTagRegex.end, false)) {  // Check for the corresponding closing bracket
-                stream.match(nodeTagRegex.end);  // Consume the closing bracket
-                return "node";
-            }
-
-
-            if (stream.sol()) {
-                let match = stream.match(/```(html|css|(js|javascript)|python)/, false);
-                if (match && match[1]) {
-                    state.inBlock = match[1] === "javascript" ? "js" : match[1];
-                    state.subState = CodeMirror.startState({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]);
-                    stream.skipToEnd();
-                    return "string";
-                }
-
-                match = stream.match(/```/, false);
-                if (match) {
-                    state.inBlock = null;
-                    state.subState = null;
-                    stream.skipToEnd();
-                    return "string";
-                }
-            }
-
-            if (state.inBlock) {
-                return ({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]).token(stream, state.subState);
-            }
-
-            // Check the refTag in the bracketsMap
-            if (bracketsMap[ref]) {
-                if (stream.match(ref, false)) {  // Check for the opening bracket
-                    stream.match(ref);  // Consume the opening bracket
-                    return "ref";
-                }
-
-                const closingBracket = bracketsMap[ref];
-                if (stream.match(closingBracket, false)) {  // Check for the corresponding closing bracket
-                    stream.match(closingBracket);  // Consume the closing bracket
-                    return "ref";
-                }
-            } else {
-                // If refTag isn't in the bracketsMap, match it directly
-                if (stream.match(ref)) {
-                    return "ref";
-                }
-            }
-
-            stream.next();
-            return null;
-        },
-    };
-});
+// Original model
+// CodeMirror.defineMode("custom", function (config, parserConfig) {
+//     const Prompt = `${PROMPT_IDENTIFIER}`;
+//     // var node = parserConfig.node || "";
+//     var ref = parserConfig.ref || "";
+//
+//     const htmlMixedMode = CodeMirror.getMode(config, "htmlmixed");
+//     const cssMode = CodeMirror.getMode(config, "css");
+//     const jsMode = CodeMirror.getMode(config, "javascript");
+//     const pythonMode = CodeMirror.getMode(config, "python");
+//
+//     return {
+//         startState: function () {
+//             return {
+//                 inBlock: null,
+//                 subState: null
+//             };
+//         },
+//         token: function (stream, state) {
+//             // if (stream.sol()) {
+//             //     let match = stream.match(/```(html|css|(js|javascript)|python)/, false);
+//             //     if (match && match[1]) {
+//             //         state.inBlock = match[1] === "javascript" ? "js" : match[1];
+//             //         state.subState = CodeMirror.startState({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]);
+//             //         stream.skipToEnd();
+//             //         return "string";
+//             //     }
+//             //
+//             //     match = stream.match(/```/, false);
+//             //     if (match) {
+//             //         state.inBlock = null;
+//             //         state.subState = null;
+//             //         stream.skipToEnd();
+//             //         return "string";
+//             //     }
+//             // }
+//             //
+//             // if (state.inBlock) {
+//             //     return ({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]).token(stream, state.subState);
+//             // }
+//
+//
+//             if (stream.match(Prompt)) {
+//                 return "Prompt";
+//             }
+//
+//
+//             if (stream.sol()) {
+//
+//                 let matchStartOfNode = stream.match(nodeTagRegex.start, false);
+//                 let matchEndOfNode = stream.match(nodeTagRegex.end, false);
+//                 let match = stream.match(/```(html|css|(js|javascript)|python)/, false);
+//
+//                 if (matchStartOfNode) {  // Check for the opening bracket
+//                     stream.match(nodeTagRegex.start);  // Consume the opening bracket
+//                     return "node";
+//                 }
+//                 if (matchEndOfNode) {  // Check for the corresponding closing bracket
+//                     stream.match(nodeTagRegex.end);  // Consume the closing bracket
+//                     return "node";
+//                 }
+//
+//                 if (match && match[1]) {
+//                     state.inBlock = match[1] === "javascript" ? "js" : match[1];
+//                     state.subState = CodeMirror.startState({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]);
+//                     stream.skipToEnd();
+//                     return "string";
+//                 }
+//
+//                 match = stream.match(/```/, false);
+//                 if (match) {
+//                     state.inBlock = null;
+//                     state.subState = null;
+//                     stream.skipToEnd();
+//                     return "string";
+//                 }
+//             }
+//
+//             if (state.inBlock) {
+//                 return ({ 'html': htmlMixedMode, 'css': cssMode, 'js': jsMode, 'python': pythonMode }[state.inBlock]).token(stream, state.subState);
+//             }
+//
+//             // Check the refTag in the bracketsMap
+//             if (bracketsMap[ref]) {
+//                 if (stream.match(ref, false)) {  // Check for the opening bracket
+//                     stream.match(ref);  // Consume the opening bracket
+//                     return "ref";
+//                 }
+//
+//                 const closingBracket = bracketsMap[ref];
+//                 if (stream.match(closingBracket, false)) {  // Check for the corresponding closing bracket
+//                     stream.match(closingBracket);  // Consume the closing bracket
+//                     return "ref";
+//                 }
+//             } else {
+//                 // If refTag isn't in the bracketsMap, match it directly
+//                 if (stream.match(ref)) {
+//                     return "ref";
+//                 }
+//             }
+//
+//             stream.next();
+//             return null;
+//         },
+//     };
+// });
 
 function updateMode() {
     // var node = nodeTag;
     var ref = refTag;
     // We tried, my bad
-    // myCodeMirror.setOption("mode", { name: "customMarkdown", ref: ref });
-    myCodeMirror.setOption("mode", { name: "custom", ref: ref });
+    myCodeMirror.setOption("mode", { name: "customMarkdown", ref: ref });
+    // myCodeMirror.setOption("mode", { name: "custom", ref: ref });
     // myCodeMirror.setOption("mode", { name: "custom", node: node, ref: ref });
     myCodeMirror.refresh();
 }

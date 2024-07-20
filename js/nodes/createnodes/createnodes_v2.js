@@ -61,8 +61,8 @@ function addNodeTagToZettelkasten(language = null, title, content = null) {
 
     // Add content if given
     if (content) {
-        currentZettelkastenValue += '\n' + content.replace(/`/g, "\\`");
-        // currentZettelkastenValue += '\n' + content;
+        // currentZettelkastenValue += '\n' + content.replace(/`/g, "\\`");
+        currentZettelkastenValue += '\n' + content;
     }
 
     currentZettelkastenValue +=  '\n' + nodeTag; // closing tag

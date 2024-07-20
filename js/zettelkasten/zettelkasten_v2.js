@@ -502,8 +502,7 @@ class ZettelkastenProcessor {
                 // Replace the node's content
                 let newNodeBody = body.split('\n');
 
-                // if(language === 'markdown') newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
-                newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
+                // newNodeBody = newNodeBody.map((line) => line.replace(/`/g, "\\`"));
 
                 const newNodeContent = [lines[startLineNo]].concat([...newNodeBody, "```"]);
 
@@ -694,7 +693,7 @@ class ZettelkastenProcessor {
             // noteInput.setCursor(cursor)
             bypassZettelkasten = true;
             node.nodeObject.removeEventListener('change', node.nodeObject.zettlekastenListener);
-            node.nodeObject.code = node.plainText.replace(/\\`/g, "`");
+            // node.nodeObject.code = node.plainText.replace(/\\`/g, "`");
             node.nodeObject.addEventListener('change', node.nodeObject.zettlekastenListener);
         } else if(node.nodeObject instanceof CodeNode){
             // const codeHandler = this._getHandleNodeCodeInputEvent(currentNodeTitle)
@@ -708,7 +707,7 @@ class ZettelkastenProcessor {
             bypassZettelkasten = true;
             node.nodeObject.removeEventListener('change', node.nodeObject.zettlekastenListener);
             // node.nodeObject.code = node.plainText;
-            node.nodeObject.code = node.plainText.replace(/\\`/g, "`");
+            // node.nodeObject.code = node.plainText.replace(/\\`/g, "`");
             node.nodeObject.addEventListener('change', node.nodeObject.zettlekastenListener);
             // noteInput.setCursor(cursor);
         }

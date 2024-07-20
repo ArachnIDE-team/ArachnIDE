@@ -1,0 +1,390 @@
+﻿.CodeMirror-simplescroll-horizontal, .CodeMirror-simplescroll-vertical {
+    background-color: #222226 !important;
+    width: 6px !important;
+    display: none; /* Initially hidden */
+}
+
+.CodeMirror-simplescroll-scrollbar {
+    background: #888 !important;
+}
+
+.CodeMirror-simplescroll-scrollbar:hover {
+        background: #555 !important;
+    }
+
+.CodeMirror-cursor {
+    border-left: 2px solid #bbb !important;
+}
+
+.CodeMirror-selected {
+    background: Highlight !important;
+}
+
+/* Invert the colors for focused text to ensure it has sufficient contrast */
+.CodeMirror-focused .CodeMirror-selected {
+    background: Highlight !important;
+    color: HighlightText !important;
+}
+
+/* Gutter */
+.CodeMirror-gutters {
+    background: #282a36 !important;
+    border-right: 0px !important;
+}
+.CodeMirror-gutter-wrapper {
+    position: absolute;
+    z-index: 1000;
+    background: white !important;
+    border: 1px solid #ccc !important;
+}
+
+.CodeMirror-linenumbers {
+    color: black !important;
+}
+.CodeMirror-linenumbers div {
+    color: black !important;
+}
+/* Syntax Highlighting - Mimics our Prism.js Tomorrow theme */
+
+/* General */
+.CodeMirror {
+    left: 0 !important; /* Add this line */
+    min-width: 266px;
+    resize: none !important;
+}
+/* Background and Text */
+
+
+.cm-node {
+    color: #D15050;
+    cursor: pointer;
+}
+
+.cm-s-default {
+    color: #cccccc !important;
+}
+
+    /* Keywords */
+    .cm-s-default .cm-keyword {
+        color: #cc99cc !important;
+    }
+
+    /* Built-ins */
+    .cm-s-default .cm-builtin {
+        color: #cc99cc !important;
+    }
+
+    /* Variables */
+    .cm-s-default .cm-variable {
+        color: #f8f8f2 !important;
+    }
+
+    /* Variables 2 and 3 (often these are local and global variables) */
+    .cm-s-default .cm-variable-2 {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-s-default .cm-variable-3 {
+        color: #f8f8f2 !important;
+    }
+
+    /* Function Definitions */
+    .cm-s-default .cm-def {
+        color: #f08d49 !important;
+    }
+
+    /* Operators */
+    .cm-s-default .cm-operator {
+        color: #66cccc !important;
+    }
+
+    /* Punctuation */
+    .cm-s-default .cm-punctuation {
+        color: #cccccc !important;
+    }
+
+    /* Numbers */
+    .cm-s-default .cm-number {
+        color: #f08d49 !important;
+    }
+
+    /* Strings */
+    .cm-s-default .cm-string,
+    .cm-s-default .cm-string-2 {
+        color: #7ec699 !important;
+    }
+
+    /* Comments */
+    .cm-s-default .cm-comment {
+        color: #999999 !important;
+    }
+
+    /* Atoms */
+    .cm-s-default .cm-atom {
+        color: #95cecc !important;
+    }
+
+    /* Types */
+    .cm-s-default .cm-type {
+        color: #cc99cc !important;
+    }
+
+    /* Qualifiers */
+    .cm-s-default .cm-qualifier {
+        color: #cc99cc !important;
+    }
+
+    /* Tags */
+    .cm-s-default .cm-tag {
+        color: #e2777a !important;
+    }
+
+    /* Attributes */
+    .cm-s-default .cm-attribute {
+        color: #cc99cc !important;
+    }
+
+    /* Meta and Others */
+    .cm-s-default .cm-meta {
+        color: #55b5db !important;
+    }
+
+    .cm-s-default .cm-property {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-s-default .cm-header {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-s-default .cm-quote {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-s-default .cm-link {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-s-default .cm-error {
+        color: #f2777a !important;
+    }
+
+    .cm-s-default .cm-bracket {
+        color: #f8f8f2 !important;
+    }
+
+
+    /* Keywords */
+    .cm-markdown-keyword {
+        color: #cc99cc !important;
+    }
+
+    /* Built-ins */
+    .cm-markdown-builtin {
+        color: #cc99cc !important;
+    }
+
+    /* Variables */
+    .cm-markdown-variable {
+        color: #f8f8f2 !important;
+    }
+
+    /* Variables 2 and 3 (often these are local and global variables) */
+    .cm-markdown-variable-2 {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-markdown-variable-3 {
+        color: #f8f8f2 !important;
+    }
+
+    /* Function Definitions */
+    .cm-markdown-def {
+        color: #f08d49 !important;
+    }
+
+    /* Operators */
+    .cm-markdown-operator {
+        color: #66cccc !important;
+    }
+
+    /* Punctuation */
+    .cm-markdown-punctuation {
+        color: #cccccc !important;
+    }
+
+    /* Numbers */
+    .cm-markdown-number {
+        color: #f08d49 !important;
+    }
+
+    /* Strings */
+    .cm-markdown-string,.cm-markdown-string-2 {
+        color: #7ec699 !important;
+    }
+
+    /* Comments */
+    .cm-markdown-comment {
+        color: #999999 !important;
+    }
+
+    /* Atoms */
+    .cm-markdown-atom {
+        color: #95cecc !important;
+    }
+
+    /* Line row */
+    .cm-markdown-hr {
+        color: #95cecc !important;
+    }
+
+    /* Types */
+    .cm-markdown-type {
+        color: #cc99cc !important;
+    }
+
+    /* Qualifiers */
+    .cm-markdown-qualifier {
+        color: #cc99cc !important;
+    }
+
+    /* Tags */
+    .cm-markdown-tag {
+        color: #e2777a !important;
+    }
+
+    /* Attributes */
+    .cm-markdown-attribute {
+        color: #cc99cc !important;
+    }
+
+    /* Meta and Others */
+    .cm-markdown-meta {
+        color: #55b5db !important;
+    }
+
+    .cm-markdown-property {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-markdown-header {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-markdown-quote {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-markdown-link {
+        color: #f8f8f2 !important;
+    }
+
+    .cm-markdown-error {
+        color: #f2777a !important;
+    }
+
+    .cm-markdown-bracket {
+        color: #f8f8f2 !important;
+    }
+
+
+.cm-javascript-comment { color: #6272a4; }
+.cm-javascript-string, .cm-javascript-string-2 { color: #f1fa8c; }
+.cm-javascript-number { color: #bd93f9; }
+.cm-javascript-variable { color: #50fa7b; }
+.cm-javascript-variable-2 { color: white; }
+.cm-javascript-def { color: #50fa7b; }
+.cm-javascript-operator { color: #ff79c6; }
+.cm-javascript-keyword { color: #ff79c6; }
+.cm-javascript-atom { color: #bd93f9; }
+.cm-javascript-meta { color: #f8f8f2; }
+.cm-javascript-tag { color: #ff79c6; }
+.cm-javascript-attribute { color: #50fa7b; }
+.cm-javascript-qualifier { color: #50fa7b; }
+.cm-javascript-property { color: #66d9ef; }
+.cm-javascript-builtin { color: #50fa7b; }
+.cm-javascript-variable-3, .cm-javascript-type { color: #ffb86c; }
+
+.cm-python-comment { color: #6272a4; }
+.cm-python-string, .cm-python-string-2 { color: #f1fa8c; }
+.cm-python-number { color: #bd93f9; }
+.cm-python-variable { color: #50fa7b; }
+.cm-python-variable-2 { color: white; }
+.cm-python-def { color: #50fa7b; }
+.cm-python-operator { color: #ff79c6; }
+.cm-python-keyword { color: #ff79c6; }
+.cm-python-atom { color: #bd93f9; }
+.cm-python-meta { color: #f8f8f2; }
+.cm-python-tag { color: #ff79c6; }
+.cm-python-attribute { color: #50fa7b; }
+.cm-python-qualifier { color: #50fa7b; }
+.cm-python-property { color: #66d9ef; }
+.cm-python-builtin { color: #50fa7b; }
+.cm-python-variable-3, .cm-python-type { color: #ffb86c; }
+
+.cm-css-comment { color: #6272a4; }
+.cm-css-string, .cm-css-string-2 { color: #f1fa8c; }
+.cm-css-number { color: #bd93f9; }
+.cm-css-variable { color: #50fa7b; }
+.cm-css-variable-2 { color: white; }
+.cm-css-def { color: #50fa7b; }
+.cm-css-operator { color: #ff79c6; }
+.cm-css-keyword { color: #ff79c6; }
+.cm-css-atom { color: #bd93f9; }
+.cm-css-meta { color: #f8f8f2; }
+.cm-css-tag { color: #ff79c6; }
+.cm-css-attribute { color: #50fa7b; }
+.cm-css-qualifier { color: #50fa7b; }
+.cm-css-property { color: #66d9ef; }
+.cm-css-builtin { color: #50fa7b; }
+.cm-css-variable-3, .cm-css-type { color: #ffb86c; }
+
+
+.cm-html-comment { color: #6272a4; }
+.cm-html-string, .cm-html-string-2 { color: #f1fa8c; }
+.cm-html-number { color: #bd93f9; }
+.cm-html-variable { color: #50fa7b; }
+.cm-html-variable-2 { color: white; }
+.cm-html-def { color: #50fa7b; }
+.cm-html-operator { color: #ff79c6; }
+.cm-html-keyword { color: #ff79c6; }
+.cm-html-atom { color: #bd93f9; }
+.cm-html-meta { color: #f8f8f2; }
+.cm-html-tag { color: #ff79c6; }
+.cm-html-attribute { color: #50fa7b; }
+.cm-html-qualifier { color: #50fa7b; }
+.cm-html-property { color: #66d9ef; }
+.cm-html-builtin { color: #50fa7b; }
+.cm-html-variable-3, .cm-html-type { color: #ffb86c; }
+
+
+.cm-node.cm-markdown-paragraph {
+    color: #cccccc;
+}
+
+.cm-ref {
+    color: #4F8EB7;
+}
+
+.cm-Prompt {
+    color: #E0B0FF;
+    background-color: #464250;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+
+/* Custom markdown CodeMirror */
+.cm-s-dracula .cm-string { /* Example for Dracula theme */
+    color: #f1fa8c;
+}
+.cm-s-dracula .cm-string::before {
+    /*content: attr(data-lang); // Add the language identifier before code blocks*/
+    opacity: 0.6;
+    margin-right: 5px;
+}
+/* End of custom markdown CodeMirror */
+
+.node-title {
+    text-decoration: underline;
+}

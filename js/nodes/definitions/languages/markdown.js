@@ -128,7 +128,7 @@ class MarkdownNode extends CodeNode {
                 console.log("CODE: ", lang)
                 let language = lang.split(' ')[0];
                 if(language === "md" || language === "markdown") {
-                    code = code.replace(/\\`/g, '`');
+                    // code = code.replace(/\\`/g, '`');
                     return '<div class="language-md">' + marked.parse(code, {mangle: false, headerIds: false}) + '</div>';
                 }
                 return '<pre><code class="language-'
